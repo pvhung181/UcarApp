@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/driver_nav">
+    android:id="@+id/driver_nav"
+    app:startDestination="@id/mapFragment">
 
+    <fragment
+        android:id="@+id/mapFragment"
+        android:name="com.pvhung.ucar.ui.driver.driver_map.MapFragment"
+        android:label="MapFragment" />
 </navigation>

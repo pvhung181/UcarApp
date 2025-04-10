@@ -8,6 +8,7 @@ import android.text.TextUtils
 
 object DeviceHelper {
 
+    val isMinSdk23 get() = Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
     val isMinSdk29 get() = Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q
     val isMinSdk26 get() = Build.VERSION.SDK_INT >= Build.VERSION_CODES.O
     val isMinSdk24 get() = Build.VERSION.SDK_INT >= Build.VERSION_CODES.N

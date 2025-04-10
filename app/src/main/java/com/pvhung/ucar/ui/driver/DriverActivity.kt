@@ -2,11 +2,19 @@ package com.pvhung.ucar.ui.driver
 
 import android.graphics.Color
 import android.os.Bundle
+import androidx.navigation.NavController
+import androidx.navigation.NavDestination
+import androidx.navigation.NavGraph
+import androidx.navigation.fragment.NavHostFragment
 import com.pvhung.ucar.R
 import com.pvhung.ucar.databinding.ActivityDriverBinding
 import com.pvhung.ucar.ui.base.BaseBindingActivity
 
 class DriverActivity : BaseBindingActivity<ActivityDriverBinding, DriverViewModel>() {
+
+    private var navController: NavController? = null
+    private var navGraph: NavGraph? = null
+
     override val layoutId: Int
         get() = R.layout.activity_driver
 
@@ -15,8 +23,7 @@ class DriverActivity : BaseBindingActivity<ActivityDriverBinding, DriverViewMode
     }
 
     override fun setupView(savedInstanceState: Bundle?) {
-        init()
-
+        initView()
     }
 
     private fun init() {
@@ -26,6 +33,17 @@ class DriverActivity : BaseBindingActivity<ActivityDriverBinding, DriverViewMode
 
     override fun setupData() {
 
+    }
+
+    private fun initView() {
+        val navHostFragment =
+            supportFragmentManager.findFragmentById(R.id.fragmentContainer) as NavHostFragment
+        navController = navHostFragment.navController
+        navController?.let {
+            it.addOnDestinationChangedListener { _: NavController?, _: NavDestination, _: Bundle? ->
+            }
+        }
+        navController?.setGraph(R.navigation.driver_nav)
     }
 
     override fun onResume() {
