@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "383608089338",
+    "project_id": "ucarapp-d0367",
+    "storage_bucket": "ucarapp-d0367.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:383608089338:android:aa1e7234c429e3fd833743",
+        "android_client_info": {
+          "package_name": "com.pvhung.ucar"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDip3Ij87TNws955bnReYHkwBmDPVX6n_8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

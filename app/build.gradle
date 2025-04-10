@@ -1,0 +1,97 @@
+plugins {
+    id 'com.android.application'
+    id 'kotlin-android'
+    id 'kotlin-kapt'
+    id 'dagger.hilt.android.plugin'
+    id 'com.google.gms.google-services'
+}
+
+android {
+    namespace 'com.pvhung.ucar'
+    compileSdk versions.compileSdkVersion
+    buildToolsVersion versions.buildToolsVersion
+
+    defaultConfig {
+        applicationId "com.pvhung.ucar"
+        minSdk 21
+        targetSdk 35
+        versionCode 1
+        versionName "1.0"
+        flavorDimensions "default"
+        multiDexEnabled true
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    buildFeatures {
+        dataBinding true
+        viewBinding true
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+    kotlinOptions {
+        jvmTarget = '17'
+    }
+}
+
+dependencies {
+    implementation fileTree(dir: "libs", include: ["*.jar", "*.aar"])
+    implementation libraries.androidAppCopmpat
+    implementation libraries.multidex
+    implementation libraries.ktxCore
+    /*UI*/
+    implementation libraries.androidxNavigation
+    implementation libraries.androidUICommon
+    implementation libraries.materialDesign
+    implementation libraries.hilt
+    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
+    implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.8.7'
+    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.7'
+    implementation 'androidx.fragment:fragment-ktx:1.8.6'
+
+
+    kapt libraries.hiltKpt
+    annotationProcessor libraries.hiltAP
+
+    implementation libraries.glide
+    implementation libraries.transformationGlide
+    annotationProcessor libraries.glideAP
+
+
+    /*Database ( if use Room) */
+    implementation libraries.room
+    implementation libraries.roomRxjava
+    annotationProcessor libraries.roomKpt
+    kapt libraries.roomAP
+
+    /*Other*/
+    implementation libraries.timberLog
+    implementation libraries.sdp
+    implementation libraries.ssp
+    implementation libraries.retrofitWithLogger
+    implementation libraries.lottie
+    implementation libraries.rxJava
+
+    implementation 'com.google.firebase:firebase-database-ktx:21.0.0'
+    implementation("com.google.firebase:firebase-core:21.1.1")
+    implementation("com.google.firebase:firebase-auth:21.1.0")
+    implementation 'com.google.firebase:firebase-analytics'
+    implementation("com.google.android.gms:play-services-maps:18.0.0")
+    implementation("com.google.android.gms:play-services-location:17.0.0")
+
+
+    //jbcrypt
+    implementation("org.mindrot:jbcrypt:0.4")
+    /*Test*/
+    testImplementation 'junit:junit:4.13.2'
+    androidTestImplementation testLib
+}

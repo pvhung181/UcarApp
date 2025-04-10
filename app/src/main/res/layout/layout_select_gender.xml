@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/popup"
+        android:layout_width="wrap_content"
+        android:fitsSystemWindows="true"
+        android:layout_height="wrap_content">
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/tvMale"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_view_top"
+            android:backgroundTint="@color/white"
+            android:clickable="true"
+            android:drawableTint="@color/black"
+            android:ellipsize="end"
+            android:focusable="true"
+            android:fontFamily="@font/sf_pro_display_semi_bold"
+            android:foreground="?attr/selectableItemBackground"
+            android:maxLines="1"
+            android:paddingHorizontal="@dimen/_10sdp"
+            android:paddingVertical="@dimen/_10sdp"
+            android:text="@string/male"
+            android:textAlignment="center"
+            android:textAllCaps="false"
+            android:textSize="14sp"
+            app:layout_constraintEnd_toEndOf="@id/tvFemale"
+            app:layout_constraintStart_toStartOf="@id/tvFemale"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <View
+            android:id="@+id/divider"
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:background="@color/color_9C9C9C"
+            app:layout_constraintStart_toStartOf="@id/tvMale"
+            app:layout_constraintEnd_toEndOf="@id/tvMale"
+            app:layout_constraintTop_toBottomOf="@id/tvMale" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/tvFemale"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/_8sdp"
+            android:background="@drawable/bg_view_bot"
+            android:backgroundTint="@color/white"
+            android:clickable="true"
+            android:ellipsize="end"
+            android:focusable="true"
+            android:fontFamily="@font/sf_pro_display_semi_bold"
+            android:foreground="?attr/selectableItemBackground"
+            android:maxLines="1"
+            android:paddingHorizontal="@dimen/_10sdp"
+            android:paddingVertical="@dimen/_10sdp"
+            android:text="@string/female"
+            android:textAlignment="center"
+            android:minWidth="48dp"
+            android:textAllCaps="false"
+            android:textSize="14sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/divider" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</layout>

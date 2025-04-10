@@ -1,0 +1,199 @@
+ext {
+    versions = [
+            /*sdk build tool */
+            minSdkVersion             : 23,
+            targetSdkVersion          : 34,
+            compileSdkVersion         : 34,
+            buildToolsVersion         : '34.0.0',
+
+            /*plugin*/
+            googleServices            : '4.3.14',
+            firebaseCrashlyticGradle  : '2.9.9',
+
+            /*common lib*/
+            appCompatVersion          : '1.7.0',
+            androidxNavigationVersion : '2.7.6',
+            dagger2Version            : '2.31.1',
+            hiltVersion               : '2.56',
+            lifecycleVersion          : '2.6.1',
+            ktxVersion                : '1.10.1',
+            materialVersion           : '1.9.0',
+
+            /*network*/
+            retrofitVersion           : '2.9.0',
+            okHttpVersion             : "4.11.0",
+
+            /*database*/
+            roomVersion               : '2.5.2',
+            realmVersion              : '10.1.0',
+
+            /*other*/
+            glideVersion              : '4.12.0',
+            transformationGlideVersion: '4.3.0',
+            coroutineVersion          : '1.4.2',
+            rxJava                    : '3.0.0',
+            firebaseVersion           : '33.1.1',
+            exoplayerVersion          : '2.12.1'
+
+
+    ]
+    libraries = [
+            /*Common lib android*/
+            androidAppCopmpat    : "androidx.appcompat:appcompat:$versions.appCompatVersion",
+
+            ktxCore              : "androidx.core:core-ktx:$versions.ktxVersion",
+
+
+            coroutine            : [
+                    "org.jetbrains.kotlinx:kotlinx-coroutines-core:$versions.coroutineVersion",
+                    "org.jetbrains.kotlinx:kotlinx-coroutines-android:$versions.coroutineVersion"
+            ],
+            multidex             : 'androidx.multidex:multidex:2.0.1',
+
+            //ffmpeg
+            ffmpeg               : 'com.arthenica:mobile-ffmpeg-video:4.4.LTS',
+
+            /*exoplayer*/
+            exoplayer            : [
+                    "com.google.android.exoplayer:exoplayer-ui:$versions.exoplayerVersion",
+                    "com.google.android.exoplayer:exoplayer-core:$versions.exoplayerVersion"
+            ],
+
+
+            //view pump
+            viewpump             : [
+                    'io.github.inflationx:calligraphy3:3.1.1',
+                    'io.github.inflationx:viewpump:2.0.3'
+            ],
+
+            //firebase
+            firebase             : [
+                    'com.google.firebase:firebase-crashlytics',
+                    'com.google.firebase:firebase-analytics',
+                    'com.google.firebase:firebase-analytics-ktx',
+                    'com.google.firebase:firebase-messaging',
+                    'com.google.firebase:firebase-config'
+            ],
+
+            //billing
+            billing              : [
+                    "com.android.billingclient:billing:7.1.1",
+                    "androidx.preference:preference-ktx:1.2.1",
+                    "com.jakewharton.threetenabp:threetenabp:1.4.7",
+
+            ],
+
+            /*UI lib*/
+            androidxNavigation   : [
+                    "androidx.navigation:navigation-fragment:$versions.androidxNavigationVersion",
+                    "androidx.navigation:navigation-ui:$versions.androidxNavigationVersion",
+            ],
+            androidxNavigationKtx: [
+                    "androidx.navigation:navigation-fragment-ktx:$versions.androidxNavigationVersion",
+                    "androidx.navigation:navigation-ui-ktx:$versions.androidxNavigationVersion"
+            ],
+            androidUICommon      : [
+                    "androidx.constraintlayout:constraintlayout:2.0.4",
+                    "androidx.cardview:cardview:1.0.0",
+                    "androidx.recyclerview:recyclerview:1.1.0",
+                    "androidx.viewpager2:viewpager2:1.0.0",
+
+
+            ],
+            // ViewModel and LiveData
+            lifeCycle            : "androidx.lifecycle:lifecycle-extensions:$versions.lifecycleVersion",
+            lifeCycleKtx         : "androidx.lifecycle:lifecycle-viewmodel-ktx:$versions.lifecycleVersion",
+
+            materialDesign       : "com.google.android.material:material:$versions.materialVersion",
+
+            customFont           : [
+                    'io.github.inflationx:calligraphy3:3.1.1',
+                    'io.github.inflationx:viewpump:2.0.3'
+            ],
+
+            /*Dagger2 include annotationProcessor and kapt*/
+            dagger2              : "com.google.dagger:dagger:${versions.dagger2Version}",
+            dagger2Kpt           : "com.google.dagger:dagger-compiler:${versions.dagger2Version}",
+
+            dagger2Android       : [
+                    "com.google.dagger:dagger:$versions.dagger2Version",
+                    "com.google.dagger:dagger-android:$versions.dagger2Version",
+                    "com.google.dagger:dagger-android-support:$versions.dagger2Version"
+            ],
+
+            dagger2AndroidAP     : [
+                    "com.google.dagger:dagger-compiler:$versions.dagger2Version",
+                    "com.google.dagger:dagger-android-processor:$versions.dagger2Version"
+            ],
+
+            /*Hilt setup more detail in https://dagger.dev/hilt/gradle-setup*/
+            hilt                 : "com.google.dagger:hilt-android:$versions.hiltVersion",
+            hiltAP               : "com.google.dagger:hilt-android-compiler:$versions.hiltVersion",
+            hiltKpt              : "com.google.dagger:hilt-android-compiler:$versions.hiltVersion",
+
+            /*Rxjava*/
+            rxJava               : [
+                    "io.reactivex.rxjava3:rxjava:$versions.rxJava",
+                    "io.reactivex.rxjava3:rxandroid:$versions.rxJava"
+            ],
+
+            /*Glide*/
+            glide                : "com.github.bumptech.glide:glide:$versions.glideVersion",
+            transformationGlide  : "jp.wasabeef:glide-transformations:$versions.transformationGlideVersion",
+            glideAP              : "com.github.bumptech.glide:compiler:$versions.glideVersion",
+
+            /*Database Room include Coroutine*/
+            room                 : "androidx.room:room-runtime:$versions.roomVersion",
+            // optional - RxJava support for Room
+            roomRxjava           : "androidx.room:room-rxjava3:$versions.roomVersion",
+            // optional - Guava support for Room, including Optional and ListenableFuture
+            roomGuava            : "androidx.room:room-guava:$versions.roomVersion",
+            roomKpt              : "androidx.room:room-ktx:$versions.roomVersion",
+            roomAP               : "androidx.room:room-compiler:$versions.roomVersion",
+
+            gson                 : "com.google.code.gson:gson:2.8.6",
+            /*Network*/
+
+
+            retrofitWithLogger   : [
+                    "com.squareup.retrofit2:retrofit:$versions.retrofitVersion",
+                    "com.squareup.retrofit2:converter-gson:$versions.retrofitVersion",
+                    "com.squareup.okhttp3:logging-interceptor:$versions.okHttpVersion",
+                    "com.squareup.okhttp3:okhttp:$versions.okHttpVersion"
+            ],
+            retrofitRXjavaAdapter: "com.squareup.retrofit2:adapter-rxjava3:$versions.retrofitVersion",
+
+            /*Camera*/
+            camera               : [
+                    "androidx.camera:camera-core:1.3.0-alpha06",
+                    "androidx.camera:camera-camera2:1.3.0-alpha06",
+                    "androidx.camera:camera-lifecycle:1.3.0-alpha06",
+                    "androidx.camera:camera-video:1.3.0-alpha06",
+                    "androidx.camera:camera-view:1.3.0-alpha06",
+                    "androidx.camera:camera-mlkit-vision:1.3.0-alpha06",
+                    "androidx.camera:camera-extensions:1.3.0-alpha06",
+                    "com.google.guava:guava:29.0-android"
+            ],
+
+
+            /*Other*/
+            realtimeblurview     : 'com.github.mmin18:realtimeblurview:1.2.1',
+            touchImageView       : 'com.github.MikeOrtiz:TouchImageView:1.4.1',
+
+            timberLog            : 'com.jakewharton.timber:timber:5.0.1',
+            eventBus             : 'org.greenrobot:eventbus:3.2.0',
+            lottie               : 'com.airbnb.android:lottie:3.7.0',
+            hawk                 : 'com.orhanobut:hawk:2.0.1',
+            exoVideoView         : 'com.github.JarvanMo:ExoVideoView:2.1.6',
+            sdp                  : 'com.intuit.sdp:sdp-android:1.0.6',
+            ssp                  : 'com.intuit.ssp:ssp-android:1.1.0',
+
+            keyboardListener     : 'net.yslibrary.keyboardvisibilityevent:keyboardvisibilityevent:3.0.0-RC3'
+
+    ]
+    testLib = [
+            'androidx.test.ext:junit:1.1.3',
+            'androidx.test.espresso:espresso-core:3.3.0'
+    ]
+
+}

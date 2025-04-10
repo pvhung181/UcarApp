@@ -1,0 +1,42 @@
+<resources>
+    <string name="app_name">Ucar</string>
+
+
+    <string name="author" translatable="false">Phạm Việt Hùng</string>
+    <string name="author_phone" translatable="false">0589089549</string>
+
+    <string name="english" translatable="false">English</string>
+    <string name="vietnam" translatable="false">Tiếng Việt</string>
+
+    <string name="vietnamese">Tiếng Việt</string>
+    <string name="google">Google</string>
+    <string name="welcome_back">Welcome Back!</string>
+    <string name="phone_number">Phone Number</string>
+    <string name="sign_in">Sign in</string>
+    <string name="password">Password</string>
+    <string name="create_new_account"><u>Create New Account ?</u></string>
+    <string name="full_name">Full name</string>
+    <string name="email">Email</string>
+    <string name="date_of_birth">Date of birth</string>
+    <string name="gender">Gender</string>
+    <string name="sign_up">Sign Up</string>
+    <string name="already_have_an_account">Already have an account ?</string>
+    <string name="confirm_password">Confirm password</string>
+    <string name="home">Home</string>
+    <string name="activity">Activity</string>
+    <string name="notification">Notification</string>
+    <string name="account">Account</string>
+    <string name="sign_out">Sign out</string>
+    <string name="must_be_filled">Must be filled</string>
+    <string name="enable_gps">Enable Gps</string>
+    <string name="cancel">Cancel</string>
+    <string name="active_location">Active Location</string>
+    <string name="we_need_your_location_to_enable_nearby_service">We need your location to enable nearby service</string>
+    <string name="title_activity_maps">MapsActivity</string>
+    <string name="save">Save</string>
+    <string name="user_information">User Information</string>
+    <string name="notifications">Notifications</string>
+    <string name="activities">Activities</string>
+    <string name="male">Male</string>
+    <string name="female">Female</string>
+</resources>
