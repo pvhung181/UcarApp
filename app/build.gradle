@@ -87,7 +87,8 @@ dependencies {
     implementation 'com.google.firebase:firebase-analytics'
     implementation("com.google.android.gms:play-services-maps:17.0.1")
     implementation("com.google.android.gms:play-services-location:17.0.0")
-
+    implementation 'com.firebase:geofire-android:3.2.0'
+    implementation 'com.firebase:geofire-android-common:3.2.0'
 
     //jbcrypt
     implementation("org.mindrot:jbcrypt:0.4")

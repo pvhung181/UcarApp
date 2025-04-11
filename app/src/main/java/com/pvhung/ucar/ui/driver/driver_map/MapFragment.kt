@@ -22,8 +22,6 @@ import com.pvhung.ucar.utils.DeviceHelper
 import com.pvhung.ucar.utils.OnBackPressed
 import com.pvhung.ucar.utils.PermissionHelper
 
-//todo fix uid null
-
 class MapFragment : BaseBindingFragment<FragmentDriverMapBinding, MapViewModel>(),
     OnMapReadyCallback {
 

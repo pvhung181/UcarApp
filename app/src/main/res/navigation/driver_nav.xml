@@ -2,10 +2,28 @@
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/driver_nav"
-    app:startDestination="@id/mapFragment">
+    app:startDestination="@id/driverHomeFragment">
 
     <fragment
         android:id="@+id/mapFragment"
         android:name="com.pvhung.ucar.ui.driver.driver_map.MapFragment"
         android:label="MapFragment" />
+    <fragment
+        android:id="@+id/driverAccountFragment"
+        android:name="com.pvhung.ucar.ui.driver.driver_account.DriverAccountFragment"
+        android:label="DriverAccountFragment" />
+    <fragment
+        android:id="@+id/driverActivityFragment"
+        android:name="com.pvhung.ucar.ui.driver.driver_activity.DriverActivityFragment"
+        android:label="DriverActivityFragment" />
+    <fragment
+        android:id="@+id/driverHomeFragment"
+        android:name="com.pvhung.ucar.ui.driver.driver_home.DriverHomeFragment"
+        android:label="DriverHomeFragment" />
+    <fragment
+        android:id="@+id/driverNotificationFragment"
+        android:name="com.pvhung.ucar.ui.driver.driver_notification.DriverNotificationFragment"
+        android:label="DriverNotificationFragment" />
+
+
 </navigation>
