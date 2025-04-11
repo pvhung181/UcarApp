@@ -20,8 +20,6 @@ class SplashActivity : BaseBindingActivity<ActivitySplashBinding, SplashViewMode
         get() = R.layout.activity_splash
     private val runnableGoMain = Runnable { this.goScreen() }
 
-
-
     override fun getViewModel(): Class<SplashViewModel> {
         return SplashViewModel::class.java
     }
