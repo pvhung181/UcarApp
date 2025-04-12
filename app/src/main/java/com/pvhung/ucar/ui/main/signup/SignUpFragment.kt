@@ -21,6 +21,7 @@ import com.pvhung.ucar.utils.Validator
 import com.pvhung.ucar.utils.beGone
 import com.pvhung.ucar.utils.beInvisible
 import com.pvhung.ucar.utils.beVisible
+import com.pvhung.ucar.utils.hideKeyboard
 import com.pvhung.ucar.utils.showKeyboard
 import java.util.Calendar
 
@@ -33,7 +34,9 @@ class SignUpFragment : BaseBindingFragment<FragmentSignUpBinding, SignUpViewMode
         DatePickerDialog(
             requireContext(),
             { _, year, month, dayOfMonth ->
-                binding.etDate.text = DateUtils.simpleFormatDate(dayOfMonth, month, year)
+                if (Validator.isDateValid(dayOfMonth, month, year))
+                    binding.etDate.text = DateUtils.simpleFormatDate(dayOfMonth, month, year)
+                else showToast(getString(R.string.you_must_be_over_18_years_old_to_register))
             },
             Calendar.getInstance()[Calendar.YEAR],
             Calendar.getInstance()[Calendar.MONTH],
@@ -87,6 +90,7 @@ class SignUpFragment : BaseBindingFragment<FragmentSignUpBinding, SignUpViewMode
     private fun setOnClick() {
         binding.etGender.setOnClickListener {
             toggleSelectGenderDialog()
+            hideKeyboard()
         }
 
         binding.bgGenderDialog.setOnClickListener { needToShowSelectGenderDialog(false) }
@@ -109,7 +113,10 @@ class SignUpFragment : BaseBindingFragment<FragmentSignUpBinding, SignUpViewMode
             true
         }
 
-        binding.etDate.setOnClickListener { datePickerDialog.show() }
+        binding.etDate.setOnClickListener {
+            hideKeyboard()
+            datePickerDialog.show()
+        }
 
         binding.signUpButton.setOnClickListener {
 
@@ -131,8 +138,8 @@ class SignUpFragment : BaseBindingFragment<FragmentSignUpBinding, SignUpViewMode
                         )
                         FirebaseDatabaseUtils.saveUserInfo(user.uid, userInfo)
                     }
-                }.addOnFailureListener {
-                    Toast.makeText(requireContext(), "Fail", Toast.LENGTH_SHORT).show()
+                }.addOnFailureListener { e ->
+                    Toast.makeText(requireContext(), e.toString(), Toast.LENGTH_SHORT).show()
                 }.addOnCompleteListener {
                     loading(false)
                 }
@@ -282,6 +289,14 @@ class SignUpFragment : BaseBindingFragment<FragmentSignUpBinding, SignUpViewMode
             binding.bgGenderDialog.beGone()
             binding.icSelectGender.root.beGone()
         }
+    }
+
+    private fun hideKeyboard() {
+        binding.etFullName.hideKeyboard()
+        binding.etEmail.hideKeyboard()
+        binding.etPassword.hideKeyboard()
+        binding.etPhone.hideKeyboard()
+        binding.etConfirmPassword.hideKeyboard()
     }
 
 }
