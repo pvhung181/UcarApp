@@ -75,7 +75,7 @@ class SignUpFragment : BaseBindingFragment<FragmentSignUpBinding, SignUpViewMode
         firebaseAuthStateListener = object : AuthStateListener {
             override fun onAuthStateChanged(fa: FirebaseAuth) {
                 fa.currentUser?.let {
-                    startActivity(Intent(requireActivity(), DriverActivity::class.java))
+                    startActivity(Intent(requireActivity(), DriverActivity::class.java).apply {Intent.FLAG_ACTIVITY_SINGLE_TOP})
                     requireActivity().finish()
                     return
                 }

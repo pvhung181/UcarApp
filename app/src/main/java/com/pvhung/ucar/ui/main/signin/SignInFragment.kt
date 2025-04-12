@@ -60,7 +60,7 @@ class SignInFragment : BaseBindingFragment<FragmentSignInBinding, SignInViewMode
         firebaseAuthStateListener = object : AuthStateListener {
             override fun onAuthStateChanged(fa: FirebaseAuth) {
                 fa.currentUser?.let {
-                    startActivity(Intent(requireActivity(), DriverActivity::class.java))
+                    startActivity(Intent(requireActivity(), DriverActivity::class.java).apply {Intent.FLAG_ACTIVITY_SINGLE_TOP})
                     requireActivity().finish()
                     return
                 }
@@ -114,7 +114,7 @@ class SignInFragment : BaseBindingFragment<FragmentSignInBinding, SignInViewMode
             .addOnSuccessListener {
                 val user = mAuth.currentUser
                 if(user != null) {
-                    startActivity(Intent(requireActivity(), DriverActivity::class.java))
+                    startActivity(Intent(requireActivity(), DriverActivity::class.java).apply {Intent.FLAG_ACTIVITY_SINGLE_TOP})
                     requireActivity().finish()
                 }
             }

@@ -60,12 +60,12 @@ class SplashActivity : BaseBindingActivity<ActivitySplashBinding, SplashViewMode
 
 
     private fun goScreen() {
-        startActivity(Intent(this, MainActivity::class.java))
+        startActivity(Intent(this, MainActivity::class.java).apply {Intent.FLAG_ACTIVITY_SINGLE_TOP})
         finish()
     }
 
     private fun goDriverScreen() {
-        startActivity(Intent(this, DriverActivity::class.java))
+        startActivity(Intent(this, DriverActivity::class.java).apply {Intent.FLAG_ACTIVITY_SINGLE_TOP})
         finish()
     }
 }
