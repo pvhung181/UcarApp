@@ -5,6 +5,8 @@ import android.location.Location
 import android.os.Bundle
 import android.os.Looper
 import android.view.View
+import com.firebase.geofire.GeoFire
+import com.firebase.geofire.GeoLocation
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
@@ -15,7 +17,10 @@ import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.FirebaseDatabase
 import com.pvhung.ucar.R
+import com.pvhung.ucar.common.Constant
 import com.pvhung.ucar.databinding.FragmentDriverMapBinding
 import com.pvhung.ucar.ui.base.BaseBindingFragment
 import com.pvhung.ucar.utils.DeviceHelper
@@ -39,6 +44,14 @@ class MapFragment : BaseBindingFragment<FragmentDriverMapBinding, MapViewModel>(
                     val newPos = LatLng(it.latitude, it.longitude)
                     mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(newPos, 18f))
                     mMap.animateCamera(CameraUpdateFactory.zoomTo(11f))
+
+                    FirebaseAuth.getInstance().currentUser?.uid?.let { id ->
+                        val ref = FirebaseDatabase.getInstance()
+                            .getReference(Constant.DRIVERS_AVAILABLE_REFERENCES)
+                        val geo = GeoFire(ref)
+                        geo.setLocation(id, GeoLocation(it.latitude, it.longitude))
+                    }
+
                 }
             }
         }
@@ -108,7 +121,6 @@ class MapFragment : BaseBindingFragment<FragmentDriverMapBinding, MapViewModel>(
         mLocationRequest = LocationRequest().apply {
             interval = 5000
             priority = LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY
-
         }
 
         if (DeviceHelper.isMinSdk23) {
@@ -131,6 +143,12 @@ class MapFragment : BaseBindingFragment<FragmentDriverMapBinding, MapViewModel>(
         super.onDestroy()
         try {
             mFusedLocationClient.removeLocationUpdates(mLocationCallback)
+            FirebaseAuth.getInstance().currentUser?.uid?.let { id ->
+                val ref = FirebaseDatabase.getInstance()
+                    .getReference(Constant.DRIVERS_AVAILABLE_REFERENCES)
+                val geo = GeoFire(ref)
+                geo.removeLocation(id)
+            }
 
         } catch (_: Exception) {
         }

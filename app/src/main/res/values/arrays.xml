@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="roles">
+        <item>You are normal user</item>
+        <item>You are driver</item>
+    </string-array>
+</resources>

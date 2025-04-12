@@ -10,13 +10,13 @@ import android.widget.Toast
 import androidx.core.view.isVisible
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuth.AuthStateListener
-import com.google.firebase.database.FirebaseDatabase
 import com.pvhung.ucar.R
-import com.pvhung.ucar.common.Constant
+import com.pvhung.ucar.data.model.User
 import com.pvhung.ucar.databinding.FragmentSignUpBinding
 import com.pvhung.ucar.ui.base.BaseBindingFragment
 import com.pvhung.ucar.ui.driver.DriverActivity
 import com.pvhung.ucar.utils.DateUtils
+import com.pvhung.ucar.utils.FirebaseDatabaseUtils
 import com.pvhung.ucar.utils.Validator
 import com.pvhung.ucar.utils.beGone
 import com.pvhung.ucar.utils.beInvisible
@@ -24,11 +24,11 @@ import com.pvhung.ucar.utils.beVisible
 import com.pvhung.ucar.utils.showKeyboard
 import java.util.Calendar
 
+
 class SignUpFragment : BaseBindingFragment<FragmentSignUpBinding, SignUpViewModel>() {
 
     private lateinit var mAuth: FirebaseAuth
     private lateinit var firebaseAuthStateListener: AuthStateListener
-
     private val datePickerDialog by lazy {
         DatePickerDialog(
             requireContext(),
@@ -82,7 +82,6 @@ class SignUpFragment : BaseBindingFragment<FragmentSignUpBinding, SignUpViewMode
 
     private fun initView() {
 
-
     }
 
     private fun setOnClick() {
@@ -121,13 +120,16 @@ class SignUpFragment : BaseBindingFragment<FragmentSignUpBinding, SignUpViewMode
                 ).addOnSuccessListener {
                     val user = mAuth.currentUser
                     if (user != null) {
-                        val userDb = FirebaseDatabase.getInstance().getReference()
-                            .child(Constant.USERS_REFERENCES).child(Constant.RIDERS_REFERENCES)
-                            .child(user.uid)
-
-                        userDb.setValue(true)
-                    } else {
-
+                        val userInfo = User(
+                            fullName = binding.etFullName.text.toString(),
+                            phoneNumber = binding.etPhone.text.toString(),
+                            email = binding.etEmail.text.toString(),
+                            gender = binding.etGender.text.toString(),
+                            dateOfBirth = binding.etDate.text.toString(),
+                            password = binding.etPassword.text.toString(),
+                            isDriver = !binding.rbUser.isChecked
+                        )
+                        FirebaseDatabaseUtils.saveUserInfo(user.uid, userInfo)
                     }
                 }.addOnFailureListener {
                     Toast.makeText(requireContext(), "Fail", Toast.LENGTH_SHORT).show()

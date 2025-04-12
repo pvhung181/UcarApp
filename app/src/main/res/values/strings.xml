@@ -39,4 +39,6 @@
     <string name="activities">Activities</string>
     <string name="male">Male</string>
     <string name="female">Female</string>
+    <string name="you_are_normal_user">You are normal user</string>
+    <string name="you_are_driver">You are driver</string>
 </resources>

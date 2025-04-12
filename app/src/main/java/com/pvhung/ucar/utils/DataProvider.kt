@@ -8,4 +8,10 @@ object DataProvider {
             SettingType.SIGN_OUT
         )
     }
+
+    fun getRoles(): List<SettingType> {
+        return listOf(
+                SettingType.SIGN_OUT
+        )
+    }
 }
