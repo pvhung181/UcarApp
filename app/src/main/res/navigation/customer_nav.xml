@@ -1,6 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/customer_nav">
+    android:id="@+id/customer_nav"
+    app:startDestination="@id/customerAccountFragment">
 
+    <fragment
+        android:id="@+id/customerAccountFragment"
+        android:name="com.pvhung.ucar.ui.customer.customer_account.CustomerAccountFragment"
+        android:label="CustomerAccountFragment" />
+    <fragment
+        android:id="@+id/customerHomeFragment"
+        android:name="com.pvhung.ucar.ui.customer.customer_home.CustomerHomeFragment"
+        android:label="CustomerHomeFragment" />
+    <fragment
+        android:id="@+id/customerMapFragment"
+        android:name="com.pvhung.ucar.ui.customer.customer_map.CustomerMapFragment"
+        android:label="CustomerMapFragment" />
+    <fragment
+        android:id="@+id/customerNotificationFragment"
+        android:name="com.pvhung.ucar.ui.customer.customer_notification.CustomerNotificationFragment"
+        android:label="CustomerNotificationFragment" />
 </navigation>
