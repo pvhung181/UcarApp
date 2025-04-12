@@ -19,8 +19,9 @@ object Validator {
         if (DeviceHelper.isMinSdk26) {
             val currentDate = LocalDate.now()
             val selectedDate = LocalDate.of(y, m, d)
+            if (selectedDate.isAfter(currentDate)) return false
 
-            return ChronoUnit.YEARS.between(currentDate, selectedDate) >= 18
+            return ChronoUnit.YEARS.between(selectedDate, currentDate) >= 18
 
         } else {
             return isOver18(d, m, y)

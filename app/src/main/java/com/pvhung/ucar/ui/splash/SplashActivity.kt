@@ -4,21 +4,18 @@ import android.annotation.SuppressLint
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import com.pvhung.ucar.R
 import com.pvhung.ucar.databinding.ActivitySplashBinding
 import com.pvhung.ucar.ui.base.BaseBindingActivity
+import com.pvhung.ucar.ui.driver.DriverActivity
 import com.pvhung.ucar.ui.main.MainActivity
+import com.pvhung.ucar.utils.FirebaseDatabaseUtils
 
 @SuppressLint("CustomSplashScreen")
 class SplashActivity : BaseBindingActivity<ActivitySplashBinding, SplashViewModel>() {
 
-    private val TIME_ANIMATION = 5000L
-    private val handlerGoMain = Handler(Looper.myLooper()!!)
     override val layoutId: Int
         get() = R.layout.activity_splash
-    private val runnableGoMain = Runnable { this.goScreen() }
 
     override fun getViewModel(): Class<SplashViewModel> {
         return SplashViewModel::class.java
@@ -30,7 +27,11 @@ class SplashActivity : BaseBindingActivity<ActivitySplashBinding, SplashViewMode
     }
 
     private fun init() {
-
+        if (FirebaseDatabaseUtils.isUserAlreadyLogin()) {
+            goDriverScreen()
+        } else {
+            goScreen()
+        }
     }
 
 
@@ -38,20 +39,12 @@ class SplashActivity : BaseBindingActivity<ActivitySplashBinding, SplashViewMode
 
     }
 
-    override fun onStart() {
-        super.onStart()
-        handlerGoMain.postDelayed(runnableGoMain, TIME_ANIMATION)
-    }
 
     override fun onResume() {
         super.onResume()
         changeStatusBarColorByScreen()
     }
 
-    override fun onPause() {
-        super.onPause()
-        handlerGoMain.removeCallbacks(runnableGoMain)
-    }
 
     private fun changeStatusBarColorByScreen() {
         val colorS = Color.TRANSPARENT
@@ -68,6 +61,11 @@ class SplashActivity : BaseBindingActivity<ActivitySplashBinding, SplashViewMode
 
     private fun goScreen() {
         startActivity(Intent(this, MainActivity::class.java))
+        finish()
+    }
+
+    private fun goDriverScreen() {
+        startActivity(Intent(this, DriverActivity::class.java))
         finish()
     }
 }
