@@ -2,10 +2,8 @@ package com.pvhung.ucar.utils
 
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.database.ValueEventListener
 import com.pvhung.ucar.common.Constant
 import com.pvhung.ucar.data.model.User
 
@@ -33,6 +31,10 @@ object FirebaseDatabaseUtils {
             .child(Constant.DRIVERS_AVAILABLE_REFERENCES)
     }
 
+    fun getRequestsDatabase(): DatabaseReference {
+        return FirebaseDatabase.getInstance().getReference(Constant.CUSTOMER_REQUESTS_REFERENCES)
+    }
+
     fun saveUserInfo(uid: String, user: User): Boolean {
         val dbRef =
             if (user.isDriver) getRiderDatabase().child(uid) else getCustomerDatabase().child(uid)
@@ -49,11 +51,22 @@ object FirebaseDatabaseUtils {
         return FirebaseAuth.getInstance().currentUser != null
     }
 
-//    fun isNormalUser(): Boolean {
-//        if (isUserAlreadyLogin()) {
-//            val user = FirebaseAuth.getInstance().currentUser!
-//            getSpecificCustomerDatabase(user.uid).va
-//        }
-//        throw
-//    }
+    fun getUserFromSnapshot(snapshot: DataSnapshot): User? {
+        try {
+            val user = User().apply {
+                fullName = snapshot.child(Constant.USER_NAME).getStringValue()
+                phoneNumber = snapshot.child(Constant.USER_PHONE).getStringValue()
+                email = snapshot.child(Constant.USER_EMAIL).getStringValue()
+                gender = snapshot.child(Constant.USER_GENDER).getStringValue()
+                dateOfBirth = snapshot.child(Constant.USER_BIRTH).getStringValue()
+                rating = snapshot.child(Constant.USER_RATING).getNumberValue()
+                isDriver = snapshot.child(Constant.USER_IS_DRIVER).getBooleanValue()
+                isActive = snapshot.child(Constant.USER_IS_ACTIVE).getBooleanValue()
+            }
+            return user
+        } catch (_: Exception) {
+            return null
+        }
+
+    }
 }

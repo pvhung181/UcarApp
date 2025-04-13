@@ -3,12 +3,14 @@ package com.pvhung.ucar.ui.main.signin
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
+import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuth.AuthStateListener
 import com.pvhung.ucar.R
 import com.pvhung.ucar.databinding.FragmentSignInBinding
 import com.pvhung.ucar.ui.base.BaseBindingFragment
+import com.pvhung.ucar.ui.customer.CustomerActivity
 import com.pvhung.ucar.ui.driver.DriverActivity
 import com.pvhung.ucar.utils.DeviceHelper
 import com.pvhung.ucar.utils.OnBackPressed
@@ -20,7 +22,7 @@ import com.pvhung.ucar.utils.showKeyboard
 
 class SignInFragment : BaseBindingFragment<FragmentSignInBinding, SignInViewModel>() {
     private lateinit var mAuth: FirebaseAuth
-    private lateinit var firebaseAuthStateListener: AuthStateListener
+//    private lateinit var firebaseAuthStateListener: AuthStateListener
 
     private val requestNotificationPermission = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
@@ -56,27 +58,30 @@ class SignInFragment : BaseBindingFragment<FragmentSignInBinding, SignInViewMode
 
     private fun initFirebase() {
         mAuth = FirebaseAuth.getInstance()
-
-        firebaseAuthStateListener = object : AuthStateListener {
-            override fun onAuthStateChanged(fa: FirebaseAuth) {
-                fa.currentUser?.let {
-                    startActivity(Intent(requireActivity(), DriverActivity::class.java).apply {Intent.FLAG_ACTIVITY_SINGLE_TOP})
-                    requireActivity().finish()
-                    return
-                }
-            }
-
-        }
+//        firebaseAuthStateListener = object : AuthStateListener {
+//            override fun onAuthStateChanged(fa: FirebaseAuth) {
+//                fa.currentUser?.let {
+//                    startActivity(
+//                        Intent(
+//                            requireActivity(),
+//                            DriverActivity::class.java
+//                        ).apply { Intent.FLAG_ACTIVITY_SINGLE_TOP })
+//                    requireActivity().finish()
+//                    return
+//                }
+//            }
+//
+//        }
     }
 
     override fun onStart() {
         super.onStart()
-        mAuth.addAuthStateListener(firebaseAuthStateListener)
+        //mAuth.addAuthStateListener(firebaseAuthStateListener)
     }
 
     override fun onStop() {
         super.onStop()
-        mAuth.removeAuthStateListener(firebaseAuthStateListener)
+        //mAuth.removeAuthStateListener(firebaseAuthStateListener)
     }
 
     private fun initView() {
@@ -102,7 +107,35 @@ class SignInFragment : BaseBindingFragment<FragmentSignInBinding, SignInViewMode
     }
 
     override fun observerData() {
+        mainViewModel.user.observe(viewLifecycleOwner) {
+            if (it != null) {
+                if (it.isDriver) {
+                    startActivity(
+                        Intent(
+                            requireActivity(),
+                            DriverActivity::class.java
+                        ).apply { Intent.FLAG_ACTIVITY_SINGLE_TOP })
+                } else {
+                    startActivity(
+                        Intent(
+                            requireActivity(),
+                            CustomerActivity::class.java
+                        ).apply { Intent.FLAG_ACTIVITY_SINGLE_TOP })
+                }
+                requireActivity().finish()
+            }
+        }
 
+        mainViewModel.isError.observe(viewLifecycleOwner) {
+            if (it != null) {
+                if (it) {
+                    Toast.makeText(requireContext(), "Something went wrong!!", Toast.LENGTH_SHORT)
+                        .show()
+                    loading(false)
+                }
+                mainViewModel.isError.value = null
+            }
+        }
     }
 
     private fun signIn() {
@@ -112,11 +145,7 @@ class SignInFragment : BaseBindingFragment<FragmentSignInBinding, SignInViewMode
             binding.etPassword.text.toString()
         )
             .addOnSuccessListener {
-                val user = mAuth.currentUser
-                if(user != null) {
-                    startActivity(Intent(requireActivity(), DriverActivity::class.java).apply {Intent.FLAG_ACTIVITY_SINGLE_TOP})
-                    requireActivity().finish()
-                }
+                mainViewModel.getUserFromServer()
             }
             .addOnFailureListener {
 

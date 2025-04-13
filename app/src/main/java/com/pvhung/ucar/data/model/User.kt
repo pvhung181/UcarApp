@@ -2,7 +2,7 @@ package com.pvhung.ucar.data.model
 
 import com.pvhung.ucar.common.Constant
 
-class User(
+data class User(
     var fullName: String = "",
     var phoneNumber: String = "",
     var email: String = "",

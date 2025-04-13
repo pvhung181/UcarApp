@@ -12,6 +12,16 @@ object Constant {
     const val CUSTOMERS_REFERENCES = "Customers"
     const val RIDERS_REFERENCES = "Riders"
     const val DRIVERS_AVAILABLE_REFERENCES = "DriverAvailable"
+    const val CUSTOMER_REQUESTS_REFERENCES = "Requests"
 
+    //User
+    const val USER_IS_ACTIVE = "active"
+    const val USER_BIRTH = "dateOfBirth"
+    const val USER_IS_DRIVER = "driver"
+    const val USER_EMAIL = "email"
+    const val USER_NAME = "fullName"
+    const val USER_GENDER = "gender"
+    const val USER_PHONE = "phoneNumber"
+    const val USER_RATING = "rating"
 
 }

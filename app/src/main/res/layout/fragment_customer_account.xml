@@ -35,7 +35,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="6dp"
             android:fontFamily="@font/sf_pro_text_bold"
-            android:text="@string/author"
+            android:text="user"
             android:textSize="22sp"
             app:layout_constraintEnd_toEndOf="@id/ivAvatar"
             app:layout_constraintStart_toStartOf="@id/ivAvatar"

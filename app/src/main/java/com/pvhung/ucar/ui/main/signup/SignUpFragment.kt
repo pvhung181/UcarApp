@@ -14,6 +14,7 @@ import com.pvhung.ucar.R
 import com.pvhung.ucar.data.model.User
 import com.pvhung.ucar.databinding.FragmentSignUpBinding
 import com.pvhung.ucar.ui.base.BaseBindingFragment
+import com.pvhung.ucar.ui.customer.CustomerActivity
 import com.pvhung.ucar.ui.driver.DriverActivity
 import com.pvhung.ucar.utils.DateUtils
 import com.pvhung.ucar.utils.FirebaseDatabaseUtils
@@ -29,7 +30,8 @@ import java.util.Calendar
 class SignUpFragment : BaseBindingFragment<FragmentSignUpBinding, SignUpViewModel>() {
 
     private lateinit var mAuth: FirebaseAuth
-    private lateinit var firebaseAuthStateListener: AuthStateListener
+//    private lateinit var firebaseAuthStateListener: AuthStateListener
+    private var user: User? = null
     private val datePickerDialog by lazy {
         DatePickerDialog(
             requireContext(),
@@ -61,26 +63,36 @@ class SignUpFragment : BaseBindingFragment<FragmentSignUpBinding, SignUpViewMode
 
     override fun onStart() {
         super.onStart()
-        mAuth.addAuthStateListener(firebaseAuthStateListener)
+        //mAuth.addAuthStateListener(firebaseAuthStateListener)
     }
 
     override fun onStop() {
         super.onStop()
-        mAuth.removeAuthStateListener(firebaseAuthStateListener)
+        //mAuth.removeAuthStateListener(firebaseAuthStateListener)
     }
 
     private fun initFirebase() {
         mAuth = FirebaseAuth.getInstance()
 
-        firebaseAuthStateListener = object : AuthStateListener {
-            override fun onAuthStateChanged(fa: FirebaseAuth) {
-                fa.currentUser?.let {
-                    startActivity(Intent(requireActivity(), DriverActivity::class.java).apply {Intent.FLAG_ACTIVITY_SINGLE_TOP})
-                    requireActivity().finish()
-                    return
-                }
-            }
-        }
+//        firebaseAuthStateListener = object : AuthStateListener {
+//            override fun onAuthStateChanged(fa: FirebaseAuth) {
+//                fa.currentUser?.let {
+//                    user?.let { u ->
+//                        val cl =
+//                            if (u.isDriver) DriverActivity::class.java
+//                            else CustomerActivity::class.java
+//
+//                        startActivity(
+//                            Intent(
+//                                requireActivity(),
+//                                cl
+//                            ).apply { Intent.FLAG_ACTIVITY_SINGLE_TOP })
+//                        requireActivity().finish()
+//                        return
+//                    }
+//                }
+//            }
+//        }
     }
 
     private fun initView() {
@@ -125,8 +137,7 @@ class SignUpFragment : BaseBindingFragment<FragmentSignUpBinding, SignUpViewMode
                 mAuth.createUserWithEmailAndPassword(
                     binding.etEmail.text.toString(), binding.etPassword.text.toString()
                 ).addOnSuccessListener {
-                    val user = mAuth.currentUser
-                    if (user != null) {
+                    if (mAuth.currentUser != null) {
                         val userInfo = User(
                             fullName = binding.etFullName.text.toString(),
                             phoneNumber = binding.etPhone.text.toString(),
@@ -136,7 +147,8 @@ class SignUpFragment : BaseBindingFragment<FragmentSignUpBinding, SignUpViewMode
                             password = binding.etPassword.text.toString(),
                             isDriver = !binding.rbUser.isChecked
                         )
-                        FirebaseDatabaseUtils.saveUserInfo(user.uid, userInfo)
+                        user = userInfo.copy(password = "")
+                        FirebaseDatabaseUtils.saveUserInfo(mAuth.currentUser?.uid!!, userInfo)
                     }
                 }.addOnFailureListener { e ->
                     Toast.makeText(requireContext(), e.toString(), Toast.LENGTH_SHORT).show()
