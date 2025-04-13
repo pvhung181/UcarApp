@@ -7,6 +7,7 @@ import android.os.Looper
 import android.view.View
 import com.firebase.geofire.GeoFire
 import com.firebase.geofire.GeoLocation
+import com.firebase.geofire.GeoQueryDataEventListener
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
@@ -19,6 +20,8 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
 import com.pvhung.ucar.R
 import com.pvhung.ucar.databinding.FragmentCustomerMapBinding
 import com.pvhung.ucar.ui.base.BaseBindingFragment
@@ -36,6 +39,9 @@ class CustomerMapFragment : BaseBindingFragment<FragmentCustomerMapBinding, Cust
     private lateinit var mLocationRequest: LocationRequest
     private lateinit var mFusedLocationClient: FusedLocationProviderClient
     private var pickupLocation: LatLng? = null
+    private var radius: Double = 1.0
+    private var isFoundDriver = false
+    private var foundDriverId: String? = null
     private val mLocationCallback: LocationCallback = object : LocationCallback() {
         override fun onLocationResult(locationResult: LocationResult?) {
             super.onLocationResult(locationResult)
@@ -73,7 +79,6 @@ class CustomerMapFragment : BaseBindingFragment<FragmentCustomerMapBinding, Cust
         mapFragment.getMapAsync(this)
 
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity())
-
     }
 
     private fun init() {
@@ -100,7 +105,7 @@ class CustomerMapFragment : BaseBindingFragment<FragmentCustomerMapBinding, Cust
                     geo.setLocation(uid, GeoLocation(ll.latitude, ll.longitude))
                     pickupLocation = LatLng(ll.latitude, ll.longitude)
                     mMap.addMarker(MarkerOptions().position(pickupLocation!!).title("Pick up here"))
-
+                    getClosestDriver()
                     //todo show progressing
                 }
             }
@@ -127,7 +132,7 @@ class CustomerMapFragment : BaseBindingFragment<FragmentCustomerMapBinding, Cust
 
         mLocationRequest = LocationRequest().apply {
             interval = 5000
-            priority = LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY
+            priority = LocationRequest.PRIORITY_HIGH_ACCURACY
         }
 
         if (DeviceHelper.isMinSdk23) {
@@ -145,6 +150,49 @@ class CustomerMapFragment : BaseBindingFragment<FragmentCustomerMapBinding, Cust
 
     }
 
+    private fun getClosestDriver() {
+        val ref = FirebaseDatabaseUtils.getDriverAvailableDatabase()
+        val geo = GeoFire(ref)
+        pickupLocation?.let {
+            val geoQuery = geo.queryAtLocation(GeoLocation(it.latitude, it.longitude), radius)
+            geoQuery.removeAllListeners()
+            geoQuery.addGeoQueryDataEventListener(object : GeoQueryDataEventListener {
+                override fun onDataEntered(dataSnapshot: DataSnapshot?, location: GeoLocation?) {
+                    if(!isFoundDriver && dataSnapshot?.key != null) {
+                        isFoundDriver = true
+                        foundDriverId = dataSnapshot.key
+                    }
+                }
+
+                override fun onDataExited(dataSnapshot: DataSnapshot?) {
+
+                }
+
+                override fun onDataMoved(dataSnapshot: DataSnapshot?, location: GeoLocation?) {
+
+                }
+
+                override fun onDataChanged(dataSnapshot: DataSnapshot?, location: GeoLocation?) {
+
+                }
+
+                override fun onGeoQueryReady() {
+                    if(isFoundDriver) {
+                        radius++
+                        getClosestDriver()
+                    }
+                    else {
+
+                    }
+                }
+
+                override fun onGeoQueryError(error: DatabaseError?) {
+
+                }
+
+            })
+        }
+    }
 
     override fun onDestroy() {
         super.onDestroy()
