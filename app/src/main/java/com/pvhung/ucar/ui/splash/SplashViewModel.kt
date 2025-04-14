@@ -30,14 +30,16 @@ class SplashViewModel @Inject constructor() : BaseViewModel() {
                         if (snapshot.exists()) {
                             user.postValue(FirebaseDatabaseUtils.getUserFromSnapshot(snapshot))
                         } else {
-                            FirebaseDatabaseUtils.getSpecificCustomerDatabase(FirebaseAuth.getInstance().currentUser?.uid!!)
+                            FirebaseDatabaseUtils.getSpecificRiderDatabase(FirebaseAuth.getInstance().currentUser?.uid!!)
                                 .addListenerForSingleValueEvent(object : ValueEventListener {
                                     override fun onDataChange(snapshot: DataSnapshot) {
-                                        user.postValue(
-                                            FirebaseDatabaseUtils.getUserFromSnapshot(
-                                                snapshot
+                                        if(snapshot.exists()) {
+                                            user.postValue(
+                                                FirebaseDatabaseUtils.getUserFromSnapshot(
+                                                    snapshot
+                                                )
                                             )
-                                        )
+                                        }
                                     }
 
                                     override fun onCancelled(error: DatabaseError) {
