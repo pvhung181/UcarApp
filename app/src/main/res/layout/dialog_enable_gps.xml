@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/color_4D000000"
+        android:paddingHorizontal="@dimen/_16sdp">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_view_round"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/ivLocation"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/image_request_location"
+
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"/>
+
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvTitle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/_15sdp"
+                android:layout_marginTop="@dimen/_12sdp"
+                android:ellipsize="end"
+                android:fontFamily="@font/sf_pro_rounded_bold"
+                android:gravity="center"
+                android:maxLines="1"
+                android:minWidth="@dimen/_20sdp"
+                android:padding="@dimen/_2sdp"
+                android:text="@string/active_location"
+                android:textColor="@color/black"
+                android:textSize="17sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/ivLocation"/>
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvDes"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/_15sdp"
+                android:fontFamily="@font/sf_pro_display_regular"
+                android:gravity="center"
+                android:minWidth="@dimen/_20sdp"
+                android:padding="@dimen/_2sdp"
+                android:text="@string/we_need_your_location_to_enable_nearby_service"
+                android:textColor="#CC000000"
+                android:textSize="14sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tvTitle" />
+
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvCancel"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_marginTop="@dimen/_16sdp"
+                android:background="@drawable/bg_view_bot_left"
+                android:ellipsize="end"
+                android:fontFamily="@font/sf_pro_display_regular"
+                android:gravity="center"
+                android:maxLines="1"
+                android:paddingVertical="@dimen/_10sdp"
+                android:text="@string/cancel"
+                android:textColor="@color/color_9C9C9C"
+                android:textSize="16sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/tvEnable"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tvDes" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvEnable"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/_16sdp"
+                android:background="@drawable/bg_view_bot_right"
+                android:ellipsize="end"
+                android:fontFamily="@font/sf_pro_rounded_bold"
+                android:gravity="center"
+                android:maxLines="1"
+                android:paddingVertical="@dimen/_10sdp"
+                android:text="@string/enable_gps"
+                android:textColor="@color/color_007aff"
+                android:textSize="17sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@id/tvCancel"
+                app:layout_constraintTop_toBottomOf="@id/tvDes" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/color_4d3c3c43"
+                app:layout_constraintTop_toTopOf="@id/tvEnable" />
+
+            <View
+                android:layout_width="1dp"
+                android:layout_height="0dp"
+                android:background="@color/color_4d3c3c43"
+                app:layout_constraintBottom_toBottomOf="@id/tvEnable"
+                app:layout_constraintStart_toEndOf="@id/tvCancel"
+                app:layout_constraintTop_toTopOf="@id/tvEnable" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</layout>
+

@@ -1,10 +1,12 @@
 package com.pvhung.ucar.ui.customer.customer_map
 
+import android.Manifest
 import android.annotation.SuppressLint
 import android.location.Location
 import android.os.Bundle
 import android.os.Looper
 import android.view.View
+import androidx.activity.result.contract.ActivityResultContracts
 import com.firebase.geofire.GeoFire
 import com.firebase.geofire.GeoLocation
 import com.firebase.geofire.GeoQueryDataEventListener
@@ -28,6 +30,7 @@ import com.pvhung.ucar.R
 import com.pvhung.ucar.common.Constant
 import com.pvhung.ucar.databinding.FragmentCustomerMapBinding
 import com.pvhung.ucar.ui.base.BaseBindingFragment
+import com.pvhung.ucar.ui.dialog.EnableGpsDialog
 import com.pvhung.ucar.utils.DeviceHelper
 import com.pvhung.ucar.utils.FirebaseDatabaseUtils
 import com.pvhung.ucar.utils.OnBackPressed
@@ -35,6 +38,8 @@ import com.pvhung.ucar.utils.PermissionHelper
 
 class CustomerMapFragment : BaseBindingFragment<FragmentCustomerMapBinding, CustomerMapViewModel>(),
     OnMapReadyCallback {
+
+    private val enableGpsDialog by lazy { EnableGpsDialog(requireContext()) }
 
     private lateinit var mMap: GoogleMap
     private lateinit var mapFragment: SupportMapFragment
@@ -45,6 +50,20 @@ class CustomerMapFragment : BaseBindingFragment<FragmentCustomerMapBinding, Cust
     private var radius: Double = 1.0
     private var isFoundDriver = false
     private var foundDriverId: String? = null
+    private val locationPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestMultiplePermissions()
+    ) { permissions ->
+        val fineLocationGranted = permissions[Manifest.permission.ACCESS_FINE_LOCATION] ?: false
+        val coarseLocationGranted = permissions[Manifest.permission.ACCESS_COARSE_LOCATION] ?: false
+
+        if (fineLocationGranted && coarseLocationGranted) {
+
+        } else {
+
+        }
+    }
+
+
     private val mLocationCallback: LocationCallback = object : LocationCallback() {
         override fun onLocationResult(locationResult: LocationResult?) {
             super.onLocationResult(locationResult)
@@ -85,9 +104,7 @@ class CustomerMapFragment : BaseBindingFragment<FragmentCustomerMapBinding, Cust
     }
 
     private fun init() {
-        if (!PermissionHelper.hasLocationPermission(requireContext())) {
-            PermissionHelper.requestLocationPermission(requireActivity())
-        }
+
     }
 
     private fun initView() {
@@ -101,6 +118,15 @@ class CustomerMapFragment : BaseBindingFragment<FragmentCustomerMapBinding, Cust
     private fun onClick() {
         binding.callUberBtn.setOnClickListener {
             if (checkClick()) {
+                if (!PermissionHelper.hasLocationPermission(requireContext())) {
+                    PermissionHelper.requestLocationPermission(locationPermissionLauncher)
+                    return@setOnClickListener
+                }
+                if (!PermissionHelper.isGpsEnabled(requireContext())) {
+                    enableGpsDialog.show()
+                    return@setOnClickListener
+                }
+
                 val uid = FirebaseAuth.getInstance().currentUser?.uid!!
                 val ref = FirebaseDatabaseUtils.getRequestsDatabase()
                 val geo = GeoFire(ref)
@@ -116,6 +142,10 @@ class CustomerMapFragment : BaseBindingFragment<FragmentCustomerMapBinding, Cust
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        if(PermissionHelper.isGpsEnabled(requireContext()) && enableGpsDialog.isShowing) enableGpsDialog.dismiss()
+    }
 
     private fun loading(isLoading: Boolean) {
 //        if (isLoading) {
@@ -147,7 +177,7 @@ class CustomerMapFragment : BaseBindingFragment<FragmentCustomerMapBinding, Cust
                 )
                 mMap.isMyLocationEnabled = true
             } else {
-                PermissionHelper.requestLocationPermission(requireActivity())
+                PermissionHelper.requestLocationPermission(locationPermissionLauncher)
             }
         }
 

@@ -1,9 +1,11 @@
 package com.pvhung.ucar.utils
 
+import android.Manifest
 import android.app.Activity
 import android.content.Context
 import android.content.pm.PackageManager
 import android.location.LocationManager
+import androidx.activity.result.ActivityResultLauncher
 import androidx.core.content.ContextCompat
 
 object PermissionHelper {
@@ -44,18 +46,15 @@ object PermissionHelper {
 //        }
     }
 
-    fun requestLocationPermission(context: Activity) {
-//        if (!PermissionsManager.areLocationPermissionsGranted(context)) {
-//            PermissionsManager(object : PermissionsListener {
-//                override fun onExplanationNeeded(permissionsToExplain: List<String>) {}
-//
-//                override fun onPermissionResult(granted: Boolean) {
-//
-//                }
-//
-//            }).requestLocationPermissions(context)
-//
-//        }
+    fun requestLocationPermission(
+        launcher: ActivityResultLauncher<Array<String>>
+    ) {
+        launcher.launch(
+            arrayOf(
+                Manifest.permission.ACCESS_FINE_LOCATION,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            )
+        )
     }
 
     fun requestNotificationPermission(context: Context) {

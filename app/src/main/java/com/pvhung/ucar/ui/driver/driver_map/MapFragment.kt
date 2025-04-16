@@ -1,10 +1,12 @@
 package com.pvhung.ucar.ui.driver.driver_map
 
+import android.Manifest
 import android.annotation.SuppressLint
 import android.location.Location
 import android.os.Bundle
 import android.os.Looper
 import android.view.View
+import androidx.activity.result.contract.ActivityResultContracts
 import com.firebase.geofire.GeoFire
 import com.firebase.geofire.GeoLocation
 import com.google.android.gms.location.FusedLocationProviderClient
@@ -41,6 +43,19 @@ class MapFragment : BaseBindingFragment<FragmentDriverMapBinding, MapViewModel>(
     private lateinit var mLocationRequest: LocationRequest
     private lateinit var mFusedLocationClient: FusedLocationProviderClient
     private var customerId = ""
+    private val locationPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestMultiplePermissions()
+    ) { permissions ->
+        val fineLocationGranted = permissions[Manifest.permission.ACCESS_FINE_LOCATION] ?: false
+        val coarseLocationGranted = permissions[Manifest.permission.ACCESS_COARSE_LOCATION] ?: false
+
+        if (fineLocationGranted && coarseLocationGranted) {
+
+        } else {
+
+        }
+    }
+
     private val mLocationCallback: LocationCallback = object : LocationCallback() {
         override fun onLocationResult(locationResult: LocationResult?) {
             super.onLocationResult(locationResult)
@@ -156,9 +171,7 @@ class MapFragment : BaseBindingFragment<FragmentDriverMapBinding, MapViewModel>(
     }
 
     private fun init() {
-        if (!PermissionHelper.hasLocationPermission(requireContext())) {
-            PermissionHelper.requestLocationPermission(requireActivity())
-        }
+
     }
 
     private fun initView() {
@@ -204,7 +217,7 @@ class MapFragment : BaseBindingFragment<FragmentDriverMapBinding, MapViewModel>(
                 )
                 mMap.isMyLocationEnabled = true
             } else {
-                PermissionHelper.requestLocationPermission(requireActivity())
+                PermissionHelper.requestLocationPermission(locationPermissionLauncher)
             }
         }
 
