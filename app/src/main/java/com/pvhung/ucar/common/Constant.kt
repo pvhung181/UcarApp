@@ -12,7 +12,9 @@ object Constant {
     const val CUSTOMERS_REFERENCES = "Customers"
     const val RIDERS_REFERENCES = "Riders"
     const val DRIVERS_AVAILABLE_REFERENCES = "DriverAvailable"
+    const val DRIVERS_WORKING_REFERENCES = "DriversWorking"
     const val CUSTOMER_REQUESTS_REFERENCES = "Requests"
+    const val CUSTOMER_RIDE_ID = "CustomerRideId"
 
     //User
     const val USER_IS_ACTIVE = "active"
@@ -23,5 +25,6 @@ object Constant {
     const val USER_GENDER = "gender"
     const val USER_PHONE = "phoneNumber"
     const val USER_RATING = "rating"
+
 
 }

@@ -27,8 +27,13 @@ object FirebaseDatabaseUtils {
     }
 
     fun getDriverAvailableDatabase(): DatabaseReference {
-        return FirebaseDatabase.getInstance().getReference(Constant.USERS_REFERENCES)
+        return FirebaseDatabase.getInstance().getReference()
             .child(Constant.DRIVERS_AVAILABLE_REFERENCES)
+    }
+
+    fun getDriverWorkingDatabase(): DatabaseReference {
+        return FirebaseDatabase.getInstance().getReference()
+            .child(Constant.DRIVERS_WORKING_REFERENCES)
     }
 
     fun getRequestsDatabase(): DatabaseReference {

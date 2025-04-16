@@ -18,11 +18,14 @@ import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.ValueEventListener
 import com.pvhung.ucar.R
+import com.pvhung.ucar.common.Constant
 import com.pvhung.ucar.databinding.FragmentCustomerMapBinding
 import com.pvhung.ucar.ui.base.BaseBindingFragment
 import com.pvhung.ucar.utils.DeviceHelper
@@ -158,9 +161,20 @@ class CustomerMapFragment : BaseBindingFragment<FragmentCustomerMapBinding, Cust
             geoQuery.removeAllListeners()
             geoQuery.addGeoQueryDataEventListener(object : GeoQueryDataEventListener {
                 override fun onDataEntered(dataSnapshot: DataSnapshot?, location: GeoLocation?) {
-                    if(!isFoundDriver && dataSnapshot?.key != null) {
+                    if (!isFoundDriver && dataSnapshot?.key != null) {
                         isFoundDriver = true
                         foundDriverId = dataSnapshot.key
+
+                        val driverRef =
+                            FirebaseDatabaseUtils.getSpecificRiderDatabase(foundDriverId!!)
+                        val customerId = FirebaseAuth.getInstance().currentUser?.uid!!
+                        val hashMap = mutableMapOf<String, Any>()
+                        hashMap.put(Constant.CUSTOMER_RIDE_ID, customerId)
+                        driverRef.updateChildren(hashMap)
+
+                        binding.callUberBtn.setText("Looking for driver location...")
+                        getDriverLocation()
+
                     }
                 }
 
@@ -177,11 +191,10 @@ class CustomerMapFragment : BaseBindingFragment<FragmentCustomerMapBinding, Cust
                 }
 
                 override fun onGeoQueryReady() {
-                    if(isFoundDriver) {
+                    if (!isFoundDriver) {
                         radius++
                         getClosestDriver()
-                    }
-                    else {
+                    } else {
 
                     }
                 }
@@ -192,6 +205,53 @@ class CustomerMapFragment : BaseBindingFragment<FragmentCustomerMapBinding, Cust
 
             })
         }
+    }
+
+    private var mDriverMarker: Marker? = null
+    private fun getDriverLocation() {
+        val driverLocationRef =
+            FirebaseDatabaseUtils.getDriverWorkingDatabase().child(foundDriverId!!).child("l")
+        driverLocationRef.addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                if (snapshot.exists()) {
+                    val map = snapshot.value as List<*>
+                    var locationLat = 0.0
+                    var locationLng = 0.0
+                    binding.callUberBtn.setText("Driver found")
+                    if (map[0] != null) {
+                        locationLat = (map[0].toString()).toDouble()
+                    }
+                    if (map[1] != null) {
+                        locationLng = (map[1].toString()).toDouble()
+                    }
+                    var driverLocation = LatLng(locationLat, locationLng)
+                    mDriverMarker?.let { it.remove() }
+
+
+                    val location1 = Location("").apply {
+                        latitude = pickupLocation!!.latitude
+                        longitude = pickupLocation!!.longitude
+                    }
+
+                    val location2 = Location("").apply {
+                        latitude = driverLocation.latitude
+                        longitude = driverLocation.longitude
+                    }
+
+                    val distance = location1.distanceTo(location2)
+
+                    showToast("Driver found ${distance} ")
+
+                    mDriverMarker = mMap.addMarker(
+                        MarkerOptions().position(driverLocation).title("Your driver")
+                    )
+                }
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+
+            }
+        })
     }
 
     override fun onDestroy() {
