@@ -28,6 +28,7 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ValueEventListener
 import com.pvhung.ucar.R
 import com.pvhung.ucar.common.Constant
+import com.pvhung.ucar.common.enums.RideInfoState
 import com.pvhung.ucar.databinding.FragmentCustomerMapBinding
 import com.pvhung.ucar.ui.base.BaseBindingFragment
 import com.pvhung.ucar.ui.dialog.EnableGpsDialog
@@ -43,6 +44,7 @@ class CustomerMapFragment : BaseBindingFragment<FragmentCustomerMapBinding, Cust
 
     private val enableGpsDialog by lazy { EnableGpsDialog(requireContext()) }
     private var isChangeUiWhenDriverFound = false
+    private var rideState = RideInfoState.IDLE
 
     private lateinit var mMap: GoogleMap
     private lateinit var mapFragment: SupportMapFragment
@@ -129,25 +131,17 @@ class CustomerMapFragment : BaseBindingFragment<FragmentCustomerMapBinding, Cust
         }
 
         binding.callUberBtn.setOnClickListener {
-            if (checkClick()) {
-                if (!PermissionHelper.hasLocationPermission(requireContext())) {
-                    PermissionHelper.requestLocationPermission(locationPermissionLauncher)
-                    return@setOnClickListener
-                }
-                if (!PermissionHelper.isGpsEnabled(requireContext())) {
-                    enableGpsDialog.show()
-                    return@setOnClickListener
+            when (rideState) {
+                RideInfoState.IDLE -> {
+                    requestUcar()
                 }
 
-                val uid = FirebaseAuth.getInstance().currentUser?.uid!!
-                val ref = FirebaseDatabaseUtils.getRequestsDatabase()
-                val geo = GeoFire(ref)
-                mLastLocation?.let { ll ->
-                    geo.setLocation(uid, GeoLocation(ll.latitude, ll.longitude))
-                    pickupLocation = LatLng(ll.latitude, ll.longitude)
-                    mMap.addMarker(MarkerOptions().position(pickupLocation!!).title("Pick up here"))
-                    getClosestDriver()
-                    //todo show progressing
+                RideInfoState.LOOKING -> {
+                    cancelRequest()
+                }
+
+                RideInfoState.RIDING -> {
+
                 }
             }
 
@@ -197,6 +191,7 @@ class CustomerMapFragment : BaseBindingFragment<FragmentCustomerMapBinding, Cust
 
     private fun getClosestDriver() {
         binding.callUberBtn.setText("Looking for driver location...")
+        rideState = RideInfoState.LOOKING
         val ref = FirebaseDatabaseUtils.getDriverAvailableDatabase()
         val geo = GeoFire(ref)
         pickupLocation?.let {
@@ -299,10 +294,11 @@ class CustomerMapFragment : BaseBindingFragment<FragmentCustomerMapBinding, Cust
 
     fun updateWhenDriverArrived() {
         binding.icNotifyExpand.btnRide.text = getString(R.string.arrived)
+        rideState = RideInfoState.RIDING
     }
 
     fun updateWhenFoundDriver() {
-        if(!isChangeUiWhenDriverFound) {
+        if (!isChangeUiWhenDriverFound) {
             binding.callUberBtn.beGone()
             binding.icNotifyMinimal.root.beVisible()
             binding.icNotifyExpand.btnRide.text = getString(R.string.cancel)
@@ -317,6 +313,40 @@ class CustomerMapFragment : BaseBindingFragment<FragmentCustomerMapBinding, Cust
         binding.icNotifyMinimal.root.beGone()
         binding.icNotifyExpand.root.beGone()
         isChangeUiWhenDriverFound = false
+        rideState = RideInfoState.IDLE
+    }
+
+    private fun requestUcar() {
+        if (checkClick()) {
+            if (!PermissionHelper.hasLocationPermission(requireContext())) {
+                PermissionHelper.requestLocationPermission(locationPermissionLauncher)
+                return
+            }
+            if (!PermissionHelper.isGpsEnabled(requireContext())) {
+                enableGpsDialog.show()
+                return
+            }
+
+            val uid = FirebaseAuth.getInstance().currentUser?.uid!!
+            val ref = FirebaseDatabaseUtils.getRequestsDatabase()
+            val geo = GeoFire(ref)
+            mLastLocation?.let { ll ->
+                geo.setLocation(uid, GeoLocation(ll.latitude, ll.longitude))
+                pickupLocation = LatLng(ll.latitude, ll.longitude)
+                mMap.addMarker(MarkerOptions().position(pickupLocation!!).title("Pick up here"))
+                getClosestDriver()
+                //todo show progressing
+            }
+        }
+    }
+
+    private fun cancelRequest() {
+        rideState = RideInfoState.IDLE
+//        updateWhenRideDone()
+        FirebaseAuth.getInstance().currentUser?.uid?.let {
+            val ref = FirebaseDatabaseUtils.getRequestsDatabase().child(it)
+            ref.removeValue()
+        }
     }
 
     override fun onDestroy() {
