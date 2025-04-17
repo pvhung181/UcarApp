@@ -42,4 +42,6 @@
     <string name="you_are_normal_user">You are normal user</string>
     <string name="you_are_driver">You are driver</string>
     <string name="you_must_be_over_18_years_old_to_register">You must be over 18 years old to register</string>
+    <string name="arrived">Arrived</string>
+    <string name="call_ucar">Call Ucar</string>
 </resources>

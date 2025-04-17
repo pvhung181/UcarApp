@@ -16,11 +16,29 @@
             android:id="@+id/callUberBtn"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="Call Ucar"
-            android:textAllCaps="false"
             android:layout_marginHorizontal="6dp"
+            android:text="@string/call_ucar"
+            android:textAllCaps="false"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent" />
+
+        <include
+            android:id="@+id/icNotifyMinimal"
+            layout="@layout/layout_notify_driver_minimal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent" />
+
+        <include
+            android:id="@+id/icNotifyExpand"
+            layout="@layout/layout_notify_driver_arrived"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent" />
+
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

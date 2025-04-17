@@ -35,11 +35,14 @@ import com.pvhung.ucar.utils.DeviceHelper
 import com.pvhung.ucar.utils.FirebaseDatabaseUtils
 import com.pvhung.ucar.utils.OnBackPressed
 import com.pvhung.ucar.utils.PermissionHelper
+import com.pvhung.ucar.utils.beGone
+import com.pvhung.ucar.utils.beVisible
 
 class CustomerMapFragment : BaseBindingFragment<FragmentCustomerMapBinding, CustomerMapViewModel>(),
     OnMapReadyCallback {
 
     private val enableGpsDialog by lazy { EnableGpsDialog(requireContext()) }
+    private var isChangeUiWhenDriverFound = false
 
     private lateinit var mMap: GoogleMap
     private lateinit var mapFragment: SupportMapFragment
@@ -116,6 +119,15 @@ class CustomerMapFragment : BaseBindingFragment<FragmentCustomerMapBinding, Cust
     }
 
     private fun onClick() {
+        binding.icNotifyMinimal.ivExpand.setOnClickListener {
+            binding.icNotifyMinimal.root.beGone()
+            binding.icNotifyExpand.root.beVisible()
+        }
+        binding.icNotifyExpand.ivCollapse.setOnClickListener {
+            binding.icNotifyMinimal.root.beVisible()
+            binding.icNotifyExpand.root.beGone()
+        }
+
         binding.callUberBtn.setOnClickListener {
             if (checkClick()) {
                 if (!PermissionHelper.hasLocationPermission(requireContext())) {
@@ -144,7 +156,7 @@ class CustomerMapFragment : BaseBindingFragment<FragmentCustomerMapBinding, Cust
 
     override fun onResume() {
         super.onResume()
-        if(PermissionHelper.isGpsEnabled(requireContext()) && enableGpsDialog.isShowing) enableGpsDialog.dismiss()
+        if (PermissionHelper.isGpsEnabled(requireContext()) && enableGpsDialog.isShowing) enableGpsDialog.dismiss()
     }
 
     private fun loading(isLoading: Boolean) {
@@ -184,6 +196,7 @@ class CustomerMapFragment : BaseBindingFragment<FragmentCustomerMapBinding, Cust
     }
 
     private fun getClosestDriver() {
+        binding.callUberBtn.setText("Looking for driver location...")
         val ref = FirebaseDatabaseUtils.getDriverAvailableDatabase()
         val geo = GeoFire(ref)
         pickupLocation?.let {
@@ -202,7 +215,7 @@ class CustomerMapFragment : BaseBindingFragment<FragmentCustomerMapBinding, Cust
                         hashMap.put(Constant.CUSTOMER_RIDE_ID, customerId)
                         driverRef.updateChildren(hashMap)
 
-                        binding.callUberBtn.setText("Looking for driver location...")
+
                         getDriverLocation()
 
                     }
@@ -247,7 +260,7 @@ class CustomerMapFragment : BaseBindingFragment<FragmentCustomerMapBinding, Cust
                     val map = snapshot.value as List<*>
                     var locationLat = 0.0
                     var locationLng = 0.0
-                    binding.callUberBtn.setText("Driver found")
+                    updateWhenFoundDriver()
                     if (map[0] != null) {
                         locationLat = (map[0].toString()).toDouble()
                     }
@@ -255,7 +268,7 @@ class CustomerMapFragment : BaseBindingFragment<FragmentCustomerMapBinding, Cust
                         locationLng = (map[1].toString()).toDouble()
                     }
                     var driverLocation = LatLng(locationLat, locationLng)
-                    mDriverMarker?.let { it.remove() }
+                    mDriverMarker?.remove()
 
 
                     val location1 = Location("").apply {
@@ -270,7 +283,7 @@ class CustomerMapFragment : BaseBindingFragment<FragmentCustomerMapBinding, Cust
 
                     val distance = location1.distanceTo(location2)
 
-                    showToast("Driver found ${distance} ")
+                    if (distance < 100) updateWhenDriverArrived()
 
                     mDriverMarker = mMap.addMarker(
                         MarkerOptions().position(driverLocation).title("Your driver")
@@ -282,6 +295,28 @@ class CustomerMapFragment : BaseBindingFragment<FragmentCustomerMapBinding, Cust
 
             }
         })
+    }
+
+    fun updateWhenDriverArrived() {
+        binding.icNotifyExpand.btnRide.text = getString(R.string.arrived)
+    }
+
+    fun updateWhenFoundDriver() {
+        if(!isChangeUiWhenDriverFound) {
+            binding.callUberBtn.beGone()
+            binding.icNotifyMinimal.root.beVisible()
+            binding.icNotifyExpand.btnRide.text = getString(R.string.cancel)
+            isChangeUiWhenDriverFound = true
+        }
+
+    }
+
+    fun updateWhenRideDone() {
+        binding.callUberBtn.text = getString(R.string.call_ucar)
+        binding.callUberBtn.beVisible()
+        binding.icNotifyMinimal.root.beGone()
+        binding.icNotifyExpand.root.beGone()
+        isChangeUiWhenDriverFound = false
     }
 
     override fun onDestroy() {
