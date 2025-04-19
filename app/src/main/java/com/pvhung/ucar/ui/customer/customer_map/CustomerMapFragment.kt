@@ -9,6 +9,7 @@ import android.view.View
 import androidx.activity.result.contract.ActivityResultContracts
 import com.firebase.geofire.GeoFire
 import com.firebase.geofire.GeoLocation
+import com.firebase.geofire.GeoQuery
 import com.firebase.geofire.GeoQueryDataEventListener
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationCallback
@@ -55,6 +56,7 @@ class CustomerMapFragment : BaseBindingFragment<FragmentCustomerMapBinding, Cust
     private var radius: Double = 1.0
     private var isFoundDriver = false
     private var foundDriverId: String? = null
+    private var geoQuery: GeoQuery? = null
     private val locationPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
     ) { permissions ->
@@ -195,9 +197,9 @@ class CustomerMapFragment : BaseBindingFragment<FragmentCustomerMapBinding, Cust
         val ref = FirebaseDatabaseUtils.getDriverAvailableDatabase()
         val geo = GeoFire(ref)
         pickupLocation?.let {
-            val geoQuery = geo.queryAtLocation(GeoLocation(it.latitude, it.longitude), radius)
-            geoQuery.removeAllListeners()
-            geoQuery.addGeoQueryDataEventListener(object : GeoQueryDataEventListener {
+            geoQuery = geo.queryAtLocation(GeoLocation(it.latitude, it.longitude), radius)
+            geoQuery?.removeAllListeners()
+            geoQuery?.addGeoQueryDataEventListener(object : GeoQueryDataEventListener {
                 override fun onDataEntered(dataSnapshot: DataSnapshot?, location: GeoLocation?) {
                     if (!isFoundDriver && dataSnapshot?.key != null) {
                         isFoundDriver = true
@@ -209,10 +211,7 @@ class CustomerMapFragment : BaseBindingFragment<FragmentCustomerMapBinding, Cust
                         val hashMap = mutableMapOf<String, Any>()
                         hashMap.put(Constant.CUSTOMER_RIDE_ID, customerId)
                         driverRef.updateChildren(hashMap)
-
-
                         getDriverLocation()
-
                     }
                 }
 
@@ -229,7 +228,7 @@ class CustomerMapFragment : BaseBindingFragment<FragmentCustomerMapBinding, Cust
                 }
 
                 override fun onGeoQueryReady() {
-                    if (!isFoundDriver) {
+                    if (!isFoundDriver && rideState == RideInfoState.LOOKING) {
                         radius++
                         getClosestDriver()
                     } else {
@@ -313,6 +312,7 @@ class CustomerMapFragment : BaseBindingFragment<FragmentCustomerMapBinding, Cust
         binding.icNotifyMinimal.root.beGone()
         binding.icNotifyExpand.root.beGone()
         isChangeUiWhenDriverFound = false
+        geoQuery?.removeAllListeners()
         rideState = RideInfoState.IDLE
     }
 
@@ -342,7 +342,7 @@ class CustomerMapFragment : BaseBindingFragment<FragmentCustomerMapBinding, Cust
 
     private fun cancelRequest() {
         rideState = RideInfoState.IDLE
-//        updateWhenRideDone()
+        updateWhenRideDone()
         FirebaseAuth.getInstance().currentUser?.uid?.let {
             val ref = FirebaseDatabaseUtils.getRequestsDatabase().child(it)
             ref.removeValue()
