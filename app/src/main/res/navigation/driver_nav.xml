@@ -24,6 +24,10 @@
         android:id="@+id/driverNotificationFragment"
         android:name="com.pvhung.ucar.ui.driver.driver_notification.DriverNotificationFragment"
         android:label="DriverNotificationFragment" />
+    <fragment
+        android:id="@+id/driverInfoFragment"
+        android:name="com.pvhung.ucar.ui.driver.driver_info.DriverInfoFragment"
+        android:label="DriverInfoFragment" />
 
 
 </navigation>

@@ -24,4 +24,8 @@
         android:id="@+id/customerActivityFragment"
         android:name="com.pvhung.ucar.ui.customer.customer_activity.CustomerActivityFragment"
         android:label="CustomerActivityFragment" />
+    <fragment
+        android:id="@+id/customerInfoFragment"
+        android:name="com.pvhung.ucar.ui.customer.customer_info.CustomerInfoFragment"
+        android:label="CustomerInfoFragment" />
 </navigation>

@@ -55,7 +55,7 @@ class DriverAccountFragment :
 
     private fun onClick() {
         binding.ivEdit.setOnClickListener {
-
+            navigateScreen(null, R.id.driverInfoFragment)
         }
     }
 

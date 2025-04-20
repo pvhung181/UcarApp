@@ -55,7 +55,7 @@ class CustomerAccountFragment :
 
     private fun onClick() {
         binding.ivEdit.setOnClickListener {
-
+            navigateScreen(null, R.id.customerInfoFragment)
         }
     }
 

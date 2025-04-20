@@ -40,6 +40,18 @@ object FirebaseDatabaseUtils {
         return FirebaseDatabase.getInstance().getReference(Constant.CUSTOMER_REQUESTS_REFERENCES)
     }
 
+    fun getCurrentCustomerDatabase(): DatabaseReference {
+        return FirebaseDatabase.getInstance().getReference(Constant.USERS_REFERENCES)
+            .child(Constant.CUSTOMERS_REFERENCES)
+            .child(FirebaseAuth.getInstance().currentUser!!.uid)
+    }
+
+    fun getCurrentDriverDatabase(): DatabaseReference {
+        return FirebaseDatabase.getInstance().getReference(Constant.USERS_REFERENCES)
+            .child(Constant.RIDERS_REFERENCES).child(FirebaseAuth.getInstance().currentUser!!.uid)
+    }
+
+
     fun saveUserInfo(uid: String, user: User): Boolean {
         val dbRef =
             if (user.isDriver) getRiderDatabase().child(uid) else getCustomerDatabase().child(uid)
