@@ -20,6 +20,7 @@ import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
@@ -49,6 +50,7 @@ class MapFragment : BaseBindingFragment<FragmentDriverMapBinding, MapViewModel>(
     private lateinit var mLocationRequest: LocationRequest
     private lateinit var mFusedLocationClient: FusedLocationProviderClient
     private val requestModel = RequestModel()
+    private var pickupLocation: Marker? = null
 
     private val locationPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
@@ -72,8 +74,6 @@ class MapFragment : BaseBindingFragment<FragmentDriverMapBinding, MapViewModel>(
                     val newPos = LatLng(it.latitude, it.longitude)
                     mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(newPos, 18f))
                     mMap.animateCamera(CameraUpdateFactory.zoomTo(11f))
-
-
 
                     FirebaseAuth.getInstance().currentUser?.uid?.let { id ->
                         val refAvailable = FirebaseDatabase.getInstance()
@@ -135,7 +135,13 @@ class MapFragment : BaseBindingFragment<FragmentDriverMapBinding, MapViewModel>(
                         requestModel.customerId = request.customerId;
                         getAssignedCustomerPickupLocation()
                     }
-
+                } else {
+                    requestModel.customerId = ""
+                    requestModel.state = RequestState.IDLE
+                    pickupLocation?.remove()
+                    assignedCustomerPickupRefListener?.let {
+                        assignedCustomerPickupRef?.removeEventListener(it)
+                    }
                 }
             }
 
@@ -145,33 +151,37 @@ class MapFragment : BaseBindingFragment<FragmentDriverMapBinding, MapViewModel>(
         })
     }
 
+    private var assignedCustomerPickupRef: DatabaseReference? = null
+    private var assignedCustomerPickupRefListener: ValueEventListener? = null
+
     private fun getAssignedCustomerPickupLocation() {
-        val assignedCustomerPickupRef =
+        assignedCustomerPickupRef =
             FirebaseDatabaseUtils.getRequestsDatabase().child(requestModel.customerId).child("l")
 
-        assignedCustomerPickupRef.addValueEventListener(object : ValueEventListener {
-            override fun onDataChange(snapshot: DataSnapshot) {
-                if (snapshot.exists()) {
-                    val map = snapshot.value as List<*>
-                    var locationLat = 0.0
-                    var locationLng = 0.0
-                    if (map[0] != null) {
-                        locationLat = (map[0].toString()).toDouble()
+        assignedCustomerPickupRefListener =
+            assignedCustomerPickupRef?.addValueEventListener(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    if (snapshot.exists() && requestModel.customerId != "") {
+                        val map = snapshot.value as List<*>
+                        var locationLat = 0.0
+                        var locationLng = 0.0
+                        if (map[0] != null) {
+                            locationLat = (map[0].toString()).toDouble()
+                        }
+                        if (map[1] != null) {
+                            locationLng = (map[1].toString()).toDouble()
+                        }
+                        var driverLocation = LatLng(locationLat, locationLng)
+                        pickupLocation = mMap.addMarker(
+                            MarkerOptions().position(driverLocation).title("Pickup location")
+                        )
                     }
-                    if (map[1] != null) {
-                        locationLng = (map[1].toString()).toDouble()
-                    }
-                    var driverLocation = LatLng(locationLat, locationLng)
-                    mMap.addMarker(
-                        MarkerOptions().position(driverLocation).title("Pickup location")
-                    )
                 }
-            }
 
-            override fun onCancelled(error: DatabaseError) {
+                override fun onCancelled(error: DatabaseError) {
 
-            }
-        })
+                }
+            })
     }
 
     private fun initMaps() {

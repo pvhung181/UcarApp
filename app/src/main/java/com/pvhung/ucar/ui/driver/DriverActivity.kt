@@ -6,9 +6,11 @@ import androidx.navigation.NavController
 import androidx.navigation.NavDestination
 import androidx.navigation.NavGraph
 import androidx.navigation.fragment.NavHostFragment
+import com.bumptech.glide.util.Util
 import com.pvhung.ucar.R
 import com.pvhung.ucar.databinding.ActivityDriverBinding
 import com.pvhung.ucar.ui.base.BaseBindingActivity
+import com.pvhung.ucar.utils.Utils
 
 class DriverActivity : BaseBindingActivity<ActivityDriverBinding, DriverViewModel>() {
 
@@ -62,5 +64,11 @@ class DriverActivity : BaseBindingActivity<ActivityDriverBinding, DriverViewMode
             darkNavigation = false,
             true
         )
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        Utils.removeDriverWorking()
+        Utils.removeDriverAvailable()
     }
 }

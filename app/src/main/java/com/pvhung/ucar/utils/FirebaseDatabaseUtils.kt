@@ -72,6 +72,5 @@ object FirebaseDatabaseUtils {
         } catch (_: Exception) {
             return null
         }
-
     }
 }

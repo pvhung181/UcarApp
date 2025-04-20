@@ -8,6 +8,7 @@ import android.os.Looper
 import android.util.Log
 import android.view.View
 import androidx.activity.result.contract.ActivityResultContracts
+import com.bumptech.glide.util.Util
 import com.firebase.geofire.GeoFire
 import com.firebase.geofire.GeoLocation
 import com.firebase.geofire.GeoQuery
@@ -32,7 +33,7 @@ import com.google.firebase.database.ValueEventListener
 import com.pvhung.ucar.R
 import com.pvhung.ucar.common.Constant
 import com.pvhung.ucar.common.enums.RequestState
-import com.pvhung.ucar.common.enums.UserBookState
+import com.pvhung.ucar.common.enums.UserBookingState
 import com.pvhung.ucar.data.model.RequestModel
 import com.pvhung.ucar.databinding.FragmentCustomerMapBinding
 import com.pvhung.ucar.ui.base.BaseBindingFragment
@@ -41,6 +42,7 @@ import com.pvhung.ucar.utils.DeviceHelper
 import com.pvhung.ucar.utils.FirebaseDatabaseUtils
 import com.pvhung.ucar.utils.OnBackPressed
 import com.pvhung.ucar.utils.PermissionHelper
+import com.pvhung.ucar.utils.Utils
 import com.pvhung.ucar.utils.beGone
 import com.pvhung.ucar.utils.beVisible
 
@@ -49,7 +51,7 @@ class CustomerMapFragment : BaseBindingFragment<FragmentCustomerMapBinding, Cust
 
     private val enableGpsDialog by lazy { EnableGpsDialog(requireContext()) }
     private var isChangeUiWhenDriverFound = false
-    private var bookState = UserBookState.IDLE
+    private var bookState = UserBookingState.IDLE
     private var isWaitingResponse = false
 
     private lateinit var mMap: GoogleMap
@@ -146,7 +148,7 @@ class CustomerMapFragment : BaseBindingFragment<FragmentCustomerMapBinding, Cust
 
         binding.callUberBtn.setOnClickListener {
             when (bookState) {
-                UserBookState.IDLE -> {
+                UserBookingState.IDLE -> {
                     requestUcar()
                 }
 
@@ -201,7 +203,7 @@ class CustomerMapFragment : BaseBindingFragment<FragmentCustomerMapBinding, Cust
 
     private fun getClosestDriver() {
         binding.callUberBtn.setText("Looking for driver location...")
-        bookState = UserBookState.LOOKING
+        bookState = UserBookingState.LOOKING
         val ref = FirebaseDatabaseUtils.getDriverAvailableDatabase()
         val geo = GeoFire(ref)
         pickupLocation?.let {
@@ -209,7 +211,7 @@ class CustomerMapFragment : BaseBindingFragment<FragmentCustomerMapBinding, Cust
             geoQuery?.removeAllListeners()
             geoQuery?.addGeoQueryDataEventListener(object : GeoQueryDataEventListener {
                 override fun onDataEntered(dataSnapshot: DataSnapshot?, location: GeoLocation?) {
-                    if (!isFoundDriver && dataSnapshot?.key != null && bookState == UserBookState.LOOKING) {
+                    if (!isFoundDriver && dataSnapshot?.key != null && bookState == UserBookingState.LOOKING) {
                         isFoundDriver = true
                         foundDriverId = dataSnapshot.key
 
@@ -218,7 +220,7 @@ class CustomerMapFragment : BaseBindingFragment<FragmentCustomerMapBinding, Cust
                                 .child(Constant.REQUEST_STATE_REFERENCES)
                         val customerId = FirebaseAuth.getInstance().currentUser?.uid!!
                         driverRef.setValue(RequestModel(customerId))
-                        bookState = UserBookState.PENDING
+                        bookState = UserBookingState.PENDING
                         if (!isWaitingResponse) {
                             isWaitingResponse = true
                             driverRef.addValueEventListener(object : ValueEventListener {
@@ -231,13 +233,13 @@ class CustomerMapFragment : BaseBindingFragment<FragmentCustomerMapBinding, Cust
                                                 showToast("Accepted")
                                                 getDriverLocation()
                                                 isWaitingResponse = false
-                                                bookState = UserBookState.FOUND
+                                                bookState = UserBookingState.FOUND
                                             } else if (request.state == RequestState.CANCEL) {
                                                 driverRef.removeValue()
                                                 isFoundDriver = false
                                                 foundDriverId = ""
                                                 driverRef.removeEventListener(this)
-                                                bookState = UserBookState.LOOKING
+                                                bookState = UserBookingState.LOOKING
                                                 showToast("Driver cancel")
                                             }
 
@@ -265,7 +267,7 @@ class CustomerMapFragment : BaseBindingFragment<FragmentCustomerMapBinding, Cust
                 }
 
                 override fun onGeoQueryReady() {
-                    if (!isFoundDriver && bookState == UserBookState.LOOKING) {
+                    if (!isFoundDriver && bookState == UserBookingState.LOOKING) {
                         radius++
                         getClosestDriver()
                     } else {
@@ -332,7 +334,7 @@ class CustomerMapFragment : BaseBindingFragment<FragmentCustomerMapBinding, Cust
 
     fun updateWhenDriverArrived() {
         binding.icNotifyExpand.btnRide.text = getString(R.string.arrived)
-        bookState = UserBookState.RIDING
+        bookState = UserBookingState.RIDING
     }
 
     fun updateWhenFoundDriver() {
@@ -354,13 +356,12 @@ class CustomerMapFragment : BaseBindingFragment<FragmentCustomerMapBinding, Cust
         }
         radius = 1.0
         foundDriverId?.let {
-
             isFoundDriver = false
             foundDriverId = null
         }
         pickupMarker?.remove()
-        bookState = UserBookState.IDLE
-
+        bookState = UserBookingState.IDLE
+        Utils.removeRequest()
     }
 
     private fun requestUcar() {
@@ -389,12 +390,8 @@ class CustomerMapFragment : BaseBindingFragment<FragmentCustomerMapBinding, Cust
     }
 
     private fun cancelRequest() {
-        bookState = UserBookState.IDLE
+        bookState = UserBookingState.IDLE
         updateWhenRideDone()
-        FirebaseAuth.getInstance().currentUser?.uid?.let {
-            val ref = FirebaseDatabaseUtils.getRequestsDatabase().child(it)
-            ref.removeValue()
-        }
     }
 
     override fun onDestroy() {

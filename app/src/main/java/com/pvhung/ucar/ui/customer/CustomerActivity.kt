@@ -2,13 +2,18 @@ package com.pvhung.ucar.ui.customer
 
 import android.graphics.Color
 import android.os.Bundle
+import android.util.Log
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination
 import androidx.navigation.NavGraph
 import androidx.navigation.fragment.NavHostFragment
+import com.bumptech.glide.util.Util
+import com.google.firebase.auth.FirebaseAuth
 import com.pvhung.ucar.R
 import com.pvhung.ucar.databinding.ActivityCustomerBinding
 import com.pvhung.ucar.ui.base.BaseBindingActivity
+import com.pvhung.ucar.utils.FirebaseDatabaseUtils
+import com.pvhung.ucar.utils.Utils
 
 class CustomerActivity : BaseBindingActivity<ActivityCustomerBinding, CustomerViewModel>() {
 
@@ -62,5 +67,9 @@ class CustomerActivity : BaseBindingActivity<ActivityCustomerBinding, CustomerVi
             darkNavigation = false,
             true
         )
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
     }
 }
