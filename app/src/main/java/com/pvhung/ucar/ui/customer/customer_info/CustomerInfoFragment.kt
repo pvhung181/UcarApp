@@ -18,6 +18,7 @@ import com.pvhung.ucar.utils.beGone
 class CustomerInfoFragment :
     BaseBindingFragment<FragmentCustomerInfoBinding, CustomerInfoViewModel>() {
     private var db: DatabaseReference? = null
+    private var dbListener: ValueEventListener? = null
 
     override fun getViewModel(): Class<CustomerInfoViewModel> {
         return CustomerInfoViewModel::class.java
@@ -36,7 +37,10 @@ class CustomerInfoFragment :
     private fun getData() {
         Utils.getUid {
             db = FirebaseDatabaseUtils.getCurrentCustomerDatabase()
-            db?.addValueEventListener(object : ValueEventListener {
+            dbListener?.let {
+                db?.removeEventListener(it)
+            }
+            dbListener = db?.addValueEventListener(object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
                     if (snapshot.exists()) {
                         val user = FirebaseDatabaseUtils.getUserFromSnapshot(snapshot)
