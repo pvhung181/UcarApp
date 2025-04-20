@@ -22,6 +22,7 @@ import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
@@ -321,7 +322,7 @@ class CustomerMapFragment : BaseBindingFragment<FragmentCustomerMapBinding, Cust
                         if (distance < 100) updateWhenDriverArrived()
 
                         mDriverMarker = mMap.addMarker(
-                            MarkerOptions().position(driverLocation).title("Your driver")
+                            MarkerOptions().position(driverLocation).title("Your driver").icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_car))
                         )
                     }
                 }
@@ -382,7 +383,7 @@ class CustomerMapFragment : BaseBindingFragment<FragmentCustomerMapBinding, Cust
                 geo.setLocation(uid, GeoLocation(ll.latitude, ll.longitude))
                 pickupLocation = LatLng(ll.latitude, ll.longitude)
                 pickupMarker =
-                    mMap.addMarker(MarkerOptions().position(pickupLocation!!).title("Pick up here"))
+                    mMap.addMarker(MarkerOptions().position(pickupLocation!!).title("Pick up here").icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_map_pin)))
                 getClosestDriver()
                 //todo show progressing
             }
@@ -397,7 +398,6 @@ class CustomerMapFragment : BaseBindingFragment<FragmentCustomerMapBinding, Cust
     override fun onDestroy() {
         super.onDestroy()
         try {
-
 
         } catch (_: Exception) {
         }
