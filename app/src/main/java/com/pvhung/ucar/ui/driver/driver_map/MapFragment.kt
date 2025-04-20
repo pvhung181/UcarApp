@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.os.Looper
 import android.view.View
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.view.isVisible
 import com.firebase.geofire.GeoFire
 import com.firebase.geofire.GeoLocation
 import com.google.android.gms.location.FusedLocationProviderClient
@@ -23,16 +24,21 @@ import com.google.android.gms.maps.model.MarkerOptions
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.pvhung.ucar.R
 import com.pvhung.ucar.common.Constant
+import com.pvhung.ucar.common.enums.RequestState
+import com.pvhung.ucar.data.model.RequestModel
 import com.pvhung.ucar.databinding.FragmentDriverMapBinding
 import com.pvhung.ucar.ui.base.BaseBindingFragment
 import com.pvhung.ucar.utils.DeviceHelper
 import com.pvhung.ucar.utils.FirebaseDatabaseUtils
 import com.pvhung.ucar.utils.OnBackPressed
 import com.pvhung.ucar.utils.PermissionHelper
+import com.pvhung.ucar.utils.beGone
+import com.pvhung.ucar.utils.beVisible
 
 class MapFragment : BaseBindingFragment<FragmentDriverMapBinding, MapViewModel>(),
     OnMapReadyCallback {
@@ -42,7 +48,8 @@ class MapFragment : BaseBindingFragment<FragmentDriverMapBinding, MapViewModel>(
     var mLastLocation: Location? = null
     private lateinit var mLocationRequest: LocationRequest
     private lateinit var mFusedLocationClient: FusedLocationProviderClient
-    private var customerId = ""
+    private val requestModel = RequestModel()
+
     private val locationPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
     ) { permissions ->
@@ -77,7 +84,7 @@ class MapFragment : BaseBindingFragment<FragmentDriverMapBinding, MapViewModel>(
                         val geoAvailable = GeoFire(refAvailable)
                         val geoWorking = GeoFire(refWorking)
 
-                        when (customerId) {
+                        when (requestModel.customerId) {
                             "" -> {
                                 geoWorking.removeLocation(id)
                                 geoAvailable.setLocation(id, GeoLocation(it.latitude, it.longitude))
@@ -101,7 +108,7 @@ class MapFragment : BaseBindingFragment<FragmentDriverMapBinding, MapViewModel>(
     }
 
     override val layoutId: Int
-        get() = R.layout.fragment_riders_map
+        get() = R.layout.fragment_driver_map
 
     override fun onCreatedView(view: View?, savedInstanceState: Bundle?) {
         OnBackPressed.onBackPressedFinishActivity(requireActivity(), this)
@@ -116,13 +123,19 @@ class MapFragment : BaseBindingFragment<FragmentDriverMapBinding, MapViewModel>(
     private fun getAssignedCustomer() {
         val driverId = FirebaseAuth.getInstance().currentUser?.uid!!
         val assignedCustomerRef = FirebaseDatabaseUtils.getSpecificRiderDatabase(driverId)
-            .child(Constant.CUSTOMER_RIDE_ID)
+            .child(Constant.REQUEST_STATE_REFERENCES)
 
         assignedCustomerRef.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 if (snapshot.exists()) {
-                    customerId = snapshot.value.toString();
-                    getAssignedCustomerPickupLocation()
+                    val request = snapshot.getValue(RequestModel::class.java)
+
+                    if (!binding.icUserRequest.root.isVisible && request?.state == RequestState.IDLE) binding.icUserRequest.root.beVisible()
+                    if (request != null && request.state == RequestState.ACCEPT) {
+                        requestModel.customerId = request.customerId;
+                        getAssignedCustomerPickupLocation()
+                    }
+
                 }
             }
 
@@ -133,8 +146,8 @@ class MapFragment : BaseBindingFragment<FragmentDriverMapBinding, MapViewModel>(
     }
 
     private fun getAssignedCustomerPickupLocation() {
-        val assignedCustomerPickupRef = FirebaseDatabaseUtils.getRequestsDatabase()
-            .child(customerId).child("l")
+        val assignedCustomerPickupRef =
+            FirebaseDatabaseUtils.getRequestsDatabase().child(requestModel.customerId).child("l")
 
         assignedCustomerPickupRef.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
@@ -162,8 +175,7 @@ class MapFragment : BaseBindingFragment<FragmentDriverMapBinding, MapViewModel>(
     }
 
     private fun initMaps() {
-        mapFragment = childFragmentManager
-            .findFragmentById(R.id.map) as SupportMapFragment
+        mapFragment = childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
 
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity())
@@ -183,9 +195,25 @@ class MapFragment : BaseBindingFragment<FragmentDriverMapBinding, MapViewModel>(
     }
 
     private fun onClick() {
+        binding.icUserRequest.ivAccept.setOnClickListener {
+            val db = getDb().child("state")
+            db.setValue(RequestState.ACCEPT)
+            binding.icUserRequest.root.beGone()
+        }
 
+        binding.icUserRequest.tvCancel.setOnClickListener {
+            val db = getDb().child("state")
+            db.setValue(RequestState.CANCEL)
+            binding.icUserRequest.root.beGone()
+        }
     }
 
+    private fun getDb(): DatabaseReference {
+        val driverId = FirebaseAuth.getInstance().currentUser?.uid!!
+
+        return FirebaseDatabaseUtils.getSpecificRiderDatabase(driverId)
+            .child(Constant.REQUEST_STATE_REFERENCES)
+    }
 
     private fun loading(isLoading: Boolean) {
 //        if (isLoading) {
@@ -211,9 +239,7 @@ class MapFragment : BaseBindingFragment<FragmentDriverMapBinding, MapViewModel>(
         if (DeviceHelper.isMinSdk23) {
             if (PermissionHelper.hasLocationPermission(requireActivity())) {
                 mFusedLocationClient.requestLocationUpdates(
-                    mLocationRequest,
-                    mLocationCallback,
-                    Looper.myLooper()
+                    mLocationRequest, mLocationCallback, Looper.myLooper()
                 )
                 mMap.isMyLocationEnabled = true
             } else {

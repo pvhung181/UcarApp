@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@drawable/bg_white_round_6"
+    >
+    <TextView
+        android:id="@+id/tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:textColor="@color/black"
+        android:text="test"
+        android:textSize="20dp"
+        />
+
+
+
+    <View
+        android:id="@+id/viewLine"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/color_4d3c3c43"
+        app:layout_constraintTop_toTopOf="@id/tvCancel" />
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/tvCancel"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:ellipsize="end"
+        android:fontFamily="@font/sf_pro_display_regular"
+        android:gravity="center"
+        android:maxLines="1"
+        android:src="@drawable/ic_cancel"
+        android:paddingVertical="@dimen/_10sdp"
+        android:text="@string/cancel"
+        android:textColor="@color/color_9C9C9C"
+        android:textSize="16sp"
+        app:layout_constraintTop_toTopOf="@id/ivAccept"
+        app:layout_constraintBottom_toBottomOf="@id/ivAccept"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/ivAccept"
+        />
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/ivAccept"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:ellipsize="end"
+        android:fontFamily="@font/sf_pro_rounded_bold"
+        android:gravity="center"
+        android:src="@drawable/ic_tick"
+        android:maxLines="1"
+        android:paddingVertical="@dimen/_10sdp"
+        android:text="@string/enable_gps"
+        android:textColor="@color/color_007aff"
+        android:textSize="17sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/tvCancel"
+        app:layout_constraintTop_toBottomOf="@id/tv" />
+
+
+    <View
+        android:layout_width="1dp"
+        android:layout_height="0dp"
+        android:background="@color/color_4d3c3c43"
+        app:layout_constraintBottom_toBottomOf="@id/tvCancel"
+        app:layout_constraintStart_toEndOf="@id/tvCancel"
+        app:layout_constraintTop_toTopOf="@id/tvCancel" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

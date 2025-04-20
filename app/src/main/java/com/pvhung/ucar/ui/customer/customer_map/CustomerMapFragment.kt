@@ -5,6 +5,7 @@ import android.annotation.SuppressLint
 import android.location.Location
 import android.os.Bundle
 import android.os.Looper
+import android.util.Log
 import android.view.View
 import androidx.activity.result.contract.ActivityResultContracts
 import com.firebase.geofire.GeoFire
@@ -26,10 +27,13 @@ import com.google.android.gms.maps.model.MarkerOptions
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.ValueEventListener
 import com.pvhung.ucar.R
 import com.pvhung.ucar.common.Constant
-import com.pvhung.ucar.common.enums.RideInfoState
+import com.pvhung.ucar.common.enums.RequestState
+import com.pvhung.ucar.common.enums.UserBookState
+import com.pvhung.ucar.data.model.RequestModel
 import com.pvhung.ucar.databinding.FragmentCustomerMapBinding
 import com.pvhung.ucar.ui.base.BaseBindingFragment
 import com.pvhung.ucar.ui.dialog.EnableGpsDialog
@@ -45,7 +49,8 @@ class CustomerMapFragment : BaseBindingFragment<FragmentCustomerMapBinding, Cust
 
     private val enableGpsDialog by lazy { EnableGpsDialog(requireContext()) }
     private var isChangeUiWhenDriverFound = false
-    private var rideState = RideInfoState.IDLE
+    private var bookState = UserBookState.IDLE
+    private var isWaitingResponse = false
 
     private lateinit var mMap: GoogleMap
     private lateinit var mapFragment: SupportMapFragment
@@ -56,7 +61,14 @@ class CustomerMapFragment : BaseBindingFragment<FragmentCustomerMapBinding, Cust
     private var radius: Double = 1.0
     private var isFoundDriver = false
     private var foundDriverId: String? = null
+
+    //Use for looking driver
     private var geoQuery: GeoQuery? = null
+    private var driverLocationRef: DatabaseReference? = null
+    private var driverLocationRefListener: ValueEventListener? = null
+
+    private var pickupMarker: Marker? = null
+
     private val locationPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
     ) { permissions ->
@@ -133,17 +145,13 @@ class CustomerMapFragment : BaseBindingFragment<FragmentCustomerMapBinding, Cust
         }
 
         binding.callUberBtn.setOnClickListener {
-            when (rideState) {
-                RideInfoState.IDLE -> {
+            when (bookState) {
+                UserBookState.IDLE -> {
                     requestUcar()
                 }
 
-                RideInfoState.LOOKING -> {
+                else -> {
                     cancelRequest()
-                }
-
-                RideInfoState.RIDING -> {
-
                 }
             }
 
@@ -193,7 +201,7 @@ class CustomerMapFragment : BaseBindingFragment<FragmentCustomerMapBinding, Cust
 
     private fun getClosestDriver() {
         binding.callUberBtn.setText("Looking for driver location...")
-        rideState = RideInfoState.LOOKING
+        bookState = UserBookState.LOOKING
         val ref = FirebaseDatabaseUtils.getDriverAvailableDatabase()
         val geo = GeoFire(ref)
         pickupLocation?.let {
@@ -201,17 +209,46 @@ class CustomerMapFragment : BaseBindingFragment<FragmentCustomerMapBinding, Cust
             geoQuery?.removeAllListeners()
             geoQuery?.addGeoQueryDataEventListener(object : GeoQueryDataEventListener {
                 override fun onDataEntered(dataSnapshot: DataSnapshot?, location: GeoLocation?) {
-                    if (!isFoundDriver && dataSnapshot?.key != null) {
+                    if (!isFoundDriver && dataSnapshot?.key != null && bookState == UserBookState.LOOKING) {
                         isFoundDriver = true
                         foundDriverId = dataSnapshot.key
 
                         val driverRef =
                             FirebaseDatabaseUtils.getSpecificRiderDatabase(foundDriverId!!)
+                                .child(Constant.REQUEST_STATE_REFERENCES)
                         val customerId = FirebaseAuth.getInstance().currentUser?.uid!!
-                        val hashMap = mutableMapOf<String, Any>()
-                        hashMap.put(Constant.CUSTOMER_RIDE_ID, customerId)
-                        driverRef.updateChildren(hashMap)
-                        getDriverLocation()
+                        driverRef.setValue(RequestModel(customerId))
+                        bookState = UserBookState.PENDING
+                        if (!isWaitingResponse) {
+                            isWaitingResponse = true
+                            driverRef.addValueEventListener(object : ValueEventListener {
+                                override fun onDataChange(snapshot: DataSnapshot) {
+                                    if (snapshot.exists()) {
+                                        val request = snapshot.getValue(RequestModel::class.java)
+                                        Log.d("pvhung1", "onDataChange: ${request}")
+                                        if (request != null) {
+                                            if (request.state == RequestState.ACCEPT) {
+                                                showToast("Accepted")
+                                                getDriverLocation()
+                                                isWaitingResponse = false
+                                                bookState = UserBookState.FOUND
+                                            } else if (request.state == RequestState.CANCEL) {
+                                                driverRef.removeValue()
+                                                isFoundDriver = false
+                                                foundDriverId = ""
+                                                driverRef.removeEventListener(this)
+                                                bookState = UserBookState.LOOKING
+                                                showToast("Driver cancel")
+                                            }
+
+                                        }
+                                    }
+                                }
+
+                                override fun onCancelled(error: DatabaseError) {}
+
+                            })
+                        }
                     }
                 }
 
@@ -228,7 +265,7 @@ class CustomerMapFragment : BaseBindingFragment<FragmentCustomerMapBinding, Cust
                 }
 
                 override fun onGeoQueryReady() {
-                    if (!isFoundDriver && rideState == RideInfoState.LOOKING) {
+                    if (!isFoundDriver && bookState == UserBookState.LOOKING) {
                         radius++
                         getClosestDriver()
                     } else {
@@ -246,54 +283,56 @@ class CustomerMapFragment : BaseBindingFragment<FragmentCustomerMapBinding, Cust
 
     private var mDriverMarker: Marker? = null
     private fun getDriverLocation() {
-        val driverLocationRef =
+        driverLocationRef =
             FirebaseDatabaseUtils.getDriverWorkingDatabase().child(foundDriverId!!).child("l")
-        driverLocationRef.addValueEventListener(object : ValueEventListener {
-            override fun onDataChange(snapshot: DataSnapshot) {
-                if (snapshot.exists()) {
-                    val map = snapshot.value as List<*>
-                    var locationLat = 0.0
-                    var locationLng = 0.0
-                    updateWhenFoundDriver()
-                    if (map[0] != null) {
-                        locationLat = (map[0].toString()).toDouble()
+        driverLocationRefListener =
+            driverLocationRef!!.addValueEventListener(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    Log.d("pvhung1", "onDataChange: getDriverLocation")
+                    if (snapshot.exists()) {
+                        val map = snapshot.value as List<*>
+                        var locationLat = 0.0
+                        var locationLng = 0.0
+                        updateWhenFoundDriver()
+                        if (map[0] != null) {
+                            locationLat = (map[0].toString()).toDouble()
+                        }
+                        if (map[1] != null) {
+                            locationLng = (map[1].toString()).toDouble()
+                        }
+                        var driverLocation = LatLng(locationLat, locationLng)
+                        mDriverMarker?.remove()
+
+
+                        val location1 = Location("").apply {
+                            latitude = pickupLocation!!.latitude
+                            longitude = pickupLocation!!.longitude
+                        }
+
+                        val location2 = Location("").apply {
+                            latitude = driverLocation.latitude
+                            longitude = driverLocation.longitude
+                        }
+
+                        val distance = location1.distanceTo(location2)
+
+                        if (distance < 100) updateWhenDriverArrived()
+
+                        mDriverMarker = mMap.addMarker(
+                            MarkerOptions().position(driverLocation).title("Your driver")
+                        )
                     }
-                    if (map[1] != null) {
-                        locationLng = (map[1].toString()).toDouble()
-                    }
-                    var driverLocation = LatLng(locationLat, locationLng)
-                    mDriverMarker?.remove()
-
-
-                    val location1 = Location("").apply {
-                        latitude = pickupLocation!!.latitude
-                        longitude = pickupLocation!!.longitude
-                    }
-
-                    val location2 = Location("").apply {
-                        latitude = driverLocation.latitude
-                        longitude = driverLocation.longitude
-                    }
-
-                    val distance = location1.distanceTo(location2)
-
-                    if (distance < 100) updateWhenDriverArrived()
-
-                    mDriverMarker = mMap.addMarker(
-                        MarkerOptions().position(driverLocation).title("Your driver")
-                    )
                 }
-            }
 
-            override fun onCancelled(error: DatabaseError) {
+                override fun onCancelled(error: DatabaseError) {
 
-            }
-        })
+                }
+            })
     }
 
     fun updateWhenDriverArrived() {
         binding.icNotifyExpand.btnRide.text = getString(R.string.arrived)
-        rideState = RideInfoState.RIDING
+        bookState = UserBookState.RIDING
     }
 
     fun updateWhenFoundDriver() {
@@ -306,14 +345,22 @@ class CustomerMapFragment : BaseBindingFragment<FragmentCustomerMapBinding, Cust
 
     }
 
-    fun updateWhenRideDone() {
-        binding.callUberBtn.text = getString(R.string.call_ucar)
-        binding.callUberBtn.beVisible()
-        binding.icNotifyMinimal.root.beGone()
-        binding.icNotifyExpand.root.beGone()
+    private fun updateWhenRideDone() {
+        updateUiWhenRideDone()
         isChangeUiWhenDriverFound = false
         geoQuery?.removeAllListeners()
-        rideState = RideInfoState.IDLE
+        driverLocationRefListener?.let {
+            driverLocationRef?.removeEventListener(it)
+        }
+        radius = 1.0
+        foundDriverId?.let {
+
+            isFoundDriver = false
+            foundDriverId = null
+        }
+        pickupMarker?.remove()
+        bookState = UserBookState.IDLE
+
     }
 
     private fun requestUcar() {
@@ -333,7 +380,8 @@ class CustomerMapFragment : BaseBindingFragment<FragmentCustomerMapBinding, Cust
             mLastLocation?.let { ll ->
                 geo.setLocation(uid, GeoLocation(ll.latitude, ll.longitude))
                 pickupLocation = LatLng(ll.latitude, ll.longitude)
-                mMap.addMarker(MarkerOptions().position(pickupLocation!!).title("Pick up here"))
+                pickupMarker =
+                    mMap.addMarker(MarkerOptions().position(pickupLocation!!).title("Pick up here"))
                 getClosestDriver()
                 //todo show progressing
             }
@@ -341,7 +389,7 @@ class CustomerMapFragment : BaseBindingFragment<FragmentCustomerMapBinding, Cust
     }
 
     private fun cancelRequest() {
-        rideState = RideInfoState.IDLE
+        bookState = UserBookState.IDLE
         updateWhenRideDone()
         FirebaseAuth.getInstance().currentUser?.uid?.let {
             val ref = FirebaseDatabaseUtils.getRequestsDatabase().child(it)
@@ -357,4 +405,13 @@ class CustomerMapFragment : BaseBindingFragment<FragmentCustomerMapBinding, Cust
         } catch (_: Exception) {
         }
     }
+
+    //region update ui
+    private fun updateUiWhenRideDone() {
+        binding.callUberBtn.text = getString(R.string.call_ucar)
+        binding.callUberBtn.beVisible()
+        binding.icNotifyMinimal.root.beGone()
+        binding.icNotifyExpand.root.beGone()
+    }
+    //endregion
 }
