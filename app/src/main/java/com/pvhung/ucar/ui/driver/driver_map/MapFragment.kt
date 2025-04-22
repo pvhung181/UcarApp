@@ -67,7 +67,7 @@ class MapFragment : BaseBindingFragment<FragmentDriverMapBinding, MapViewModel>(
     }
 
     private val mLocationCallback: LocationCallback = object : LocationCallback() {
-        override fun onLocationResult(locationResult: LocationResult?) {
+        override fun onLocationResult(locationResult: LocationResult) {
             super.onLocationResult(locationResult)
             if (locationResult != null) {
                 locationResult.lastLocation?.let {
@@ -133,12 +133,13 @@ class MapFragment : BaseBindingFragment<FragmentDriverMapBinding, MapViewModel>(
 
                     if (!binding.icUserRequest.root.isVisible && request?.state == RequestState.IDLE) binding.icUserRequest.root.beVisible()
                     if (request != null && request.state == RequestState.ACCEPT) {
-                        requestModel.customerId = request.customerId;
+                        requestModel.customerId = request.customerId
+                        requestModel.destination = request.destination
+                        if(isAdded) binding.icUserRequest.tvDestination.text = request.destination
                         getAssignedCustomerPickupLocation()
                     }
                 } else {
-                    requestModel.customerId = ""
-                    requestModel.state = RequestState.IDLE
+                    requestModel.reset()
                     pickupLocation?.remove()
                     assignedCustomerPickupRefListener?.let {
                         assignedCustomerPickupRef?.removeEventListener(it)

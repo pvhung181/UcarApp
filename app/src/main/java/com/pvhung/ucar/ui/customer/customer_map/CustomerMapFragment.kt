@@ -5,10 +5,12 @@ import android.annotation.SuppressLint
 import android.location.Location
 import android.os.Bundle
 import android.os.Looper
+import android.text.Editable
+import android.text.TextWatcher
 import android.util.Log
 import android.view.View
 import androidx.activity.result.contract.ActivityResultContracts
-import com.bumptech.glide.util.Util
+import androidx.lifecycle.lifecycleScope
 import com.firebase.geofire.GeoFire
 import com.firebase.geofire.GeoLocation
 import com.firebase.geofire.GeoQuery
@@ -31,6 +33,11 @@ import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.ValueEventListener
+import com.mapbox.search.autocomplete.PlaceAutocomplete
+import com.mapbox.search.autocomplete.PlaceAutocompleteSuggestion
+import com.mapbox.search.ui.adapter.autocomplete.PlaceAutocompleteUiAdapter
+import com.mapbox.search.ui.view.CommonSearchViewConfiguration
+import com.mapbox.search.ui.view.SearchResultsView
 import com.pvhung.ucar.R
 import com.pvhung.ucar.common.Constant
 import com.pvhung.ucar.common.enums.RequestState
@@ -46,6 +53,9 @@ import com.pvhung.ucar.utils.PermissionHelper
 import com.pvhung.ucar.utils.Utils
 import com.pvhung.ucar.utils.beGone
 import com.pvhung.ucar.utils.beVisible
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+
 
 class CustomerMapFragment : BaseBindingFragment<FragmentCustomerMapBinding, CustomerMapViewModel>(),
     OnMapReadyCallback {
@@ -70,6 +80,10 @@ class CustomerMapFragment : BaseBindingFragment<FragmentCustomerMapBinding, Cust
     private var driverLocationRef: DatabaseReference? = null
     private var driverLocationRefListener: ValueEventListener? = null
 
+    private var placeAutocomplete: PlaceAutocomplete? = null
+    private var placeAutocompleteUiAdapter: PlaceAutocompleteUiAdapter? = null
+
+    private var destination = ""
     private var pickupMarker: Marker? = null
 
     private val locationPermissionLauncher = registerForActivityResult(
@@ -87,7 +101,7 @@ class CustomerMapFragment : BaseBindingFragment<FragmentCustomerMapBinding, Cust
 
 
     private val mLocationCallback: LocationCallback = object : LocationCallback() {
-        override fun onLocationResult(locationResult: LocationResult?) {
+        override fun onLocationResult(locationResult: LocationResult) {
             super.onLocationResult(locationResult)
             if (locationResult != null) {
                 locationResult.lastLocation?.let {
@@ -115,6 +129,57 @@ class CustomerMapFragment : BaseBindingFragment<FragmentCustomerMapBinding, Cust
         init()
         initView()
         onClick()
+        setupAutoComplete()
+
+    }
+
+    private fun setupAutoComplete() {
+        binding.searchResultsView.initialize(
+            SearchResultsView.Configuration(
+                CommonSearchViewConfiguration()
+            )
+        )
+        placeAutocomplete = PlaceAutocomplete.create()
+        placeAutocompleteUiAdapter =
+            PlaceAutocompleteUiAdapter(binding.searchResultsView, placeAutocomplete!!)
+
+        placeAutocompleteUiAdapter?.addSearchListener(object :
+            PlaceAutocompleteUiAdapter.SearchListener {
+            override fun onError(e: Exception) {}
+
+            override fun onPopulateQueryClick(suggestion: PlaceAutocompleteSuggestion) {}
+
+            override fun onSuggestionSelected(suggestion: PlaceAutocompleteSuggestion) {
+                destination = suggestion.name
+                binding.search.setText(suggestion.name)
+                binding.searchResultsView.beGone()
+            }
+
+            override fun onSuggestionsShown(suggestions: List<PlaceAutocompleteSuggestion>) {
+
+            }
+        })
+
+        binding.search.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+
+            }
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                s?.let {
+                    lifecycleScope.launch(Dispatchers.IO) {
+                        placeAutocompleteUiAdapter?.search(s.toString())
+
+                    }
+                }
+
+            }
+
+            override fun afterTextChanged(s: Editable?) {
+
+            }
+        })
+
     }
 
     private fun initMaps() {
@@ -220,7 +285,12 @@ class CustomerMapFragment : BaseBindingFragment<FragmentCustomerMapBinding, Cust
                             FirebaseDatabaseUtils.getSpecificRiderDatabase(foundDriverId!!)
                                 .child(Constant.REQUEST_STATE_REFERENCES)
                         val customerId = FirebaseAuth.getInstance().currentUser?.uid!!
-                        driverRef.setValue(RequestModel(customerId))
+                        driverRef.setValue(
+                            RequestModel(
+                                customerId = customerId,
+                                destination = destination
+                            )
+                        )
                         bookState = UserBookingState.PENDING
                         if (!isWaitingResponse) {
                             isWaitingResponse = true
@@ -322,7 +392,8 @@ class CustomerMapFragment : BaseBindingFragment<FragmentCustomerMapBinding, Cust
                         if (distance < 100) updateWhenDriverArrived()
 
                         mDriverMarker = mMap.addMarker(
-                            MarkerOptions().position(driverLocation).title("Your driver").icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_car))
+                            MarkerOptions().position(driverLocation).title("Your driver")
+                                .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_car))
                         )
                     }
                 }
@@ -383,7 +454,10 @@ class CustomerMapFragment : BaseBindingFragment<FragmentCustomerMapBinding, Cust
                 geo.setLocation(uid, GeoLocation(ll.latitude, ll.longitude))
                 pickupLocation = LatLng(ll.latitude, ll.longitude)
                 pickupMarker =
-                    mMap.addMarker(MarkerOptions().position(pickupLocation!!).title("Pick up here").icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_map_pin)))
+                    mMap.addMarker(
+                        MarkerOptions().position(pickupLocation!!).title("Pick up here")
+                            .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_map_pin))
+                    )
                 getClosestDriver()
                 //todo show progressing
             }
