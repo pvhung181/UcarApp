@@ -53,6 +53,7 @@ import com.pvhung.ucar.utils.PermissionHelper
 import com.pvhung.ucar.utils.Utils
 import com.pvhung.ucar.utils.beGone
 import com.pvhung.ucar.utils.beVisible
+import com.pvhung.ucar.utils.hideKeyboard
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -74,6 +75,7 @@ class CustomerMapFragment : BaseBindingFragment<FragmentCustomerMapBinding, Cust
     private var radius: Double = 1.0
     private var isFoundDriver = false
     private var foundDriverId: String? = null
+    private var isEditing = false
 
     //Use for looking driver
     private var geoQuery: GeoQuery? = null
@@ -151,14 +153,17 @@ class CustomerMapFragment : BaseBindingFragment<FragmentCustomerMapBinding, Cust
 
             override fun onSuggestionSelected(suggestion: PlaceAutocompleteSuggestion) {
                 destination = suggestion.name
-                binding.search.setText(suggestion.name)
-                binding.searchResultsView.beGone()
+                searchDone()
             }
 
             override fun onSuggestionsShown(suggestions: List<PlaceAutocompleteSuggestion>) {
-
+                if (isEditing) {
+                    binding.searchResultsView.beVisible()
+                }
+                Log.e("hunglkj", "onSuggestionsShown")
             }
         })
+
 
         binding.search.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
@@ -166,10 +171,14 @@ class CustomerMapFragment : BaseBindingFragment<FragmentCustomerMapBinding, Cust
             }
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                isEditing = true
                 s?.let {
+                    if (s.isNotBlank()) {
+                        binding.searchResultsView.beVisible()
+                        Log.e("hunglkj", "onTextChanged: dsadaass")
+                    }
                     lifecycleScope.launch(Dispatchers.IO) {
                         placeAutocompleteUiAdapter?.search(s.toString())
-
                     }
                 }
 
@@ -203,6 +212,17 @@ class CustomerMapFragment : BaseBindingFragment<FragmentCustomerMapBinding, Cust
     }
 
     private fun onClick() {
+
+        binding.search.setOnTouchListener { v, event ->
+            binding.ivBack.beVisible()
+            false
+        }
+
+
+        binding.ivBack.setOnClickListener {
+            searchDone()
+        }
+
         binding.icNotifyMinimal.ivExpand.setOnClickListener {
             binding.icNotifyMinimal.root.beGone()
             binding.icNotifyExpand.root.beVisible()
@@ -226,6 +246,15 @@ class CustomerMapFragment : BaseBindingFragment<FragmentCustomerMapBinding, Cust
         }
     }
 
+    private fun searchDone() {
+        binding.search.setText(destination)
+        binding.search.hideKeyboard()
+        binding.search.clearFocus()
+        binding.searchResultsView.beGone()
+        binding.ivBack.beGone()
+        isEditing = false
+    }
+
     override fun onResume() {
         super.onResume()
         if (PermissionHelper.isGpsEnabled(requireContext()) && enableGpsDialog.isShowing) enableGpsDialog.dismiss()
@@ -245,6 +274,20 @@ class CustomerMapFragment : BaseBindingFragment<FragmentCustomerMapBinding, Cust
     override fun onMapReady(gm: GoogleMap) {
         loading(false)
         mMap = gm
+
+        mMap.setOnMapClickListener {
+            if (binding.search.isFocused) {
+                if (destination.isNotBlank()) {
+                    searchDone()
+                }
+                else {
+                    binding.search.clearFocus()
+                    binding.search.hideKeyboard()
+                }
+                binding.ivBack.beGone()
+            }
+        }
+
         mMap.uiSettings.isZoomControlsEnabled = true
 
         mLocationRequest = LocationRequest().apply {
