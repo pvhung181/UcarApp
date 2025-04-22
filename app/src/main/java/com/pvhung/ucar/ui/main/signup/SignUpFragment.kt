@@ -1,21 +1,20 @@
 package com.pvhung.ucar.ui.main.signup
 
 import android.app.DatePickerDialog
-import android.content.Intent
+import android.content.res.ColorStateList
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
 import android.widget.Toast
+import androidx.appcompat.widget.AppCompatTextView
+import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.FirebaseAuth.AuthStateListener
 import com.pvhung.ucar.R
 import com.pvhung.ucar.data.model.User
 import com.pvhung.ucar.databinding.FragmentSignUpBinding
 import com.pvhung.ucar.ui.base.BaseBindingFragment
-import com.pvhung.ucar.ui.customer.CustomerActivity
-import com.pvhung.ucar.ui.driver.DriverActivity
 import com.pvhung.ucar.utils.DateUtils
 import com.pvhung.ucar.utils.FirebaseDatabaseUtils
 import com.pvhung.ucar.utils.Validator
@@ -29,8 +28,14 @@ import java.util.Calendar
 
 class SignUpFragment : BaseBindingFragment<FragmentSignUpBinding, SignUpViewModel>() {
 
+    private val MOTOBIKE_SERVICE = -1
+    private val CAR_SERVICE = -2
+
+    private var currentService = MOTOBIKE_SERVICE
+
     private lateinit var mAuth: FirebaseAuth
-//    private lateinit var firebaseAuthStateListener: AuthStateListener
+
+    //    private lateinit var firebaseAuthStateListener: AuthStateListener
     private var user: User? = null
     private val datePickerDialog by lazy {
         DatePickerDialog(
@@ -100,6 +105,30 @@ class SignUpFragment : BaseBindingFragment<FragmentSignUpBinding, SignUpViewMode
     }
 
     private fun setOnClick() {
+        binding.rbDriver.setOnCheckedChangeListener { buttonView, isChecked ->
+            if (isChecked) {
+                binding.serviceGroup.beVisible()
+                handleChooseService()
+            }
+        }
+
+        binding.rbUser.setOnCheckedChangeListener { buttonView, isChecked ->
+            if (isChecked) {
+                binding.serviceGroup.beGone()
+            }
+        }
+
+        binding.motobikeBtn.setOnClickListener {
+            currentService = MOTOBIKE_SERVICE
+            handleChooseService()
+        }
+
+        binding.carBtn.setOnClickListener {
+            currentService = CAR_SERVICE
+            handleChooseService()
+        }
+
+
         binding.etGender.setOnClickListener {
             toggleSelectGenderDialog()
             hideKeyboard()
@@ -169,6 +198,41 @@ class SignUpFragment : BaseBindingFragment<FragmentSignUpBinding, SignUpViewMode
             binding.viewBlock.beGone()
             binding.signUpButton.beVisible()
             binding.progress.beGone()
+        }
+    }
+
+    private fun setSelect(view: AppCompatTextView, bool: Boolean) {
+        if (bool) {
+            view.apply {
+                setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
+                backgroundTintList = ColorStateList.valueOf(
+                    ContextCompat.getColor(
+                        requireContext(),
+                        R.color.color_2CBBC1
+                    )
+                )
+            }
+        } else {
+
+            view.apply {
+                setTextColor(ContextCompat.getColor(requireContext(), R.color.black))
+                backgroundTintList = ColorStateList.valueOf(
+                    ContextCompat.getColor(
+                        requireContext(),
+                        R.color.transparent
+                    )
+                )
+            }
+        }
+    }
+
+    private fun handleChooseService() {
+        if (currentService == MOTOBIKE_SERVICE) {
+            setSelect(binding.motobikeBtn, true)
+            setSelect(binding.carBtn, false)
+        } else {
+            setSelect(binding.motobikeBtn, false)
+            setSelect(binding.carBtn, true)
         }
     }
 

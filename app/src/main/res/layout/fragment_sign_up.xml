@@ -300,6 +300,46 @@
                     android:text="@string/you_are_driver" />
             </RadioGroup>
 
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/motobikeBtn"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:background="@drawable/bg_ripple_white_stroke_round_12"
+                android:backgroundTint="@color/color_2CBBC1"
+                android:fontFamily="@font/sf_pro_text_semibold"
+                android:gravity="center"
+                android:paddingVertical="14dp"
+                android:text="Motobike"
+                android:textColor="@color/white"
+                android:textSize="16dp"
+                app:layout_constraintEnd_toStartOf="@id/carBtn"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/rbGroup"
+                app:layout_constraintWidth_percent="0.4" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/carBtn"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_ripple_white_stroke_round_12"
+                android:fontFamily="@font/sf_pro_text_semibold"
+                android:gravity="center"
+                android:paddingVertical="14dp"
+                android:text="Car"
+                android:textSize="16dp"
+                app:layout_constraintBottom_toBottomOf="@id/motobikeBtn"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@id/motobikeBtn"
+                app:layout_constraintTop_toTopOf="@id/motobikeBtn"
+                app:layout_constraintWidth_percent="0.4" />
+
+            <androidx.constraintlayout.widget.Group
+                android:id="@+id/serviceGroup"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                app:constraint_referenced_ids="carBtn, motobikeBtn" />
 
             <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/signUpButton"
@@ -315,7 +355,7 @@
                 android:textAllCaps="false"
                 android:textColor="@color/white"
                 android:textSize="@dimen/_16sdp"
-                app:layout_constraintTop_toBottomOf="@id/rbGroup" />
+                app:layout_constraintTop_toBottomOf="@id/motobikeBtn" />
 
 
             <androidx.appcompat.widget.AppCompatTextView
