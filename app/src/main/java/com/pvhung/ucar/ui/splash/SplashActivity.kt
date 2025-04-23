@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import com.pvhung.ucar.R
 import com.pvhung.ucar.databinding.ActivitySplashBinding
@@ -30,6 +31,7 @@ class SplashActivity : BaseBindingActivity<ActivitySplashBinding, SplashViewMode
     private fun observe() {
         viewModel.user.observe(this) {
             if (it != null) {
+                Log.e("pvhung2", "observe: suer !+ null")
                 if (it.isDriver) goDriverScreen()
                 else goCustomerScreen()
                 viewModel.user.value = null

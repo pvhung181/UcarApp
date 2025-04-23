@@ -12,6 +12,8 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import com.google.firebase.auth.FirebaseAuth
 import com.pvhung.ucar.R
+import com.pvhung.ucar.common.Constant.CAR_SERVICE
+import com.pvhung.ucar.common.Constant.MOTOBIKE_SERVICE
 import com.pvhung.ucar.data.model.User
 import com.pvhung.ucar.databinding.FragmentSignUpBinding
 import com.pvhung.ucar.ui.base.BaseBindingFragment
@@ -27,10 +29,6 @@ import java.util.Calendar
 
 
 class SignUpFragment : BaseBindingFragment<FragmentSignUpBinding, SignUpViewModel>() {
-
-    private val MOTOBIKE_SERVICE = -1
-    private val CAR_SERVICE = -2
-
     private var currentService = MOTOBIKE_SERVICE
 
     private lateinit var mAuth: FirebaseAuth
@@ -177,6 +175,7 @@ class SignUpFragment : BaseBindingFragment<FragmentSignUpBinding, SignUpViewMode
                             isDriver = !binding.rbUser.isChecked
                         )
                         user = userInfo.copy(password = "")
+                        userInfo.setService(currentService)
                         FirebaseDatabaseUtils.saveUserInfo(mAuth.currentUser?.uid!!, userInfo)
                     }
                 }.addOnFailureListener { e ->

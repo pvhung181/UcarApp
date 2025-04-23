@@ -1,7 +1,5 @@
 package com.pvhung.ucar.data.model
 
-import com.pvhung.ucar.common.Constant
-
 data class User(
     var fullName: String = "",
     var phoneNumber: String = "",
@@ -13,6 +11,13 @@ data class User(
     var isDriver: Boolean = false,
     var isActive: Boolean = true
 ) {
+    private var service = ""
+    fun setService(s: String) {
+        if (isDriver) service = s
+    }
+    fun getService(): String {
+        return service
+    }
 //    fun convertPropertiesToMap(): Map<String, Any> {
 //        val map = mutableMapOf<String, Any>()
 //        map[Constant.KEY_FULL_NAME] = fullName

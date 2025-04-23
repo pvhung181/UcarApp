@@ -26,6 +26,9 @@ object Constant {
     const val USER_GENDER = "gender"
     const val USER_PHONE = "phoneNumber"
     const val USER_RATING = "rating"
+    const val USER_SERVICE = "service"
+    const val MOTOBIKE_SERVICE = "Motobike"
+    const val CAR_SERVICE = "Car"
 
     const val DRIVER_STATE = "DriverState"
 

@@ -43,8 +43,10 @@ import com.pvhung.ucar.common.Constant
 import com.pvhung.ucar.common.enums.RequestState
 import com.pvhung.ucar.common.enums.UserBookingState
 import com.pvhung.ucar.data.model.RequestModel
+import com.pvhung.ucar.data.model.User
 import com.pvhung.ucar.databinding.FragmentCustomerMapBinding
 import com.pvhung.ucar.ui.base.BaseBindingFragment
+import com.pvhung.ucar.ui.dialog.BottomSheetBookingVehicle
 import com.pvhung.ucar.ui.dialog.EnableGpsDialog
 import com.pvhung.ucar.utils.DeviceHelper
 import com.pvhung.ucar.utils.FirebaseDatabaseUtils
@@ -76,6 +78,8 @@ class CustomerMapFragment : BaseBindingFragment<FragmentCustomerMapBinding, Cust
     private var isFoundDriver = false
     private var foundDriverId: String? = null
     private var isEditing = false
+    private var serviceBooking = Constant.MOTOBIKE_SERVICE
+    private var bookingBottomSheet: BottomSheetBookingVehicle? = null
 
     //Use for looking driver
     private var geoQuery: GeoQuery? = null
@@ -132,7 +136,21 @@ class CustomerMapFragment : BaseBindingFragment<FragmentCustomerMapBinding, Cust
         initView()
         onClick()
         setupAutoComplete()
+        initBottomsheet()
+    }
 
+    private fun initBottomsheet() {
+        bookingBottomSheet = BottomSheetBookingVehicle(
+            requireActivity(),
+            object : BottomSheetBookingVehicle.OnRequestListener {
+                override fun onBook(service: String) {
+                    serviceBooking = service
+                    requestUcar()
+                }
+
+                override fun onDismiss() {}
+            }
+        )
     }
 
     private fun setupAutoComplete() {
@@ -175,7 +193,6 @@ class CustomerMapFragment : BaseBindingFragment<FragmentCustomerMapBinding, Cust
                 s?.let {
                     if (s.isNotBlank()) {
                         binding.searchResultsView.beVisible()
-                        Log.e("hunglkj", "onTextChanged: dsadaass")
                     }
                     lifecycleScope.launch(Dispatchers.IO) {
                         placeAutocompleteUiAdapter?.search(s.toString())
@@ -235,7 +252,7 @@ class CustomerMapFragment : BaseBindingFragment<FragmentCustomerMapBinding, Cust
         binding.callUberBtn.setOnClickListener {
             when (bookState) {
                 UserBookingState.IDLE -> {
-                    requestUcar()
+                    bookingBottomSheet?.show()
                 }
 
                 else -> {
@@ -279,8 +296,7 @@ class CustomerMapFragment : BaseBindingFragment<FragmentCustomerMapBinding, Cust
             if (binding.search.isFocused) {
                 if (destination.isNotBlank()) {
                     searchDone()
-                }
-                else {
+                } else {
                     binding.search.clearFocus()
                     binding.search.hideKeyboard()
                 }
@@ -321,50 +337,66 @@ class CustomerMapFragment : BaseBindingFragment<FragmentCustomerMapBinding, Cust
             geoQuery?.addGeoQueryDataEventListener(object : GeoQueryDataEventListener {
                 override fun onDataEntered(dataSnapshot: DataSnapshot?, location: GeoLocation?) {
                     if (!isFoundDriver && dataSnapshot?.key != null && bookState == UserBookingState.LOOKING) {
-                        isFoundDriver = true
-                        foundDriverId = dataSnapshot.key
+                        val db = FirebaseDatabaseUtils.getSpecificRiderDatabase(dataSnapshot.key!!)
 
-                        val driverRef =
-                            FirebaseDatabaseUtils.getSpecificRiderDatabase(foundDriverId!!)
-                                .child(Constant.REQUEST_STATE_REFERENCES)
-                        val customerId = FirebaseAuth.getInstance().currentUser?.uid!!
-                        driverRef.setValue(
-                            RequestModel(
-                                customerId = customerId,
-                                destination = destination
-                            )
-                        )
-                        bookState = UserBookingState.PENDING
-                        if (!isWaitingResponse) {
-                            isWaitingResponse = true
-                            driverRef.addValueEventListener(object : ValueEventListener {
-                                override fun onDataChange(snapshot: DataSnapshot) {
-                                    if (snapshot.exists()) {
-                                        val request = snapshot.getValue(RequestModel::class.java)
-                                        Log.d("pvhung1", "onDataChange: ${request}")
-                                        if (request != null) {
-                                            if (request.state == RequestState.ACCEPT) {
-                                                showToast("Accepted")
-                                                getDriverLocation()
-                                                isWaitingResponse = false
-                                                bookState = UserBookingState.FOUND
-                                            } else if (request.state == RequestState.CANCEL) {
-                                                driverRef.removeValue()
-                                                isFoundDriver = false
-                                                foundDriverId = ""
-                                                driverRef.removeEventListener(this)
-                                                bookState = UserBookingState.LOOKING
-                                                showToast("Driver cancel")
+                        db.addListenerForSingleValueEvent(object : ValueEventListener {
+                            override fun onDataChange(snapshot: DataSnapshot) {
+                                if (isFoundDriver) return
+                                val user = FirebaseDatabaseUtils.getUserFromSnapshot(snapshot)
+                                if (user != null && user.getService() == serviceBooking) {
+                                    isFoundDriver = true
+                                    foundDriverId = dataSnapshot.key
+
+                                    val driverRef =
+                                        FirebaseDatabaseUtils.getSpecificRiderDatabase(foundDriverId!!)
+                                            .child(Constant.REQUEST_STATE_REFERENCES)
+                                    val customerId = FirebaseAuth.getInstance().currentUser?.uid!!
+                                    driverRef.setValue(
+                                        RequestModel(
+                                            customerId = customerId,
+                                            destination = destination
+                                        )
+                                    )
+                                    bookState = UserBookingState.PENDING
+                                    if (!isWaitingResponse) {
+                                        isWaitingResponse = true
+                                        driverRef.addValueEventListener(object :
+                                            ValueEventListener {
+                                            override fun onDataChange(snapshot: DataSnapshot) {
+                                                if (snapshot.exists()) {
+                                                    val request =
+                                                        snapshot.getValue(RequestModel::class.java)
+                                                    if (request != null) {
+                                                        if (request.state == RequestState.ACCEPT) {
+                                                            showToast("Accepted")
+                                                            getDriverLocation()
+                                                            updateNotiDriverInfo(user)
+                                                            isWaitingResponse = false
+                                                            bookState = UserBookingState.FOUND
+                                                        } else if (request.state == RequestState.CANCEL) {
+                                                            driverRef.removeValue()
+                                                            isFoundDriver = false
+                                                            foundDriverId = ""
+                                                            driverRef.removeEventListener(this)
+                                                            bookState = UserBookingState.LOOKING
+                                                            showToast("Driver cancel")
+                                                        }
+
+                                                    }
+                                                }
                                             }
 
-                                        }
+                                            override fun onCancelled(error: DatabaseError) {}
+
+                                        })
                                     }
                                 }
 
-                                override fun onCancelled(error: DatabaseError) {}
+                            }
 
-                            })
-                        }
+                            override fun onCancelled(error: DatabaseError) {}
+                        })
+
                     }
                 }
 
@@ -446,6 +478,21 @@ class CustomerMapFragment : BaseBindingFragment<FragmentCustomerMapBinding, Cust
                 }
             })
     }
+
+    fun updateNotiDriverInfo(user: User) {
+        binding.icNotifyMinimal.let {
+            it.tvName.text = user.fullName
+            it.tvRating.text = user.rating.toString()
+            it.tvVehicle.text = user.getService()
+        }
+
+        binding.icNotifyExpand.let {
+            it.tvName.text = user.fullName
+            it.tvRating.text = user.rating.toString()
+            it.tvVehicle.text = user.getService()
+        }
+    }
+
 
     fun updateWhenDriverArrived() {
         binding.icNotifyExpand.btnRide.text = getString(R.string.arrived)
