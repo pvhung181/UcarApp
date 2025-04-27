@@ -5,9 +5,17 @@ import android.annotation.SuppressLint
 import android.location.Location
 import android.os.Bundle
 import android.os.Looper
+import android.util.Log
 import android.view.View
+import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
+import com.directions.route.AbstractRouting
+import com.directions.route.Route
+import com.directions.route.RouteException
+import com.directions.route.Routing
+import com.directions.route.RoutingListener
 import com.firebase.geofire.GeoFire
 import com.firebase.geofire.GeoLocation
 import com.google.android.gms.location.FusedLocationProviderClient
@@ -23,12 +31,15 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
+import com.google.android.gms.maps.model.Polyline
+import com.google.android.gms.maps.model.PolylineOptions
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
+import com.pvhung.ucar.App
 import com.pvhung.ucar.R
 import com.pvhung.ucar.common.Constant
 import com.pvhung.ucar.common.enums.RequestState
@@ -42,8 +53,9 @@ import com.pvhung.ucar.utils.PermissionHelper
 import com.pvhung.ucar.utils.beGone
 import com.pvhung.ucar.utils.beVisible
 
+
 class MapFragment : BaseBindingFragment<FragmentDriverMapBinding, MapViewModel>(),
-    OnMapReadyCallback {
+    OnMapReadyCallback, RoutingListener {
 
     private lateinit var mMap: GoogleMap
     private lateinit var mapFragment: SupportMapFragment
@@ -52,6 +64,13 @@ class MapFragment : BaseBindingFragment<FragmentDriverMapBinding, MapViewModel>(
     private lateinit var mFusedLocationClient: FusedLocationProviderClient
     private val requestModel = RequestModel()
     private var pickupLocation: Marker? = null
+    private var polylines = mutableListOf<Polyline>()
+    private val COLORS: IntArray = intArrayOf(
+        R.color.primary_dark,
+        R.color.primary,
+        R.color.primary_light,
+        R.color.accent
+    )
 
     private val locationPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
@@ -113,6 +132,7 @@ class MapFragment : BaseBindingFragment<FragmentDriverMapBinding, MapViewModel>(
 
     override fun onCreatedView(view: View?, savedInstanceState: Bundle?) {
         OnBackPressed.onBackPressedFinishActivity(requireActivity(), this)
+        polylines = mutableListOf()
         loading(true)
         initMaps()
         init()
@@ -135,10 +155,14 @@ class MapFragment : BaseBindingFragment<FragmentDriverMapBinding, MapViewModel>(
                     if (request != null && request.state == RequestState.ACCEPT) {
                         requestModel.customerId = request.customerId
                         requestModel.destination = request.destination
-                        if(isAdded) binding.icUserRequest.tvDestination.text = request.destination
+                        if (isAdded) binding.icUserRequest.tvDestination.text = request.destination
                         getAssignedCustomerPickupLocation()
                     }
+                    else if(request != null && request.state == RequestState.CANCEL) {
+                        assignedCustomerRef.removeValue()
+                    }
                 } else {
+                    erasePolyLines()
                     requestModel.reset()
                     pickupLocation?.remove()
                     assignedCustomerPickupRefListener?.let {
@@ -173,12 +197,13 @@ class MapFragment : BaseBindingFragment<FragmentDriverMapBinding, MapViewModel>(
                         if (map[1] != null) {
                             locationLng = (map[1].toString()).toDouble()
                         }
-                        var driverLocation = LatLng(locationLat, locationLng)
+                        var pickupLatLng = LatLng(locationLat, locationLng)
                         pickupLocation = mMap.addMarker(
-                            MarkerOptions().position(driverLocation).title("Pickup location").icon(
+                            MarkerOptions().position(pickupLatLng).title("Pickup location").icon(
                                 BitmapDescriptorFactory.fromResource(R.drawable.ic_map_pin)
                             )
                         )
+                        getRouteToMarker(pickupLatLng)
                     }
                 }
 
@@ -186,6 +211,17 @@ class MapFragment : BaseBindingFragment<FragmentDriverMapBinding, MapViewModel>(
 
                 }
             })
+    }
+
+    fun getRouteToMarker(l: LatLng) {
+        val routing = Routing.Builder()
+            .travelMode(AbstractRouting.TravelMode.DRIVING)
+            .withListener(this)
+            .key(Constant.MAPS_API)
+            .alternativeRoutes(false)
+            .waypoints(LatLng(mLastLocation!!.latitude, mLastLocation!!.longitude), l)
+            .build()
+        routing.execute()
     }
 
     private fun initMaps() {
@@ -277,6 +313,67 @@ class MapFragment : BaseBindingFragment<FragmentDriverMapBinding, MapViewModel>(
 
         } catch (_: Exception) {
         }
+    }
+
+    override fun onRoutingFailure(e: RouteException?) {
+        if (e != null) {
+            Toast.makeText(requireContext(), "Error: ${e.message}", Toast.LENGTH_LONG).show();
+            Log.e("pvhung111", "onRoutingFailure: ${e.message}", )
+        } else {
+            Toast.makeText(requireContext(), "Something went wrong, Try again", Toast.LENGTH_SHORT)
+                .show();
+        }
+    }
+
+    override fun onRoutingStart() {
+
+    }
+
+    override fun onRoutingSuccess(route: ArrayList<Route>?, shortestIndex: Int) {
+        route?.let {
+            if (polylines?.isNotEmpty() == true) {
+                for (poly in polylines!!) {
+                    poly.remove()
+                }
+            }
+
+            polylines = ArrayList<Polyline>()
+
+            //add route(s) to the map.
+            for (i in 0 until route.size) {
+                //In case of more than 5 alternative routes
+
+                val colorIndex: Int = i % COLORS.size
+
+                val polyOptions = PolylineOptions()
+                polyOptions.color(ContextCompat.getColor(requireContext(), COLORS[colorIndex]))
+                polyOptions.width((10 + i * 3).toFloat())
+                polyOptions.addAll(route[i].points)
+                val polyline: Polyline = mMap.addPolyline(polyOptions)
+                polylines.add(polyline)
+
+                Toast.makeText(
+                    App.instance,
+                    ("Route " + (i + 1) + ": distance - " + route[i]
+                        .distanceValue).toString() + ": duration - " + route[i]
+                        .durationValue,
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+        }
+
+    }
+
+    override fun onRoutingCancelled() {
+
+    }
+
+    private fun erasePolyLines() {
+        polylines.forEach {
+            it.remove()
+        }
+        polylines.clear()
+
     }
 
 }

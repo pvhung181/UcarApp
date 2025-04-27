@@ -171,6 +171,13 @@ class CustomerMapFragment : BaseBindingFragment<FragmentCustomerMapBinding, Cust
 
             override fun onSuggestionSelected(suggestion: PlaceAutocompleteSuggestion) {
                 destination = suggestion.name
+                if(suggestion.routablePoints !=null) {
+                    for(i in 0 until  suggestion.routablePoints!!.size) {
+                        val item = suggestion.routablePoints!![i]
+                        Log.e("Hunggg", "onSuggestionSelected: ${item.point.longitude()} | lat : ${item.point.latitude()}", )
+                    }
+
+                }
                 searchDone()
             }
 

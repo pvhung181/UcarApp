@@ -61,7 +61,7 @@ class DriverAccountFragment :
     }
 
     private fun initView() {
-        binding.rvSetting.adapter = settingsAdapter
+
     }
 
     private fun onClick() {

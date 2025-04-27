@@ -67,15 +67,209 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rvSetting"
+
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvSelectDefault"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_marginTop="8dp"
-            android:orientation="vertical"
-            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/bgInfo" />
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/_10sdp"
+            android:layout_marginTop="20dp"
+            android:background="@drawable/bg_view_top_settings"
+            android:drawableEnd="@drawable/ic_arrow_right"
+            android:drawablePadding="@dimen/_10sdp"
+            android:ellipsize="end"
+            android:fontFamily="@font/sf_pro_text_regular"
+            android:gravity="center_vertical"
+            android:maxLines="1"
+            android:paddingHorizontal="@dimen/_14sdp"
+            android:paddingVertical="@dimen/_16sdp"
+            android:text=""
+            android:textColor="@color/black"
+            android:textSize="16sp"
+            app:layout_constraintTop_toBottomOf="@id/tvPhone" />
+
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvWeather"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_view_rect_settings"
+            android:drawableEnd="@drawable/ic_arrow_right"
+            android:drawablePadding="@dimen/_10sdp"
+            android:ellipsize="end"
+            android:fontFamily="@font/sf_pro_text_regular"
+            android:gravity="center_vertical"
+            android:maxLines="1"
+            android:paddingHorizontal="@dimen/_14sdp"
+            android:paddingVertical="@dimen/_16sdp"
+            android:text=""
+            android:textColor="@color/black"
+            android:textSize="16sp"
+            app:layout_constraintEnd_toEndOf="@id/tvSelectDefault"
+            app:layout_constraintStart_toStartOf="@id/tvSelectDefault"
+            app:layout_constraintTop_toBottomOf="@id/tvSelectDefault" />
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="0.5dp"
+            android:background="@drawable/bg_view"
+            app:layout_constraintBottom_toTopOf="@id/tvWeather"
+            app:layout_constraintEnd_toEndOf="@id/tvWeather" />
+
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvLanguage"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_view_rect_settings"
+            android:drawableEnd="@drawable/ic_arrow_right"
+            android:drawablePadding="@dimen/_10sdp"
+            android:ellipsize="end"
+            android:fontFamily="@font/sf_pro_text_regular"
+            android:gravity="center_vertical"
+            android:maxLines="1"
+            android:paddingHorizontal="@dimen/_14sdp"
+            android:paddingVertical="@dimen/_16sdp"
+
+            android:text=""
+            android:textColor="@color/black"
+            android:textSize="16sp"
+            app:layout_constraintEnd_toEndOf="@id/tvSelectDefault"
+            app:layout_constraintStart_toStartOf="@id/tvSelectDefault"
+            app:layout_constraintTop_toBottomOf="@id/tvWeather" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvCurrentSetLanguage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="@dimen/_32sdp"
+            android:fontFamily="@font/sf_pro_text_regular"
+            android:text="@string/english"
+            android:textColor="@color/_993C3C43"
+            android:textSize="16sp"
+            app:layout_constraintBottom_toBottomOf="@id/tvLanguage"
+            app:layout_constraintEnd_toEndOf="@id/tvSelectDefault"
+            app:layout_constraintTop_toTopOf="@id/tvLanguage" />
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="0.5dp"
+            android:background="@drawable/bg_view"
+            app:layout_constraintBottom_toTopOf="@id/tvLanguage"
+            app:layout_constraintEnd_toEndOf="@id/tvLanguage" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvPolicy"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_view_rect_settings"
+            android:drawableEnd="@drawable/ic_arrow_right"
+            android:drawablePadding="@dimen/_10sdp"
+            android:ellipsize="end"
+            android:fontFamily="@font/sf_pro_text_regular"
+            android:gravity="center_vertical"
+            android:maxLines="1"
+            android:paddingHorizontal="@dimen/_14sdp"
+            android:paddingVertical="@dimen/_16sdp"
+
+            android:text=""
+            android:textColor="@color/black"
+            android:textSize="16sp"
+            app:layout_constraintEnd_toEndOf="@id/tvSelectDefault"
+            app:layout_constraintStart_toStartOf="@id/tvSelectDefault"
+            app:layout_constraintTop_toBottomOf="@id/tvLanguage" />
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="0.5dp"
+            android:background="@drawable/bg_view"
+            app:layout_constraintBottom_toTopOf="@id/tvPolicy"
+            app:layout_constraintEnd_toEndOf="@id/tvPolicy" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvRate"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_view_rect_settings"
+            android:drawableEnd="@drawable/ic_arrow_right"
+            android:drawablePadding="@dimen/_10sdp"
+            android:ellipsize="end"
+            android:fontFamily="@font/sf_pro_text_regular"
+            android:gravity="center_vertical"
+            android:maxLines="1"
+            android:paddingHorizontal="@dimen/_14sdp"
+            android:paddingVertical="@dimen/_16sdp"
+
+            android:text=""
+            android:textColor="@color/black"
+            android:textSize="16sp"
+            app:layout_constraintEnd_toEndOf="@id/tvSelectDefault"
+            app:layout_constraintStart_toStartOf="@id/tvSelectDefault"
+            app:layout_constraintTop_toBottomOf="@id/tvPolicy" />
+
+        <View
+            android:id="@+id/viewRate"
+            android:layout_width="0dp"
+            android:layout_height="0.5dp"
+            android:background="@drawable/bg_view"
+            app:layout_constraintBottom_toTopOf="@id/tvRate"
+            app:layout_constraintEnd_toEndOf="@id/tvRate" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvFeedBack"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_view_rect_settings"
+            android:drawableEnd="@drawable/ic_arrow_right"
+            android:drawablePadding="@dimen/_10sdp"
+            android:ellipsize="end"
+            android:fontFamily="@font/sf_pro_text_regular"
+            android:gravity="center_vertical"
+            android:maxLines="1"
+            android:paddingHorizontal="@dimen/_14sdp"
+            android:paddingVertical="@dimen/_16sdp"
+
+            android:text=""
+            android:textColor="@color/black"
+            android:textSize="16sp"
+            app:layout_constraintEnd_toEndOf="@id/tvSelectDefault"
+            app:layout_constraintStart_toStartOf="@id/tvSelectDefault"
+            app:layout_constraintTop_toBottomOf="@id/tvRate" />
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="0.5dp"
+            android:background="@drawable/bg_view"
+            app:layout_constraintBottom_toTopOf="@id/tvFeedBack"
+            app:layout_constraintEnd_toEndOf="@id/tvFeedBack" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvShareApp"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_view_bot_settings"
+            android:drawableEnd="@drawable/ic_arrow_right"
+            android:drawablePadding="@dimen/_10sdp"
+            android:ellipsize="end"
+            android:fontFamily="@font/sf_pro_text_regular"
+            android:gravity="center_vertical"
+            android:maxLines="1"
+            android:paddingHorizontal="@dimen/_14sdp"
+            android:paddingVertical="@dimen/_16sdp"
+            android:text=""
+            android:textColor="@color/black"
+            android:textSize="16sp"
+            app:layout_constraintEnd_toEndOf="@id/tvSelectDefault"
+            app:layout_constraintStart_toStartOf="@id/tvSelectDefault"
+            app:layout_constraintTop_toBottomOf="@id/tvFeedBack" />
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="0.5dp"
+            android:background="@drawable/bg_view"
+            app:layout_constraintBottom_toTopOf="@id/tvShareApp"
+            app:layout_constraintEnd_toEndOf="@id/tvShareApp" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

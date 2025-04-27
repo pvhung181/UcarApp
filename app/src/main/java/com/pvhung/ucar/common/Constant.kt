@@ -2,6 +2,8 @@ package com.pvhung.ucar.common
 
 
 object Constant {
+    const val MAPS_API = "AIzaSyBkCI_IMYyTCLTxv6u49YVVLFckNRCTHFg"
+
     const val LANGUAGE_EN = "en"
     const val LANGUAGE_VN = "vi"
     const val PREF_SETTING_LANGUAGE = "PREF_SETTING_LANGUAGE"
