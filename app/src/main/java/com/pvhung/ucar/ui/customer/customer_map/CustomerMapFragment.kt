@@ -5,16 +5,14 @@ import android.annotation.SuppressLint
 import android.location.Location
 import android.os.Bundle
 import android.os.Looper
-import android.text.Editable
-import android.text.TextWatcher
 import android.util.Log
 import android.view.View
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.lifecycle.lifecycleScope
 import com.firebase.geofire.GeoFire
 import com.firebase.geofire.GeoLocation
 import com.firebase.geofire.GeoQuery
 import com.firebase.geofire.GeoQueryDataEventListener
+import com.google.android.gms.common.api.Status
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
@@ -28,16 +26,16 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
+import com.google.android.libraries.places.api.Places
+import com.google.android.libraries.places.api.model.Place
+import com.google.android.libraries.places.widget.AutocompleteSupportFragment
+import com.google.android.libraries.places.widget.listener.PlaceSelectionListener
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.ValueEventListener
-import com.mapbox.search.autocomplete.PlaceAutocomplete
-import com.mapbox.search.autocomplete.PlaceAutocompleteSuggestion
-import com.mapbox.search.ui.adapter.autocomplete.PlaceAutocompleteUiAdapter
-import com.mapbox.search.ui.view.CommonSearchViewConfiguration
-import com.mapbox.search.ui.view.SearchResultsView
+import com.pvhung.ucar.App
 import com.pvhung.ucar.R
 import com.pvhung.ucar.common.Constant
 import com.pvhung.ucar.common.enums.RequestState
@@ -55,9 +53,6 @@ import com.pvhung.ucar.utils.PermissionHelper
 import com.pvhung.ucar.utils.Utils
 import com.pvhung.ucar.utils.beGone
 import com.pvhung.ucar.utils.beVisible
-import com.pvhung.ucar.utils.hideKeyboard
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 
 
 class CustomerMapFragment : BaseBindingFragment<FragmentCustomerMapBinding, CustomerMapViewModel>(),
@@ -77,7 +72,6 @@ class CustomerMapFragment : BaseBindingFragment<FragmentCustomerMapBinding, Cust
     private var radius: Double = 1.0
     private var isFoundDriver = false
     private var foundDriverId: String? = null
-    private var isEditing = false
     private var serviceBooking = Constant.MOTOBIKE_SERVICE
     private var bookingBottomSheet: BottomSheetBookingVehicle? = null
 
@@ -86,10 +80,8 @@ class CustomerMapFragment : BaseBindingFragment<FragmentCustomerMapBinding, Cust
     private var driverLocationRef: DatabaseReference? = null
     private var driverLocationRefListener: ValueEventListener? = null
 
-    private var placeAutocomplete: PlaceAutocomplete? = null
-    private var placeAutocompleteUiAdapter: PlaceAutocompleteUiAdapter? = null
 
-    private var destination = ""
+    private val requestModel = RequestModel()
     private var pickupMarker: Marker? = null
 
     private val locationPermissionLauncher = registerForActivityResult(
@@ -154,62 +146,25 @@ class CustomerMapFragment : BaseBindingFragment<FragmentCustomerMapBinding, Cust
     }
 
     private fun setupAutoComplete() {
-        binding.searchResultsView.initialize(
-            SearchResultsView.Configuration(
-                CommonSearchViewConfiguration()
+
+        if (!Places.isInitialized()) {
+            Places.initialize(App.instance, Constant.MAPS_API)
+        }
+        val autoCompleteFragment =
+            ((childFragmentManager.findFragmentById(R.id.autocompleteFragment)) as AutocompleteSupportFragment).setPlaceFields(
+                listOf(Place.Field.NAME, Place.Field.LAT_LNG)
             )
-        )
-        placeAutocomplete = PlaceAutocomplete.create()
-        placeAutocompleteUiAdapter =
-            PlaceAutocompleteUiAdapter(binding.searchResultsView, placeAutocomplete!!)
+        autoCompleteFragment.setOnPlaceSelectedListener(object : PlaceSelectionListener {
+            override fun onError(e: Status) {
+                e.statusMessage?.let { showToast(it) }
+            }
 
-        placeAutocompleteUiAdapter?.addSearchListener(object :
-            PlaceAutocompleteUiAdapter.SearchListener {
-            override fun onError(e: Exception) {}
-
-            override fun onPopulateQueryClick(suggestion: PlaceAutocompleteSuggestion) {}
-
-            override fun onSuggestionSelected(suggestion: PlaceAutocompleteSuggestion) {
-                destination = suggestion.name
-                if(suggestion.routablePoints !=null) {
-                    for(i in 0 until  suggestion.routablePoints!!.size) {
-                        val item = suggestion.routablePoints!![i]
-                        Log.e("Hunggg", "onSuggestionSelected: ${item.point.longitude()} | lat : ${item.point.latitude()}", )
-                    }
-
+            override fun onPlaceSelected(place: Place) {
+                requestModel.destination = place.name?.toString() ?: ""
+                place.latLng?.let {
+                    requestModel.destinationLat = it.latitude
+                    requestModel.destinationLng = it.longitude
                 }
-                searchDone()
-            }
-
-            override fun onSuggestionsShown(suggestions: List<PlaceAutocompleteSuggestion>) {
-                if (isEditing) {
-                    binding.searchResultsView.beVisible()
-                }
-                Log.e("hunglkj", "onSuggestionsShown")
-            }
-        })
-
-
-        binding.search.addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
-
-            }
-
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                isEditing = true
-                s?.let {
-                    if (s.isNotBlank()) {
-                        binding.searchResultsView.beVisible()
-                    }
-                    lifecycleScope.launch(Dispatchers.IO) {
-                        placeAutocompleteUiAdapter?.search(s.toString())
-                    }
-                }
-
-            }
-
-            override fun afterTextChanged(s: Editable?) {
-
             }
         })
 
@@ -236,17 +191,6 @@ class CustomerMapFragment : BaseBindingFragment<FragmentCustomerMapBinding, Cust
     }
 
     private fun onClick() {
-
-        binding.search.setOnTouchListener { v, event ->
-            binding.ivBack.beVisible()
-            false
-        }
-
-
-        binding.ivBack.setOnClickListener {
-            searchDone()
-        }
-
         binding.icNotifyMinimal.ivExpand.setOnClickListener {
             binding.icNotifyMinimal.root.beGone()
             binding.icNotifyExpand.root.beVisible()
@@ -270,14 +214,6 @@ class CustomerMapFragment : BaseBindingFragment<FragmentCustomerMapBinding, Cust
         }
     }
 
-    private fun searchDone() {
-        binding.search.setText(destination)
-        binding.search.hideKeyboard()
-        binding.search.clearFocus()
-        binding.searchResultsView.beGone()
-        binding.ivBack.beGone()
-        isEditing = false
-    }
 
     override fun onResume() {
         super.onResume()
@@ -300,15 +236,7 @@ class CustomerMapFragment : BaseBindingFragment<FragmentCustomerMapBinding, Cust
         mMap = gm
 
         mMap.setOnMapClickListener {
-            if (binding.search.isFocused) {
-                if (destination.isNotBlank()) {
-                    searchDone()
-                } else {
-                    binding.search.clearFocus()
-                    binding.search.hideKeyboard()
-                }
-                binding.ivBack.beGone()
-            }
+
         }
 
         mMap.uiSettings.isZoomControlsEnabled = true
@@ -358,12 +286,8 @@ class CustomerMapFragment : BaseBindingFragment<FragmentCustomerMapBinding, Cust
                                         FirebaseDatabaseUtils.getSpecificRiderDatabase(foundDriverId!!)
                                             .child(Constant.REQUEST_STATE_REFERENCES)
                                     val customerId = FirebaseAuth.getInstance().currentUser?.uid!!
-                                    driverRef.setValue(
-                                        RequestModel(
-                                            customerId = customerId,
-                                            destination = destination
-                                        )
-                                    )
+                                    requestModel.customerId = customerId
+                                    driverRef.setValue(requestModel)
                                     bookState = UserBookingState.PENDING
                                     if (!isWaitingResponse) {
                                         isWaitingResponse = true

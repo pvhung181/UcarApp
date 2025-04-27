@@ -3,6 +3,7 @@ package com.pvhung.ucar
 import android.app.Application
 import android.content.res.Configuration
 import androidx.appcompat.app.AppCompatDelegate
+import com.google.android.libraries.places.api.Places
 import com.google.firebase.FirebaseApp
 import com.pvhung.ucar.common.Constant
 import com.pvhung.ucar.data.local.SharedPreferenceHelper

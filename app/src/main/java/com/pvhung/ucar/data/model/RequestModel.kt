@@ -5,11 +5,15 @@ import com.pvhung.ucar.common.enums.RequestState
 data class RequestModel(
     var customerId: String = "",
     var state: RequestState = RequestState.IDLE,
-    var destination: String = ""
+    var destination: String = "",
+    var destinationLat: Double = 0.0,
+    var destinationLng: Double = 0.0
 ) {
     fun reset() {
         customerId = ""
         state = RequestState.IDLE
         destination = ""
+        destinationLng = 0.0
+        destinationLat = 0.0
     }
 }

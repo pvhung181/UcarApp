@@ -18,6 +18,8 @@ object Constant {
     const val CUSTOMER_REQUESTS_REFERENCES = "Requests"
     const val CUSTOMER_RIDE_ID = "CustomerRideId"
     const val REQUEST_STATE_REFERENCES = "RequestState"
+    const val DESTINATION_LAT = "DESTINATION_LAT"
+    const val DESTINATION_LNG = "DESTINATION_LNG"
 
     //User
     const val USER_IS_ACTIVE = "active"
