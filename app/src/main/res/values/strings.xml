@@ -47,4 +47,10 @@
     <string name="hyphen">-----------------</string>
     <string name="where_to">Where to ?</string>
     <string name="book">Book</string>
+    <string name="my_profile">My Profile</string>
+    <string name="languages">Languages</string>
+    <string name="feedback">Feedback</string>
+    <string name="rate_us">Rate Us</string>
+    <string name="privacy_policy">Privacy policy</string>
+    <string name="share_app">Share App</string>
 </resources>

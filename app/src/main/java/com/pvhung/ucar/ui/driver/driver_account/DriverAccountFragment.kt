@@ -9,21 +9,16 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.ValueEventListener
 import com.pvhung.ucar.R
-import com.pvhung.ucar.common.enums.SettingType
 import com.pvhung.ucar.data.model.User
 import com.pvhung.ucar.databinding.FragmentDriverAccountBinding
-import com.pvhung.ucar.interfaces.OnSettingListener
-import com.pvhung.ucar.ui.adapter.SettingsAdapter
 import com.pvhung.ucar.ui.base.BaseBindingFragment
 import com.pvhung.ucar.ui.main.MainActivity
-import com.pvhung.ucar.utils.DataProvider
 import com.pvhung.ucar.utils.FirebaseDatabaseUtils
 import com.pvhung.ucar.utils.OnBackPressed
 import com.pvhung.ucar.utils.Utils
 
 class DriverAccountFragment :
     BaseBindingFragment<FragmentDriverAccountBinding, DriverAccountViewModel>() {
-    private lateinit var settingsAdapter: SettingsAdapter
     private var db: DatabaseReference? = null
     private var dbListener: ValueEventListener? = null
 
@@ -44,20 +39,7 @@ class DriverAccountFragment :
     }
 
     private fun initData() {
-        settingsAdapter = SettingsAdapter(
-            requireContext(),
-            DataProvider.getSettingItems(),
-            object : OnSettingListener {
-                override fun onItemClick(type: SettingType) {
-                    when (type) {
-                        SettingType.SIGN_OUT -> {
-                            signOut()
-                        }
-                    }
-                }
 
-            }
-        )
     }
 
     private fun initView() {
@@ -65,9 +47,31 @@ class DriverAccountFragment :
     }
 
     private fun onClick() {
-        binding.ivEdit.setOnClickListener {
+        binding.tvInfo.setOnClickListener {
             navigateScreen(null, R.id.driverInfoFragment)
         }
+
+        binding.tvLanguage.setOnClickListener {
+
+        }
+
+        binding.tvFb.setOnClickListener {
+
+        }
+
+        binding.tvPolicy.setOnClickListener {
+
+        }
+
+        binding.tvRate.setOnClickListener {
+
+        }
+
+        binding.tvShareApp.setOnClickListener {
+
+        }
+
+        binding.tvLogout.setOnClickListener { signOut() }
     }
 
     override fun observerData() {

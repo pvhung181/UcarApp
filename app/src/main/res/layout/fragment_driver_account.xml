@@ -2,274 +2,291 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto">
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        tools:context=".ui.driver.driver_account.DriverAccountFragment">
-        <View
-            android:id="@+id/bgInfo"
+        android:layout_height="match_parent">
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:background="@drawable/bg_gradient_87cefa_ffffff"
-            app:layout_constraintBottom_toBottomOf="@id/tvPhone"
-            app:layout_constraintTop_toTopOf="parent" />
+            android:layout_height="match_parent"
+            tools:context=".ui.driver.driver_account.DriverAccountFragment">
+            <View
+                android:id="@+id/bgInfo"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:background="@drawable/bg_gradient_87cefa_ffffff"
+                app:layout_constraintBottom_toBottomOf="@id/tvPhone"
+                app:layout_constraintTop_toTopOf="parent" />
 
-        <com.google.android.material.imageview.ShapeableImageView
-            android:id="@+id/ivAvatar"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_marginTop="8dp"
-            android:background="@color/white"
-            android:scaleType="centerCrop"
-            android:src="@drawable/iv_male_avatar"
-            app:layout_constraintDimensionRatio="1"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintWidth_percent="0.2"
-            app:shapeAppearanceOverlay="@style/RoundedImageView" />
+            <com.google.android.material.imageview.ShapeableImageView
+                android:id="@+id/ivAvatar"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_marginTop="8dp"
+                android:background="@color/white"
+                android:scaleType="centerCrop"
+                android:src="@drawable/iv_male_avatar"
+                app:layout_constraintDimensionRatio="1"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintWidth_percent="0.2"
+                app:shapeAppearanceOverlay="@style/RoundedImageView" />
 
-        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/tvUserName"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="6dp"
-            android:fontFamily="@font/sf_pro_text_bold"
-            android:text="@string/author"
-            android:textSize="22sp"
-            app:layout_constraintEnd_toEndOf="@id/ivAvatar"
-            app:layout_constraintStart_toStartOf="@id/ivAvatar"
-            app:layout_constraintTop_toBottomOf="@id/ivAvatar" />
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvUserName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:fontFamily="@font/sf_pro_text_bold"
+                android:text="@string/author"
+                android:textSize="22sp"
+                app:layout_constraintEnd_toEndOf="@id/ivAvatar"
+                app:layout_constraintStart_toStartOf="@id/ivAvatar"
+                app:layout_constraintTop_toBottomOf="@id/ivAvatar" />
 
-        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/tvPhone"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="@dimen/_8sdp"
-            android:fontFamily="@font/sf_pro_text_regular"
-            android:paddingBottom="@dimen/_8sdp"
-            android:text="@string/author_phone"
-            android:textSize="16sp"
-            app:layout_constraintEnd_toEndOf="@id/ivAvatar"
-            app:layout_constraintStart_toStartOf="@id/ivAvatar"
-            app:layout_constraintTop_toBottomOf="@id/tvUserName" />
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvPhone"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/_8sdp"
+                android:fontFamily="@font/sf_pro_text_regular"
+                android:paddingBottom="@dimen/_8sdp"
+                android:text="@string/author_phone"
+                android:textSize="16sp"
+                app:layout_constraintEnd_toEndOf="@id/ivAvatar"
+                app:layout_constraintStart_toStartOf="@id/ivAvatar"
+                app:layout_constraintTop_toBottomOf="@id/tvUserName" />
 
-        <androidx.appcompat.widget.AppCompatImageView
-            android:id="@+id/ivEdit"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:layout_marginEnd="4dp"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:padding="6dp"
-            android:src="@drawable/ic_edit"
-            android:tint="@color/white"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-
-
-        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/tvSelectDefault"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="@dimen/_10sdp"
-            android:layout_marginTop="20dp"
-            android:background="@drawable/bg_view_top_settings"
-            android:drawableEnd="@drawable/ic_arrow_right"
-            android:drawablePadding="@dimen/_10sdp"
-            android:ellipsize="end"
-            android:fontFamily="@font/sf_pro_text_regular"
-            android:gravity="center_vertical"
-            android:maxLines="1"
-            android:paddingHorizontal="@dimen/_14sdp"
-            android:paddingVertical="@dimen/_16sdp"
-            android:text=""
-            android:textColor="@color/black"
-            android:textSize="16sp"
-            app:layout_constraintTop_toBottomOf="@id/tvPhone" />
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvInfo"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/_10sdp"
+                android:layout_marginTop="20dp"
+                android:background="@drawable/bg_view_top_settings"
+                android:drawableEnd="@drawable/ic_arrow_right"
+                android:drawablePadding="@dimen/_10sdp"
+                android:ellipsize="end"
+                android:fontFamily="@font/sf_pro_text_regular"
+                android:gravity="center_vertical"
+                android:maxLines="1"
+                android:paddingHorizontal="@dimen/_14sdp"
+                android:paddingVertical="@dimen/_16sdp"
+                android:text="@string/my_profile"
+                android:textColor="@color/black"
+                android:textSize="16sp"
+                app:layout_constraintTop_toBottomOf="@id/tvPhone" />
 
 
-        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/tvWeather"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:background="@drawable/bg_view_rect_settings"
-            android:drawableEnd="@drawable/ic_arrow_right"
-            android:drawablePadding="@dimen/_10sdp"
-            android:ellipsize="end"
-            android:fontFamily="@font/sf_pro_text_regular"
-            android:gravity="center_vertical"
-            android:maxLines="1"
-            android:paddingHorizontal="@dimen/_14sdp"
-            android:paddingVertical="@dimen/_16sdp"
-            android:text=""
-            android:textColor="@color/black"
-            android:textSize="16sp"
-            app:layout_constraintEnd_toEndOf="@id/tvSelectDefault"
-            app:layout_constraintStart_toStartOf="@id/tvSelectDefault"
-            app:layout_constraintTop_toBottomOf="@id/tvSelectDefault" />
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvLanguage"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_view_rect_settings"
+                android:drawableEnd="@drawable/ic_arrow_right"
+                android:drawablePadding="@dimen/_10sdp"
+                android:ellipsize="end"
+                android:fontFamily="@font/sf_pro_text_regular"
+                android:gravity="center_vertical"
+                android:maxLines="1"
+                android:paddingHorizontal="@dimen/_14sdp"
+                android:paddingVertical="@dimen/_16sdp"
+                android:text="@string/languages"
+                android:textColor="@color/black"
+                android:textSize="16sp"
+                app:layout_constraintEnd_toEndOf="@id/tvInfo"
+                app:layout_constraintStart_toStartOf="@id/tvInfo"
+                app:layout_constraintTop_toBottomOf="@id/tvInfo" />
 
-        <View
-            android:layout_width="0dp"
-            android:layout_height="0.5dp"
-            android:background="@drawable/bg_view"
-            app:layout_constraintBottom_toTopOf="@id/tvWeather"
-            app:layout_constraintEnd_toEndOf="@id/tvWeather" />
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvCurrentSetLanguage"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="@dimen/_32sdp"
+                android:fontFamily="@font/sf_pro_text_regular"
+                android:text="@string/english"
+                android:textColor="@color/_993C3C43"
+                android:textSize="16sp"
+                app:layout_constraintBottom_toBottomOf="@id/tvLanguage"
+                app:layout_constraintEnd_toEndOf="@id/tvInfo"
+                app:layout_constraintTop_toTopOf="@id/tvLanguage" />
 
 
-        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/tvLanguage"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:background="@drawable/bg_view_rect_settings"
-            android:drawableEnd="@drawable/ic_arrow_right"
-            android:drawablePadding="@dimen/_10sdp"
-            android:ellipsize="end"
-            android:fontFamily="@font/sf_pro_text_regular"
-            android:gravity="center_vertical"
-            android:maxLines="1"
-            android:paddingHorizontal="@dimen/_14sdp"
-            android:paddingVertical="@dimen/_16sdp"
+            <View
+                android:layout_width="0dp"
+                android:layout_height="0.5dp"
+                android:background="@drawable/bg_view"
+                app:layout_constraintBottom_toTopOf="@id/tvLanguage"
+                app:layout_constraintEnd_toEndOf="@id/tvLanguage" />
 
-            android:text=""
-            android:textColor="@color/black"
-            android:textSize="16sp"
-            app:layout_constraintEnd_toEndOf="@id/tvSelectDefault"
-            app:layout_constraintStart_toStartOf="@id/tvSelectDefault"
-            app:layout_constraintTop_toBottomOf="@id/tvWeather" />
 
-        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/tvCurrentSetLanguage"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="@dimen/_32sdp"
-            android:fontFamily="@font/sf_pro_text_regular"
-            android:text="@string/english"
-            android:textColor="@color/_993C3C43"
-            android:textSize="16sp"
-            app:layout_constraintBottom_toBottomOf="@id/tvLanguage"
-            app:layout_constraintEnd_toEndOf="@id/tvSelectDefault"
-            app:layout_constraintTop_toTopOf="@id/tvLanguage" />
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvFb"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_view_rect_settings"
+                android:drawableEnd="@drawable/ic_arrow_right"
+                android:drawablePadding="@dimen/_10sdp"
+                android:ellipsize="end"
+                android:fontFamily="@font/sf_pro_text_regular"
+                android:gravity="center_vertical"
+                android:maxLines="1"
+                android:paddingHorizontal="@dimen/_14sdp"
+                android:paddingVertical="@dimen/_16sdp"
+                android:text="@string/feedback"
+                android:textColor="@color/black"
+                android:textSize="16sp"
+                app:layout_constraintEnd_toEndOf="@id/tvInfo"
+                app:layout_constraintStart_toStartOf="@id/tvInfo"
+                app:layout_constraintTop_toBottomOf="@id/tvLanguage" />
 
-        <View
-            android:layout_width="0dp"
-            android:layout_height="0.5dp"
-            android:background="@drawable/bg_view"
-            app:layout_constraintBottom_toTopOf="@id/tvLanguage"
-            app:layout_constraintEnd_toEndOf="@id/tvLanguage" />
 
-        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/tvPolicy"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:background="@drawable/bg_view_rect_settings"
-            android:drawableEnd="@drawable/ic_arrow_right"
-            android:drawablePadding="@dimen/_10sdp"
-            android:ellipsize="end"
-            android:fontFamily="@font/sf_pro_text_regular"
-            android:gravity="center_vertical"
-            android:maxLines="1"
-            android:paddingHorizontal="@dimen/_14sdp"
-            android:paddingVertical="@dimen/_16sdp"
+            <View
+                android:layout_width="0dp"
+                android:layout_height="0.5dp"
+                android:background="@drawable/bg_view"
+                app:layout_constraintBottom_toTopOf="@id/tvFb"
+                app:layout_constraintEnd_toEndOf="@id/tvFb" />
 
-            android:text=""
-            android:textColor="@color/black"
-            android:textSize="16sp"
-            app:layout_constraintEnd_toEndOf="@id/tvSelectDefault"
-            app:layout_constraintStart_toStartOf="@id/tvSelectDefault"
-            app:layout_constraintTop_toBottomOf="@id/tvLanguage" />
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvPolicy"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_view_rect_settings"
+                android:drawableEnd="@drawable/ic_arrow_right"
+                android:drawablePadding="@dimen/_10sdp"
+                android:ellipsize="end"
+                android:fontFamily="@font/sf_pro_text_regular"
+                android:gravity="center_vertical"
+                android:maxLines="1"
+                android:paddingHorizontal="@dimen/_14sdp"
+                android:paddingVertical="@dimen/_16sdp"
 
-        <View
-            android:layout_width="0dp"
-            android:layout_height="0.5dp"
-            android:background="@drawable/bg_view"
-            app:layout_constraintBottom_toTopOf="@id/tvPolicy"
-            app:layout_constraintEnd_toEndOf="@id/tvPolicy" />
+                android:text="@string/privacy_policy"
+                android:textColor="@color/black"
+                android:textSize="16sp"
+                app:layout_constraintEnd_toEndOf="@id/tvInfo"
+                app:layout_constraintStart_toStartOf="@id/tvInfo"
+                app:layout_constraintTop_toBottomOf="@id/tvFb" />
 
-        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/tvRate"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:background="@drawable/bg_view_rect_settings"
-            android:drawableEnd="@drawable/ic_arrow_right"
-            android:drawablePadding="@dimen/_10sdp"
-            android:ellipsize="end"
-            android:fontFamily="@font/sf_pro_text_regular"
-            android:gravity="center_vertical"
-            android:maxLines="1"
-            android:paddingHorizontal="@dimen/_14sdp"
-            android:paddingVertical="@dimen/_16sdp"
+            <View
+                android:layout_width="0dp"
+                android:layout_height="0.5dp"
+                android:background="@drawable/bg_view"
+                app:layout_constraintBottom_toTopOf="@id/tvPolicy"
+                app:layout_constraintEnd_toEndOf="@id/tvPolicy" />
 
-            android:text=""
-            android:textColor="@color/black"
-            android:textSize="16sp"
-            app:layout_constraintEnd_toEndOf="@id/tvSelectDefault"
-            app:layout_constraintStart_toStartOf="@id/tvSelectDefault"
-            app:layout_constraintTop_toBottomOf="@id/tvPolicy" />
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvRate"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_view_rect_settings"
+                android:drawableEnd="@drawable/ic_arrow_right"
+                android:drawablePadding="@dimen/_10sdp"
+                android:ellipsize="end"
+                android:fontFamily="@font/sf_pro_text_regular"
+                android:gravity="center_vertical"
+                android:maxLines="1"
+                android:paddingHorizontal="@dimen/_14sdp"
+                android:paddingVertical="@dimen/_16sdp"
+                android:text="@string/rate_us"
+                android:textColor="@color/black"
+                android:textSize="16sp"
+                app:layout_constraintEnd_toEndOf="@id/tvInfo"
+                app:layout_constraintStart_toStartOf="@id/tvInfo"
+                app:layout_constraintTop_toBottomOf="@id/tvPolicy" />
 
-        <View
-            android:id="@+id/viewRate"
-            android:layout_width="0dp"
-            android:layout_height="0.5dp"
-            android:background="@drawable/bg_view"
-            app:layout_constraintBottom_toTopOf="@id/tvRate"
-            app:layout_constraintEnd_toEndOf="@id/tvRate" />
+            <View
+                android:id="@+id/viewRate"
+                android:layout_width="0dp"
+                android:layout_height="0.5dp"
+                android:background="@drawable/bg_view"
+                app:layout_constraintBottom_toTopOf="@id/tvRate"
+                app:layout_constraintEnd_toEndOf="@id/tvRate" />
 
-        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/tvFeedBack"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:background="@drawable/bg_view_rect_settings"
-            android:drawableEnd="@drawable/ic_arrow_right"
-            android:drawablePadding="@dimen/_10sdp"
-            android:ellipsize="end"
-            android:fontFamily="@font/sf_pro_text_regular"
-            android:gravity="center_vertical"
-            android:maxLines="1"
-            android:paddingHorizontal="@dimen/_14sdp"
-            android:paddingVertical="@dimen/_16sdp"
+            <!--        <androidx.appcompat.widget.AppCompatTextView-->
+            <!--            android:id="@+id/tvLanguage"-->
+            <!--            android:layout_width="0dp"-->
+            <!--            android:layout_height="wrap_content"-->
+            <!--            android:background="@drawable/bg_view_rect_settings"-->
+            <!--            android:drawableEnd="@drawable/ic_arrow_right"-->
+            <!--            android:drawablePadding="@dimen/_10sdp"-->
+            <!--            android:ellipsize="end"-->
+            <!--            android:fontFamily="@font/sf_pro_text_regular"-->
+            <!--            android:gravity="center_vertical"-->
+            <!--            android:maxLines="1"-->
+            <!--            android:paddingHorizontal="@dimen/_14sdp"-->
+            <!--            android:paddingVertical="@dimen/_16sdp"-->
 
-            android:text=""
-            android:textColor="@color/black"
-            android:textSize="16sp"
-            app:layout_constraintEnd_toEndOf="@id/tvSelectDefault"
-            app:layout_constraintStart_toStartOf="@id/tvSelectDefault"
-            app:layout_constraintTop_toBottomOf="@id/tvRate" />
+            <!--            android:text=""-->
+            <!--            android:textColor="@color/black"-->
+            <!--            android:textSize="16sp"-->
+            <!--            app:layout_constraintEnd_toEndOf="@id/tvInfo"-->
+            <!--            app:layout_constraintStart_toStartOf="@id/tvInfo"-->
+            <!--            app:layout_constraintTop_toBottomOf="@id/tvRate" />-->
 
-        <View
-            android:layout_width="0dp"
-            android:layout_height="0.5dp"
-            android:background="@drawable/bg_view"
-            app:layout_constraintBottom_toTopOf="@id/tvFeedBack"
-            app:layout_constraintEnd_toEndOf="@id/tvFeedBack" />
+            <!--        <View-->
+            <!--            android:layout_width="0dp"-->
+            <!--            android:layout_height="0.5dp"-->
+            <!--            android:background="@drawable/bg_view"-->
+            <!--            app:layout_constraintBottom_toTopOf="@id/tvLanguage"-->
+            <!--            app:layout_constraintEnd_toEndOf="@id/tvLanguage" />-->
 
-        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/tvShareApp"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:background="@drawable/bg_view_bot_settings"
-            android:drawableEnd="@drawable/ic_arrow_right"
-            android:drawablePadding="@dimen/_10sdp"
-            android:ellipsize="end"
-            android:fontFamily="@font/sf_pro_text_regular"
-            android:gravity="center_vertical"
-            android:maxLines="1"
-            android:paddingHorizontal="@dimen/_14sdp"
-            android:paddingVertical="@dimen/_16sdp"
-            android:text=""
-            android:textColor="@color/black"
-            android:textSize="16sp"
-            app:layout_constraintEnd_toEndOf="@id/tvSelectDefault"
-            app:layout_constraintStart_toStartOf="@id/tvSelectDefault"
-            app:layout_constraintTop_toBottomOf="@id/tvFeedBack" />
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvShareApp"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_view_rect_settings"
+                android:drawableEnd="@drawable/ic_arrow_right"
+                android:drawablePadding="@dimen/_10sdp"
+                android:ellipsize="end"
+                android:fontFamily="@font/sf_pro_text_regular"
+                android:gravity="center_vertical"
+                android:maxLines="1"
+                android:paddingHorizontal="@dimen/_14sdp"
+                android:paddingVertical="@dimen/_16sdp"
+                android:text="@string/share_app"
+                android:textColor="@color/black"
+                android:textSize="16sp"
+                app:layout_constraintEnd_toEndOf="@id/tvInfo"
+                app:layout_constraintStart_toStartOf="@id/tvInfo"
+                app:layout_constraintTop_toBottomOf="@id/tvRate" />
 
-        <View
-            android:layout_width="0dp"
-            android:layout_height="0.5dp"
-            android:background="@drawable/bg_view"
-            app:layout_constraintBottom_toTopOf="@id/tvShareApp"
-            app:layout_constraintEnd_toEndOf="@id/tvShareApp" />
+            <View
+                android:layout_width="0dp"
+                android:layout_height="0.5dp"
+                android:background="@drawable/bg_view"
+                app:layout_constraintBottom_toTopOf="@id/tvShareApp"
+                app:layout_constraintEnd_toEndOf="@id/tvShareApp" />
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvLogout"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_view_bot_settings"
+                android:drawableEnd="@drawable/ic_arrow_right"
+                android:drawablePadding="@dimen/_10sdp"
+                android:ellipsize="end"
+                android:fontFamily="@font/sf_pro_text_regular"
+                android:gravity="center_vertical"
+                android:maxLines="1"
+                android:paddingHorizontal="@dimen/_14sdp"
+                android:paddingVertical="@dimen/_16sdp"
+                android:text="@string/sign_out"
+                android:textColor="@color/black"
+                android:textSize="16sp"
+                app:layout_constraintEnd_toEndOf="@id/tvInfo"
+                app:layout_constraintStart_toStartOf="@id/tvInfo"
+                app:layout_constraintTop_toBottomOf="@id/tvShareApp" />
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="0.5dp"
+                android:background="@drawable/bg_view"
+                app:layout_constraintBottom_toTopOf="@id/tvLogout"
+                app:layout_constraintEnd_toEndOf="@id/tvLogout" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.core.widget.NestedScrollView>
 </layout>
