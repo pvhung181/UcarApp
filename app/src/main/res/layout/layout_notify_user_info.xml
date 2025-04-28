@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:background="@color/white"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/ivMoney"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="12dp"
+            android:src="@drawable/ic_money"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvMoney"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="24dp"
+            android:fontFamily="@font/sf_pro_text_semibold"
+            android:text="44.5$"
+            android:textSize="24dp"
+            app:layout_constraintBottom_toBottomOf="@id/ivMoney"
+            app:layout_constraintStart_toEndOf="@id/ivMoney"
+            app:layout_constraintTop_toTopOf="@id/ivMoney" />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/ivDot"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="12dp"
+            android:src="@drawable/ic_dot"
+            app:layout_constraintBottom_toBottomOf="@id/tvMoney"
+            app:layout_constraintStart_toEndOf="@id/tvMoney"
+            app:layout_constraintTop_toTopOf="@id/tvMoney"
+            app:tint="@color/color_9C9C9C" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvDistance"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:fontFamily="@font/sf_pro_text_semibold"
+            android:text="27.21km"
+            android:textSize="24dp"
+            app:layout_constraintBottom_toBottomOf="@id/tvMoney"
+            app:layout_constraintStart_toEndOf="@id/ivDot"
+            app:layout_constraintTop_toTopOf="@id/tvMoney" />
+
+
+        <View
+            android:id="@+id/viewLine"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/color_9C9C9C"
+            app:layout_constraintTop_toBottomOf="@id/ivMoney" />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/ivAvatar"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_margin="12dp"
+            app:layout_constraintDimensionRatio="1"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/viewLine"
+            app:layout_constraintWidth_percent="0.18" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:fontFamily="@font/sf_pro_rounded_bold"
+            android:text="Driver's Name"
+            android:textSize="20dp"
+            app:layout_constraintStart_toEndOf="@id/ivAvatar"
+            app:layout_constraintTop_toTopOf="@id/ivAvatar" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvDestination"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:fontFamily="@font/sf_pro_rounded_medium"
+            android:text="ABCC"
+            android:textSize="18dp"
+            app:layout_constraintStart_toEndOf="@id/ivAvatar"
+            app:layout_constraintTop_toBottomOf="@id/tvName" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/rideStatus"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="18dp"
+            android:layout_marginTop="24dp"
+            android:layout_marginBottom="16dp"
+            android:background="@drawable/bg_view_round"
+            android:backgroundTint="@color/color_38b6ff"
+            android:fontFamily="@font/sf_pro_text_semibold"
+            android:paddingVertical="14dp"
+            android:text="@string/confirm_pickup"
+            android:textAllCaps="false"
+            android:textColor="@color/white"
+            android:textSize="22dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/ivAvatar" />
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

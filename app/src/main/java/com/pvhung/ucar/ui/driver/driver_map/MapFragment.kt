@@ -42,6 +42,7 @@ import com.google.firebase.database.ValueEventListener
 import com.pvhung.ucar.App
 import com.pvhung.ucar.R
 import com.pvhung.ucar.common.Constant
+import com.pvhung.ucar.common.enums.DriverRideState
 import com.pvhung.ucar.common.enums.RequestState
 import com.pvhung.ucar.data.model.RequestModel
 import com.pvhung.ucar.databinding.FragmentDriverMapBinding
@@ -51,6 +52,7 @@ import com.pvhung.ucar.utils.FirebaseDatabaseUtils
 import com.pvhung.ucar.utils.OnBackPressed
 import com.pvhung.ucar.utils.PermissionHelper
 import com.pvhung.ucar.utils.beGone
+import com.pvhung.ucar.utils.beInvisible
 import com.pvhung.ucar.utils.beVisible
 
 
@@ -63,6 +65,7 @@ class MapFragment : BaseBindingFragment<FragmentDriverMapBinding, MapViewModel>(
     private lateinit var mLocationRequest: LocationRequest
     private lateinit var mFusedLocationClient: FusedLocationProviderClient
     private val requestModel = RequestModel()
+    private var rideState = DriverRideState.IDLE
     private var pickupLocation: Marker? = null
     private var polylines = mutableListOf<Polyline>()
     private val COLORS: IntArray = intArrayOf(
@@ -152,22 +155,28 @@ class MapFragment : BaseBindingFragment<FragmentDriverMapBinding, MapViewModel>(
                     val request = snapshot.getValue(RequestModel::class.java)
 
                     if (!binding.icUserRequest.root.isVisible && request?.state == RequestState.IDLE) binding.icUserRequest.root.beVisible()
+                    if (request != null) {
+                        if (isAdded)
+                            binding.icUserRequest.tvDestination.text = request.destination
+                    }
                     if (request != null && request.state == RequestState.ACCEPT) {
+                        rideState = DriverRideState.MOVING
                         requestModel.customerId = request.customerId
                         requestModel.destination = request.destination
-                        if (isAdded) binding.icUserRequest.tvDestination.text = request.destination
+                        requestModel.destinationLat = request.destinationLat
+                        requestModel.destinationLng = request.destinationLng
+                        binding.icUserInfo.apply {
+                            root.beVisible()
+                            tvName.text = requestModel.customerId
+                            tvDestination.text = requestModel.destination
+                        }
                         getAssignedCustomerPickupLocation()
-                    }
-                    else if(request != null && request.state == RequestState.CANCEL) {
+                    } else if (request != null && request.state == RequestState.CANCEL) {
+                        rideState = DriverRideState.IDLE
                         assignedCustomerRef.removeValue()
                     }
                 } else {
-                    erasePolyLines()
-                    requestModel.reset()
-                    pickupLocation?.remove()
-                    assignedCustomerPickupRefListener?.let {
-                        assignedCustomerPickupRef?.removeEventListener(it)
-                    }
+                    endRide()
                 }
             }
 
@@ -224,6 +233,26 @@ class MapFragment : BaseBindingFragment<FragmentDriverMapBinding, MapViewModel>(
         routing.execute()
     }
 
+    private fun changeUiBasedOnRideState() {
+        when (rideState) {
+            DriverRideState.IDLE -> {
+
+            }
+
+            DriverRideState.MOVING -> {
+
+            }
+
+            DriverRideState.RIDING -> {
+
+            }
+
+            DriverRideState.DONE -> {
+
+            }
+        }
+    }
+
     private fun initMaps() {
         mapFragment = childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
@@ -256,7 +285,44 @@ class MapFragment : BaseBindingFragment<FragmentDriverMapBinding, MapViewModel>(
             db.setValue(RequestState.CANCEL)
             binding.icUserRequest.root.beGone()
         }
+
+        binding.icUserInfo.rideStatus.setOnClickListener {
+            when (rideState) {
+                DriverRideState.IDLE -> {}
+
+                DriverRideState.MOVING -> {
+                    rideState = DriverRideState.RIDING
+                    pickupLocation?.remove()
+                    binding.icUserInfo.rideStatus.setText(getString(R.string.confirm_done))
+                    erasePolyLines()
+                    if (requestModel.destinationLat != 0.0 && requestModel.destinationLng != 0.0) {
+                        getRouteToMarker(LatLng(requestModel.destinationLat, requestModel.destinationLng))
+                    }
+                }
+
+                DriverRideState.RIDING -> {
+                    endRide()
+                }
+
+                DriverRideState.DONE -> {}
+            }
+        }
     }
+
+    private fun endRide() {
+        FirebaseDatabaseUtils.getSpecificRiderDatabase(FirebaseAuth.getInstance().currentUser!!.uid)
+            .child(Constant.REQUEST_STATE_REFERENCES).removeValue()
+        erasePolyLines()
+        requestModel.reset()
+        pickupLocation?.remove()
+        assignedCustomerPickupRefListener?.let {
+            assignedCustomerPickupRef?.removeEventListener(it)
+        }
+        rideState = DriverRideState.IDLE
+
+        binding.icUserInfo.root.beInvisible()
+    }
+
 
     private fun getDb(): DatabaseReference {
         val driverId = FirebaseAuth.getInstance().currentUser?.uid!!
@@ -318,7 +384,7 @@ class MapFragment : BaseBindingFragment<FragmentDriverMapBinding, MapViewModel>(
     override fun onRoutingFailure(e: RouteException?) {
         if (e != null) {
             Toast.makeText(requireContext(), "Error: ${e.message}", Toast.LENGTH_LONG).show();
-            Log.e("pvhung111", "onRoutingFailure: ${e.message}", )
+            Log.e("pvhung111", "onRoutingFailure: ${e.message}")
         } else {
             Toast.makeText(requireContext(), "Something went wrong, Try again", Toast.LENGTH_SHORT)
                 .show();

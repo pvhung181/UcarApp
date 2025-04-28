@@ -22,5 +22,18 @@
             app:layout_constraintTop_toTopOf="parent"
             android:visibility="gone"
             />
+
+        <include
+            android:id="@+id/icUserInfo"
+            layout="@layout/layout_notify_user_info"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="12dp"
+            android:layout_marginTop="12dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:visibility="gone"
+            />
+
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

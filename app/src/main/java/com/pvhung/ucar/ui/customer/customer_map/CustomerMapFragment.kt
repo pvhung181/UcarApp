@@ -301,6 +301,7 @@ class CustomerMapFragment : BaseBindingFragment<FragmentCustomerMapBinding, Cust
                                                         if (request.state == RequestState.ACCEPT) {
                                                             showToast("Accepted")
                                                             getDriverLocation()
+                                                            Utils.removeRequest()
                                                             updateNotiDriverInfo(user)
                                                             isWaitingResponse = false
                                                             bookState = UserBookingState.FOUND
@@ -314,6 +315,9 @@ class CustomerMapFragment : BaseBindingFragment<FragmentCustomerMapBinding, Cust
                                                         }
 
                                                     }
+                                                } else {
+                                                    if (bookState == UserBookingState.RIDING)
+                                                        updateWhenRideDone()
                                                 }
                                             }
 
@@ -447,6 +451,8 @@ class CustomerMapFragment : BaseBindingFragment<FragmentCustomerMapBinding, Cust
         driverLocationRefListener?.let {
             driverLocationRef?.removeEventListener(it)
         }
+        if (::driveHasEndedRef.isInitialized && ::driveHasEndedRefListener.isInitialized)
+            driveHasEndedRef.removeEventListener(driveHasEndedRefListener)
         radius = 1.0
         foundDriverId?.let {
             isFoundDriver = false
@@ -455,6 +461,7 @@ class CustomerMapFragment : BaseBindingFragment<FragmentCustomerMapBinding, Cust
         pickupMarker?.remove()
         bookState = UserBookingState.IDLE
         Utils.removeRequest()
+        requestModel.reset()
     }
 
     private fun requestUcar() {
@@ -488,6 +495,31 @@ class CustomerMapFragment : BaseBindingFragment<FragmentCustomerMapBinding, Cust
     private fun cancelRequest() {
         bookState = UserBookingState.IDLE
         updateWhenRideDone()
+    }
+
+
+    private lateinit var driveHasEndedRef: DatabaseReference
+    private lateinit var driveHasEndedRefListener: ValueEventListener
+    private fun getHasRideEnded() {
+        if (foundDriverId != null) {
+            driveHasEndedRef = FirebaseDatabaseUtils.getSpecificRiderDatabase(foundDriverId!!)
+                .child(Constant.REQUEST_STATE_REFERENCES)
+
+            driveHasEndedRefListener =
+                driveHasEndedRef.addValueEventListener(object : ValueEventListener {
+                    override fun onDataChange(snapshot: DataSnapshot) {
+                        if (snapshot.exists()) {
+
+                        } else {
+                            updateWhenRideDone()
+                        }
+                    }
+
+                    override fun onCancelled(error: DatabaseError) {
+
+                    }
+                })
+        }
     }
 
     override fun onDestroy() {
