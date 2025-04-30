@@ -51,6 +51,11 @@ object FirebaseDatabaseUtils {
             .child(Constant.RIDERS_REFERENCES).child(FirebaseAuth.getInstance().currentUser!!.uid)
     }
 
+    fun getHistoryDatabase(): DatabaseReference {
+        return FirebaseDatabase.getInstance().getReference()
+            .child(Constant.HISTORY_REFERENCES)
+    }
+
 
     fun saveUserInfo(uid: String, user: User): Boolean {
         val dbRef =

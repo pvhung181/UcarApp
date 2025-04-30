@@ -33,6 +33,7 @@ import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.maps.model.Polyline
 import com.google.android.gms.maps.model.PolylineOptions
+import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -301,12 +302,29 @@ class MapFragment : BaseBindingFragment<FragmentDriverMapBinding, MapViewModel>(
                 }
 
                 DriverRideState.RIDING -> {
+                    saveRide()
                     endRide()
                 }
 
                 DriverRideState.DONE -> {}
             }
         }
+    }
+
+    private fun saveRide() {
+        val uid = FirebaseAuth.getInstance().currentUser!!.uid
+        val dr = FirebaseDatabaseUtils.getSpecificRiderDatabase(uid)
+        val cr = FirebaseDatabaseUtils.getSpecificCustomerDatabase(requestModel.customerId)
+        val hr = FirebaseDatabaseUtils.getHistoryDatabase()
+        val requestId = hr.push().key
+        val map = mutableMapOf<String, Any>(
+            "driver" to uid,
+            "customer" to requestModel.customerId,
+            "rating" to -1
+        )
+
+        hr.child(requestId!!).updateChildren(map)
+
     }
 
     private fun endRide() {
