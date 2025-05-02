@@ -166,6 +166,9 @@ class MapFragment : BaseBindingFragment<FragmentDriverMapBinding, MapViewModel>(
                         requestModel.destination = request.destination
                         requestModel.destinationLat = request.destinationLat
                         requestModel.destinationLng = request.destinationLng
+                        requestModel.time = request.time
+                        requestModel.distance = request.distance
+                        requestModel.cost = request.cost
                         binding.icUserInfo.apply {
                             root.beVisible()
                             tvName.text = requestModel.customerId
@@ -256,8 +259,9 @@ class MapFragment : BaseBindingFragment<FragmentDriverMapBinding, MapViewModel>(
 
     private fun onClick() {
         binding.icUserRequest.ivAccept.setOnClickListener {
-            val db = getDb().child("state")
-            db.setValue(RequestState.ACCEPT)
+            val db = getDb()
+            db.child("state").setValue(RequestState.ACCEPT)
+            db.child("time").setValue(System.currentTimeMillis())
             binding.icUserRequest.root.beGone()
         }
 
@@ -306,9 +310,13 @@ class MapFragment : BaseBindingFragment<FragmentDriverMapBinding, MapViewModel>(
         val requestId = hr.push().key
 
         val history = HistoryItem(
+            id = requestId ?: "",
             customerId = requestModel.customerId,
             destination = requestModel.destination,
-            driverId = uid
+            driverId = uid,
+            time = requestModel.time,
+            money = requestModel.cost.toDouble(),
+            distance = requestModel.distance
         )
 
         hr.child(requestId!!).setValue(history)

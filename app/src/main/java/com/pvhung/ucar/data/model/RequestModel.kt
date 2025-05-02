@@ -8,7 +8,10 @@ data class RequestModel(
     var destination: String = "",
     var destinationLat: Double = 0.0,
     var destinationLng: Double = 0.0,
-    var pickupLocation: String = ""
+    var pickupLocation: String = "",
+    var time: Long = 0,
+    var distance: Double = 0.0,
+    var cost: Float = 0f
 ) {
     fun reset() {
         customerId = ""

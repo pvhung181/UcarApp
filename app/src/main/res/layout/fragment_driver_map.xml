@@ -16,12 +16,8 @@
             android:id="@+id/icUserRequest"
             layout="@layout/layout_user_request"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="12dp"
-            android:layout_marginTop="12dp"
-            app:layout_constraintTop_toTopOf="parent"
-            android:visibility="gone"
-            />
+            android:layout_height="match_parent"
+            android:visibility="gone" />
 
         <include
             android:id="@+id/icUserInfo"
@@ -30,9 +26,8 @@
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="12dp"
             android:layout_marginTop="12dp"
-            app:layout_constraintBottom_toBottomOf="parent"
             android:visibility="gone"
-            />
+            app:layout_constraintBottom_toBottomOf="parent" />
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>

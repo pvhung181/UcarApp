@@ -46,6 +46,7 @@ import com.pvhung.ucar.databinding.FragmentCustomerMapBinding
 import com.pvhung.ucar.ui.base.BaseBindingFragment
 import com.pvhung.ucar.ui.dialog.BottomSheetBookingVehicle
 import com.pvhung.ucar.ui.dialog.EnableGpsDialog
+import com.pvhung.ucar.utils.CostUtils
 import com.pvhung.ucar.utils.DeviceHelper
 import com.pvhung.ucar.utils.FirebaseDatabaseUtils
 import com.pvhung.ucar.utils.OnBackPressed
@@ -137,6 +138,7 @@ class CustomerMapFragment : BaseBindingFragment<FragmentCustomerMapBinding, Cust
             object : BottomSheetBookingVehicle.OnRequestListener {
                 override fun onBook(service: String) {
                     serviceBooking = service
+                    requestModel.cost = bookingBottomSheet?.getCost() ?: 0f
                     requestUcar()
                 }
 
@@ -161,6 +163,17 @@ class CustomerMapFragment : BaseBindingFragment<FragmentCustomerMapBinding, Cust
 
             override fun onPlaceSelected(place: Place) {
                 requestModel.destination = place.name?.toString() ?: ""
+                if (mLastLocation != null && place.latLng != null) {
+                    val distance = mLastLocation!!.distanceTo(Location("").apply {
+                        latitude = place.latLng!!.latitude
+                        longitude = place.latLng!!.longitude
+                    }).toDouble()
+                    requestModel.distance = distance / 1000f
+                    bookingBottomSheet?.setCost(
+                        CostUtils.getCost(distance.toFloat()),
+                        CostUtils.getCarCost(distance.toFloat())
+                    )
+                }
                 place.latLng?.let {
                     requestModel.destinationLat = it.latitude
                     requestModel.destinationLng = it.longitude

@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.pvhung.ucar.data.model.HistoryItem
 import com.pvhung.ucar.databinding.ItemHistoryBinding
+import com.pvhung.ucar.utils.DateUtils
 
 class HistoryAdapter(
     val context: Context
@@ -38,7 +39,8 @@ class HistoryAdapter(
 
         fun bindData(historyItem: HistoryItem, position: Int) {
             binding.tvDestination.text = historyItem.destination
-
+            if (historyItem.time != 0L)
+                binding.tvTime.text = DateUtils.convertMillisToFormattedDate(historyItem.time)
         }
     }
 
