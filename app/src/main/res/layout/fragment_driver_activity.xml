@@ -24,5 +24,16 @@
             android:layout_height="1dp"
             android:background="@color/color_9C9C9C"
             app:layout_constraintTop_toBottomOf="@id/tvTitle" />
+
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rcvHistory"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_marginVertical="12dp"
+            android:orientation="vertical"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/viewLine" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

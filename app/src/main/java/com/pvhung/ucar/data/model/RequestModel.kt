@@ -7,7 +7,8 @@ data class RequestModel(
     var state: RequestState = RequestState.IDLE,
     var destination: String = "",
     var destinationLat: Double = 0.0,
-    var destinationLng: Double = 0.0
+    var destinationLng: Double = 0.0,
+    var pickupLocation: String = ""
 ) {
     fun reset() {
         customerId = ""

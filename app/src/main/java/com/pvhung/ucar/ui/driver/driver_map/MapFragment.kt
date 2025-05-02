@@ -33,7 +33,6 @@ import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.maps.model.Polyline
 import com.google.android.gms.maps.model.PolylineOptions
-import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -45,6 +44,7 @@ import com.pvhung.ucar.R
 import com.pvhung.ucar.common.Constant
 import com.pvhung.ucar.common.enums.DriverRideState
 import com.pvhung.ucar.common.enums.RequestState
+import com.pvhung.ucar.data.model.HistoryItem
 import com.pvhung.ucar.data.model.RequestModel
 import com.pvhung.ucar.databinding.FragmentDriverMapBinding
 import com.pvhung.ucar.ui.base.BaseBindingFragment
@@ -234,26 +234,6 @@ class MapFragment : BaseBindingFragment<FragmentDriverMapBinding, MapViewModel>(
         routing.execute()
     }
 
-    private fun changeUiBasedOnRideState() {
-        when (rideState) {
-            DriverRideState.IDLE -> {
-
-            }
-
-            DriverRideState.MOVING -> {
-
-            }
-
-            DriverRideState.RIDING -> {
-
-            }
-
-            DriverRideState.DONE -> {
-
-            }
-        }
-    }
-
     private fun initMaps() {
         mapFragment = childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
@@ -294,10 +274,15 @@ class MapFragment : BaseBindingFragment<FragmentDriverMapBinding, MapViewModel>(
                 DriverRideState.MOVING -> {
                     rideState = DriverRideState.RIDING
                     pickupLocation?.remove()
-                    binding.icUserInfo.rideStatus.setText(getString(R.string.confirm_done))
+                    binding.icUserInfo.rideStatus.text = getString(R.string.confirm_done)
                     erasePolyLines()
                     if (requestModel.destinationLat != 0.0 && requestModel.destinationLng != 0.0) {
-                        getRouteToMarker(LatLng(requestModel.destinationLat, requestModel.destinationLng))
+                        getRouteToMarker(
+                            LatLng(
+                                requestModel.destinationLat,
+                                requestModel.destinationLng
+                            )
+                        )
                     }
                 }
 
@@ -313,18 +298,22 @@ class MapFragment : BaseBindingFragment<FragmentDriverMapBinding, MapViewModel>(
 
     private fun saveRide() {
         val uid = FirebaseAuth.getInstance().currentUser!!.uid
-        val dr = FirebaseDatabaseUtils.getSpecificRiderDatabase(uid)
+        val dr =
+            FirebaseDatabaseUtils.getSpecificRiderDatabase(uid).child(Constant.HISTORY_REFERENCES)
         val cr = FirebaseDatabaseUtils.getSpecificCustomerDatabase(requestModel.customerId)
+            .child(Constant.HISTORY_REFERENCES)
         val hr = FirebaseDatabaseUtils.getHistoryDatabase()
         val requestId = hr.push().key
-        val map = mutableMapOf<String, Any>(
-            "driver" to uid,
-            "customer" to requestModel.customerId,
-            "rating" to -1
+
+        val history = HistoryItem(
+            customerId = requestModel.customerId,
+            destination = requestModel.destination,
+            driverId = uid
         )
 
-        hr.child(requestId!!).updateChildren(map)
-
+        hr.child(requestId!!).setValue(history)
+        dr.child(requestId!!).setValue(history)
+        cr.child(requestId!!).setValue(history)
     }
 
     private fun endRide() {
