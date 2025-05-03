@@ -18,8 +18,8 @@ import com.pvhung.ucar.utils.FirebaseDatabaseUtils
 import com.pvhung.ucar.utils.OnBackPressed
 
 class CustomerActivityFragment :
-    BaseBindingFragment<FragmentCustomerActivityBinding, CustomerActivityViewModel>() ,
-    RatingRideDialog.RatingListener{
+    BaseBindingFragment<FragmentCustomerActivityBinding, CustomerActivityViewModel>(),
+    RatingRideDialog.RatingListener {
 
 
     private lateinit var historyAdapter: HistoryAdapter
@@ -96,7 +96,8 @@ class CustomerActivityFragment :
         } else {
 //            ratingDialog.loading(true)
             val dr =
-                FirebaseDatabaseUtils.getSpecificRiderDatabase(historyItem.driverId).child(Constant.HISTORY_REFERENCES).child(historyItem.id)
+                FirebaseDatabaseUtils.getSpecificRiderDatabase(historyItem.driverId)
+                    .child(Constant.HISTORY_REFERENCES).child(historyItem.id)
             val cr = FirebaseDatabaseUtils.getSpecificCustomerDatabase(historyItem.customerId)
                 .child(Constant.HISTORY_REFERENCES).child(historyItem.id)
             val hr = FirebaseDatabaseUtils.getHistoryDatabase().child(historyItem.id)
@@ -104,7 +105,31 @@ class CustomerActivityFragment :
                 "rating" to rating,
                 "review" to review
             )
-            dr.updateChildren(map).addOnCompleteListener { ratingDialog.dismiss() }
+            dr.updateChildren(map)
+                .addOnSuccessListener {
+                    FirebaseDatabaseUtils.getDriverHistoryDatabase(historyItem.driverId)
+                        .addValueEventListener(object : ValueEventListener {
+                            override fun onDataChange(snapshot: DataSnapshot) {
+                                val lst = mutableListOf<HistoryItem>()
+                                for (item in snapshot.children) {
+                                    val history = item.getValue(HistoryItem::class.java)
+                                    if (history != null) lst.add(history)
+                                }
+                                var totalRating = 0.0
+                                for (item in lst) {
+                                    totalRating += if (item.rating == 0.0) 5.0 else item.rating
+                                }
+                                totalRating /= lst.size
+                                FirebaseDatabaseUtils.getSpecificRiderDatabase(historyItem.driverId)
+                                    .child("rating").setValue(totalRating)
+                            }
+
+                            override fun onCancelled(error: DatabaseError) {
+
+                            }
+                        })
+                }
+                .addOnCompleteListener { ratingDialog.dismiss() }
             cr.updateChildren(map).addOnCompleteListener { ratingDialog.dismiss() }
             hr.updateChildren(map).addOnCompleteListener { ratingDialog.dismiss() }
         }

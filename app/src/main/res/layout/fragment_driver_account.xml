@@ -45,6 +45,20 @@
                 app:layout_constraintTop_toBottomOf="@id/ivAvatar" />
 
             <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvRating"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="18dp"
+                android:drawableEnd="@drawable/ic_star"
+                android:drawablePadding="6dp"
+                android:fontFamily="@font/sf_pro_text_semibold"
+                android:text="4.5"
+                android:textSize="20dp"
+                app:layout_constraintBottom_toBottomOf="@id/tvUserName"
+                app:layout_constraintStart_toEndOf="@id/tvUserName"
+                app:layout_constraintTop_toTopOf="@id/tvUserName" />
+
+            <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/tvPhone"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

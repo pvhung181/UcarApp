@@ -111,6 +111,7 @@ class DriverAccountFragment :
         user?.let {
             binding.tvPhone.text = user.phoneNumber
             binding.tvUserName.text = user.fullName
+            binding.tvRating.text = String.format("%.1f", user.rating)
         }
     }
 
