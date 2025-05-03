@@ -55,4 +55,6 @@
     <string name="share_app">Share App</string>
     <string name="confirm_pickup">Confirm pickup</string>
     <string name="confirm_done">Confirm done</string>
+    <string name="submit">Submit</string>
+    <string name="exit">Exit</string>
 </resources>

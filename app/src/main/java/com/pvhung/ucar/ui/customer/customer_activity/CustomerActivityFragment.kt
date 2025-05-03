@@ -7,18 +7,24 @@ import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ValueEventListener
 import com.pvhung.ucar.R
+import com.pvhung.ucar.common.Constant
 import com.pvhung.ucar.data.model.HistoryItem
 import com.pvhung.ucar.databinding.FragmentCustomerActivityBinding
 import com.pvhung.ucar.ui.adapter.HistoryAdapter
 import com.pvhung.ucar.ui.base.BaseBindingFragment
+import com.pvhung.ucar.ui.dialog.RatingRideDialog
+import com.pvhung.ucar.ui.dialog.ViewRatingDialog
 import com.pvhung.ucar.utils.FirebaseDatabaseUtils
 import com.pvhung.ucar.utils.OnBackPressed
 
 class CustomerActivityFragment :
-    BaseBindingFragment<FragmentCustomerActivityBinding, CustomerActivityViewModel>() {
+    BaseBindingFragment<FragmentCustomerActivityBinding, CustomerActivityViewModel>() ,
+    RatingRideDialog.RatingListener{
+
 
     private lateinit var historyAdapter: HistoryAdapter
-
+    private val ratingDialog by lazy { RatingRideDialog(requireContext(), this) }
+    private val viewRatingDialog by lazy { ViewRatingDialog(requireContext()) }
 
     override fun getViewModel(): Class<CustomerActivityViewModel> {
         return CustomerActivityViewModel::class.java
@@ -35,13 +41,25 @@ class CustomerActivityFragment :
     }
 
     private fun init() {
-        historyAdapter = HistoryAdapter(requireActivity())
-        historyAdapter = HistoryAdapter(requireActivity())
+        historyAdapter = HistoryAdapter(
+            requireActivity(),
+            isDriver = false,
+            object : HistoryAdapter.HistoryClickListener {
+                override fun onReviewClick(historyItem: HistoryItem) {
+                    ratingDialog.setHistoryItem(historyItem)
+                    ratingDialog.show()
+                }
+
+                override fun onViewReviewClick(rating: Int, review: String) {
+                    viewRatingDialog.setReview(rating, review)
+                    viewRatingDialog.show()
+                }
+            })
         binding.rcvHistory.adapter = historyAdapter
 
         FirebaseAuth.getInstance().currentUser?.uid?.let {
             FirebaseDatabaseUtils.getCustomerHistoryDatabase(it)
-                .addListenerForSingleValueEvent(object : ValueEventListener {
+                .addValueEventListener(object : ValueEventListener {
                     override fun onDataChange(snapshot: DataSnapshot) {
                         val lst = mutableListOf<HistoryItem>()
                         for (item in snapshot.children) {
@@ -56,6 +74,8 @@ class CustomerActivityFragment :
                     }
                 })
         }
+
+
     }
 
     private fun initView() {
@@ -67,6 +87,30 @@ class CustomerActivityFragment :
     }
 
     private fun onClick() {
+
+    }
+
+    override fun onSubmit(historyItem: HistoryItem, rating: Int, review: String) {
+        if (rating < 1) {
+            showToast("Bạn phải đánh giá dịch vụ !")
+        } else {
+//            ratingDialog.loading(true)
+            val dr =
+                FirebaseDatabaseUtils.getSpecificRiderDatabase(historyItem.driverId).child(Constant.HISTORY_REFERENCES).child(historyItem.id)
+            val cr = FirebaseDatabaseUtils.getSpecificCustomerDatabase(historyItem.customerId)
+                .child(Constant.HISTORY_REFERENCES).child(historyItem.id)
+            val hr = FirebaseDatabaseUtils.getHistoryDatabase().child(historyItem.id)
+            val map = mutableMapOf<String, Any>(
+                "rating" to rating,
+                "review" to review
+            )
+            dr.updateChildren(map).addOnCompleteListener { ratingDialog.dismiss() }
+            cr.updateChildren(map).addOnCompleteListener { ratingDialog.dismiss() }
+            hr.updateChildren(map).addOnCompleteListener { ratingDialog.dismiss() }
+        }
+    }
+
+    override fun onCancel() {
 
     }
 }

@@ -148,7 +148,6 @@ class CustomerMapFragment : BaseBindingFragment<FragmentCustomerMapBinding, Cust
     }
 
     private fun setupAutoComplete() {
-
         if (!Places.isInitialized()) {
             Places.initialize(App.instance, Constant.MAPS_API)
         }

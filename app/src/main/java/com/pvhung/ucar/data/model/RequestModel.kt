@@ -1,6 +1,7 @@
 package com.pvhung.ucar.data.model
 
 import com.pvhung.ucar.common.enums.RequestState
+import kotlin.math.cos
 
 data class RequestModel(
     var customerId: String = "",
@@ -19,5 +20,8 @@ data class RequestModel(
         destination = ""
         destinationLng = 0.0
         destinationLat = 0.0
+        time = 0
+        distance = 0.0
+        cost = 0f
     }
 }
