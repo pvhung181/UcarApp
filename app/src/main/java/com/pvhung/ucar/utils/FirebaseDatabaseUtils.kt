@@ -104,4 +104,10 @@ object FirebaseDatabaseUtils {
             return null
         }
     }
+
+    fun removeDriverAvailable() {
+        FirebaseAuth.getInstance().currentUser?.uid?.let {
+            getDriverAvailableDatabase().child(it).removeValue()
+        }
+    }
 }

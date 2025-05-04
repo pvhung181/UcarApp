@@ -69,6 +69,7 @@ class MapFragment : BaseBindingFragment<FragmentDriverMapBinding, MapViewModel>(
     private var rideState = DriverRideState.IDLE
     private var pickupLocation: Marker? = null
     private var polylines = mutableListOf<Polyline>()
+    private var isDriverOnline = false
     private val COLORS: IntArray = intArrayOf(
         R.color.primary_dark,
         R.color.primary,
@@ -99,24 +100,33 @@ class MapFragment : BaseBindingFragment<FragmentDriverMapBinding, MapViewModel>(
                     mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(newPos, 18f))
                     mMap.animateCamera(CameraUpdateFactory.zoomTo(11f))
 
-                    FirebaseAuth.getInstance().currentUser?.uid?.let { id ->
-                        val refAvailable = FirebaseDatabase.getInstance()
-                            .getReference(Constant.DRIVERS_AVAILABLE_REFERENCES)
-                        val refWorking = FirebaseDatabase.getInstance()
-                            .getReference(Constant.DRIVERS_WORKING_REFERENCES)
+                    if (isDriverOnline) {
+                        Log.e("pvhung11", "onLocationResult: is driver online true")
+                        FirebaseAuth.getInstance().currentUser?.uid?.let { id ->
+                            val refAvailable = FirebaseDatabase.getInstance()
+                                .getReference(Constant.DRIVERS_AVAILABLE_REFERENCES)
+                            val refWorking = FirebaseDatabase.getInstance()
+                                .getReference(Constant.DRIVERS_WORKING_REFERENCES)
 
-                        val geoAvailable = GeoFire(refAvailable)
-                        val geoWorking = GeoFire(refWorking)
+                            val geoAvailable = GeoFire(refAvailable)
+                            val geoWorking = GeoFire(refWorking)
 
-                        when (requestModel.customerId) {
-                            "" -> {
-                                geoWorking.removeLocation(id)
-                                geoAvailable.setLocation(id, GeoLocation(it.latitude, it.longitude))
-                            }
+                            when (requestModel.customerId) {
+                                "" -> {
+                                    geoWorking.removeLocation(id)
+                                    geoAvailable.setLocation(
+                                        id,
+                                        GeoLocation(it.latitude, it.longitude)
+                                    )
+                                }
 
-                            else -> {
-                                geoAvailable.removeLocation(id)
-                                geoWorking.setLocation(id, GeoLocation(it.latitude, it.longitude))
+                                else -> {
+                                    geoAvailable.removeLocation(id)
+                                    geoWorking.setLocation(
+                                        id,
+                                        GeoLocation(it.latitude, it.longitude)
+                                    )
+                                }
                             }
                         }
                     }
@@ -137,7 +147,6 @@ class MapFragment : BaseBindingFragment<FragmentDriverMapBinding, MapViewModel>(
     override fun onCreatedView(view: View?, savedInstanceState: Bundle?) {
         OnBackPressed.onBackPressedFinishActivity(requireActivity(), this)
         polylines = mutableListOf()
-        loading(true)
         initMaps()
         init()
         initView()
@@ -246,7 +255,15 @@ class MapFragment : BaseBindingFragment<FragmentDriverMapBinding, MapViewModel>(
     }
 
     private fun init() {
-
+        if (mPrefHelper.getBoolean(Constant.IS_DRIVER_ONLINE, false)) {
+            binding.swGoToOnline.isChecked = true
+            isDriverOnline = true
+            binding.tvGoToOnline.text = getString(R.string.go_to_offline)
+        } else {
+            binding.swGoToOnline.isChecked = false
+            isDriverOnline = false
+            binding.tvGoToOnline.text = getString(R.string.go_to_online)
+        }
     }
 
     private fun initView() {
@@ -258,6 +275,20 @@ class MapFragment : BaseBindingFragment<FragmentDriverMapBinding, MapViewModel>(
     }
 
     private fun onClick() {
+        binding.swGoToOnline.setOnCheckedChangeListener { v, isChecked ->
+            if (isChecked) {
+                mPrefHelper.storeBoolean(Constant.IS_DRIVER_ONLINE, true)
+                binding.tvGoToOnline.text = getString(R.string.go_to_offline)
+                isDriverOnline = true
+            } else {
+                mPrefHelper.storeBoolean(Constant.IS_DRIVER_ONLINE, false)
+                binding.tvGoToOnline.text = getString(R.string.go_to_online)
+                isDriverOnline = false
+                FirebaseDatabaseUtils.removeDriverAvailable()
+
+            }
+        }
+
         binding.icUserRequest.ivAccept.setOnClickListener {
             val db = getDb()
             db.child("state").setValue(RequestState.ACCEPT)
@@ -346,19 +377,8 @@ class MapFragment : BaseBindingFragment<FragmentDriverMapBinding, MapViewModel>(
             .child(Constant.REQUEST_STATE_REFERENCES)
     }
 
-    private fun loading(isLoading: Boolean) {
-//        if (isLoading) {
-//            binding.viewBlock.beVisible()
-//            binding.progress.beVisible()
-//        } else {
-//            binding.viewBlock.beGone()
-//            binding.progress.beGone()
-//        }
-    }
-
     @SuppressLint("MissingPermission")
     override fun onMapReady(gm: GoogleMap) {
-        loading(false)
         mMap = gm
         mMap.uiSettings.isZoomControlsEnabled = true
 

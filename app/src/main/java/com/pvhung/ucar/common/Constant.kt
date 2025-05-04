@@ -35,6 +35,8 @@ object Constant {
     const val MOTOBIKE_SERVICE = "Motobike"
     const val CAR_SERVICE = "Car"
 
+    const val IS_DRIVER_ONLINE = "IS_DRIVER_ONLINE"
+
     const val DRIVER_STATE = "DriverState"
 
 }
