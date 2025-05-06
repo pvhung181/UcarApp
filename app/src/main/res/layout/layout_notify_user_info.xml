@@ -11,37 +11,55 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <androidx.appcompat.widget.AppCompatImageView
-            android:id="@+id/ivMoney"
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvPickup"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:drawableStart="@drawable/ic_pickup"
+            android:drawablePadding="12dp"
+            android:ellipsize="end"
+            android:gravity="center_vertical"
+            android:maxLines="1"
+            android:text="Pick up locations"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+
+            app:layout_constraintTop_toTopOf="parent"/>
+
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvDestination"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:padding="12dp"
-            android:src="@drawable/ic_money"
+            android:layout_marginTop="24dp"
+            android:layout_marginBottom="12dp"
+            android:drawableStart="@drawable/ic_destination"
+            android:drawablePadding="12dp"
+            android:gravity="center_vertical"
+            android:text="Destination location"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toBottomOf="@id/tvPickup" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.5"
+            android:id="@+id/guiline"/>
 
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/tvMoney"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="24dp"
             android:fontFamily="@font/sf_pro_text_semibold"
-            android:text="44.5$"
-            android:textSize="24dp"
-            app:layout_constraintBottom_toBottomOf="@id/ivMoney"
-            app:layout_constraintStart_toEndOf="@id/ivMoney"
-            app:layout_constraintTop_toTopOf="@id/ivMoney" />
-
-        <androidx.appcompat.widget.AppCompatImageView
-            android:id="@+id/ivDot"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="12dp"
-            android:src="@drawable/ic_dot"
-            app:layout_constraintBottom_toBottomOf="@id/tvMoney"
-            app:layout_constraintStart_toEndOf="@id/tvMoney"
-            app:layout_constraintTop_toTopOf="@id/tvMoney"
-            app:tint="@color/color_9C9C9C" />
+            android:text="@string/booking_fee"
+            android:layout_marginStart="6dp"
+            android:layout_marginTop="6dp"
+            android:textSize="16dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tvDestination"
+            />
 
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/tvDistance"
@@ -49,10 +67,10 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="12dp"
             android:fontFamily="@font/sf_pro_text_semibold"
-            android:text="27.21km"
-            android:textSize="24dp"
+            android:text="@string/distance"
+            android:textSize="16dp"
             app:layout_constraintBottom_toBottomOf="@id/tvMoney"
-            app:layout_constraintStart_toEndOf="@id/ivDot"
+            app:layout_constraintStart_toEndOf="@id/guiline"
             app:layout_constraintTop_toTopOf="@id/tvMoney" />
 
 
@@ -61,7 +79,7 @@
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:background="@color/color_9C9C9C"
-            app:layout_constraintTop_toBottomOf="@id/ivMoney" />
+            app:layout_constraintTop_toBottomOf="@id/tvMoney" />
 
         <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/ivAvatar"
@@ -80,20 +98,11 @@
             android:layout_marginStart="12dp"
             android:fontFamily="@font/sf_pro_rounded_bold"
             android:text="Driver's Name"
-            android:textSize="20dp"
+            android:textSize="18dp"
             app:layout_constraintStart_toEndOf="@id/ivAvatar"
             app:layout_constraintTop_toTopOf="@id/ivAvatar" />
 
-        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/tvDestination"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="12dp"
-            android:fontFamily="@font/sf_pro_rounded_medium"
-            android:text="ABCC"
-            android:textSize="18dp"
-            app:layout_constraintStart_toEndOf="@id/ivAvatar"
-            app:layout_constraintTop_toBottomOf="@id/tvName" />
+
 
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/rideStatus"
@@ -105,11 +114,11 @@
             android:background="@drawable/bg_view_round"
             android:backgroundTint="@color/color_38b6ff"
             android:fontFamily="@font/sf_pro_text_semibold"
-            android:paddingVertical="14dp"
+            android:paddingVertical="8dp"
             android:text="@string/confirm_pickup"
             android:textAllCaps="false"
             android:textColor="@color/white"
-            android:textSize="22dp"
+            android:textSize="20dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintTop_toBottomOf="@id/ivAvatar" />
 

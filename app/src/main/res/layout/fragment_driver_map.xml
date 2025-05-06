@@ -43,7 +43,6 @@
             layout="@layout/layout_notify_user_info"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginHorizontal="12dp"
             android:layout_marginTop="12dp"
             android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="parent" />

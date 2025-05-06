@@ -59,4 +59,6 @@
     <string name="exit">Exit</string>
     <string name="go_to_online">Go to online</string>
     <string name="go_to_offline">Go to offline</string>
+    <string name="booking_fee">Booking fee :</string>
+    <string name="distance">Distance :</string>
 </resources>

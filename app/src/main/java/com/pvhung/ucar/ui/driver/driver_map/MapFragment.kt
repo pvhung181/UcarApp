@@ -65,7 +65,7 @@ class MapFragment : BaseBindingFragment<FragmentDriverMapBinding, MapViewModel>(
     var mLastLocation: Location? = null
     private lateinit var mLocationRequest: LocationRequest
     private lateinit var mFusedLocationClient: FusedLocationProviderClient
-    private val requestModel = RequestModel()
+    private var requestModel = RequestModel()
     private var rideState = DriverRideState.IDLE
     private var pickupLocation: Marker? = null
     private var polylines = mutableListOf<Polyline>()
@@ -171,17 +171,19 @@ class MapFragment : BaseBindingFragment<FragmentDriverMapBinding, MapViewModel>(
                     }
                     if (request != null && request.state == RequestState.ACCEPT) {
                         rideState = DriverRideState.MOVING
-                        requestModel.customerId = request.customerId
-                        requestModel.destination = request.destination
-                        requestModel.destinationLat = request.destinationLat
-                        requestModel.destinationLng = request.destinationLng
-                        requestModel.time = request.time
-                        requestModel.distance = request.distance
-                        requestModel.cost = request.cost
+                        requestModel = request.copy()
                         binding.icUserInfo.apply {
                             root.beVisible()
                             tvName.text = requestModel.customerId
                             tvDestination.text = requestModel.destination
+                            tvMoney.text = String.format(
+                                "${getString(R.string.booking_fee)}$%.2f",
+                                requestModel.cost
+                            )
+                            tvDistance.text = String.format(
+                                "${getString(R.string.distance)}%.2f km",
+                                requestModel.distance
+                            )
                         }
                         getAssignedCustomerPickupLocation()
                     } else if (request != null && request.state == RequestState.CANCEL) {
@@ -220,6 +222,7 @@ class MapFragment : BaseBindingFragment<FragmentDriverMapBinding, MapViewModel>(
                             locationLng = (map[1].toString()).toDouble()
                         }
                         var pickupLatLng = LatLng(locationLat, locationLng)
+                        pickupLocation?.remove()
                         pickupLocation = mMap.addMarker(
                             MarkerOptions().position(pickupLatLng).title("Pickup location").icon(
                                 BitmapDescriptorFactory.fromResource(R.drawable.ic_map_pin)

@@ -215,7 +215,9 @@ class CustomerMapFragment : BaseBindingFragment<FragmentCustomerMapBinding, Cust
         binding.callUberBtn.setOnClickListener {
             when (bookState) {
                 UserBookingState.IDLE -> {
-                    bookingBottomSheet?.show()
+                    if (requestModel.destination.isNotBlank())
+                        bookingBottomSheet?.show()
+                    else showToast("Vui lòng chọn điểm đến !")
                 }
 
                 else -> {
@@ -314,7 +316,7 @@ class CustomerMapFragment : BaseBindingFragment<FragmentCustomerMapBinding, Cust
                                                             showToast("Accepted")
                                                             getDriverLocation()
                                                             Utils.removeRequest()
-                                                            updateNotiDriverInfo(user)
+                                                            updateNotiDriverInfo(user, request)
                                                             isWaitingResponse = false
                                                             bookState = UserBookingState.FOUND
                                                         } else if (request.state == RequestState.CANCEL) {
@@ -426,7 +428,7 @@ class CustomerMapFragment : BaseBindingFragment<FragmentCustomerMapBinding, Cust
             })
     }
 
-    fun updateNotiDriverInfo(user: User) {
+    fun updateNotiDriverInfo(user: User, requestModel: RequestModel) {
         binding.icNotifyMinimal.let {
             it.tvName.text = user.fullName
             it.tvRating.text = user.rating.toString()
@@ -437,6 +439,8 @@ class CustomerMapFragment : BaseBindingFragment<FragmentCustomerMapBinding, Cust
             it.tvName.text = user.fullName
             it.tvRating.text = user.rating.toString()
             it.tvVehicle.text = user.getService()
+            it.tvDistance.text = String.format("%.2f km", requestModel.distance)
+            it.tvMoney.text = String.format("$%.2f", requestModel.cost)
         }
     }
 
