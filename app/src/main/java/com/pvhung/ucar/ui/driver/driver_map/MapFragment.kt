@@ -68,6 +68,7 @@ class MapFragment : BaseBindingFragment<FragmentDriverMapBinding, MapViewModel>(
     private var requestModel = RequestModel()
     private var rideState = DriverRideState.IDLE
     private var pickupLocation: Marker? = null
+    private var destinationLocation: Marker? = null
     private var polylines = mutableListOf<Polyline>()
     private var isDriverOnline = false
     private val COLORS: IntArray = intArrayOf(
@@ -315,12 +316,17 @@ class MapFragment : BaseBindingFragment<FragmentDriverMapBinding, MapViewModel>(
                     binding.icUserInfo.rideStatus.text = getString(R.string.confirm_done)
                     erasePolyLines()
                     if (requestModel.destinationLat != 0.0 && requestModel.destinationLng != 0.0) {
-                        getRouteToMarker(
-                            LatLng(
-                                requestModel.destinationLat,
-                                requestModel.destinationLng
+                        val des = LatLng(
+                            requestModel.destinationLat,
+                            requestModel.destinationLng
+                        )
+                        destinationLocation?.remove()
+                        destinationLocation = mMap.addMarker(
+                            MarkerOptions().position(des).title("Destination location").icon(
+                                BitmapDescriptorFactory.fromResource(R.drawable.ic_destination)
                             )
                         )
+                        getRouteToMarker(des)
                     }
                 }
 

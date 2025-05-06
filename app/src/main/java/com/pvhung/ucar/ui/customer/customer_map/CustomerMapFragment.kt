@@ -85,6 +85,8 @@ class CustomerMapFragment : BaseBindingFragment<FragmentCustomerMapBinding, Cust
     private val requestModel = RequestModel()
     private var pickupMarker: Marker? = null
 
+    lateinit var autoCompleteFragment: AutocompleteSupportFragment
+
     private val locationPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
     ) { permissions ->
@@ -151,7 +153,7 @@ class CustomerMapFragment : BaseBindingFragment<FragmentCustomerMapBinding, Cust
         if (!Places.isInitialized()) {
             Places.initialize(App.instance, Constant.MAPS_API)
         }
-        val autoCompleteFragment =
+        autoCompleteFragment =
             ((childFragmentManager.findFragmentById(R.id.autocompleteFragment)) as AutocompleteSupportFragment).setPlaceFields(
                 listOf(Place.Field.NAME, Place.Field.LAT_LNG)
             )
@@ -478,6 +480,7 @@ class CustomerMapFragment : BaseBindingFragment<FragmentCustomerMapBinding, Cust
         bookState = UserBookingState.IDLE
         Utils.removeRequest()
         requestModel.reset()
+        if(::autoCompleteFragment.isInitialized) autoCompleteFragment.setText("")
     }
 
     private fun requestUcar() {
