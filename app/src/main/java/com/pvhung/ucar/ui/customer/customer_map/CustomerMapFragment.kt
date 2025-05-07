@@ -2,11 +2,14 @@ package com.pvhung.ucar.ui.customer.customer_map
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.graphics.Color
 import android.location.Location
 import android.os.Bundle
 import android.os.Looper
 import android.util.Log
 import android.view.View
+import android.widget.EditText
+import android.widget.ImageButton
 import androidx.activity.result.contract.ActivityResultContracts
 import com.firebase.geofire.GeoFire
 import com.firebase.geofire.GeoLocation
@@ -52,6 +55,7 @@ import com.pvhung.ucar.utils.FirebaseDatabaseUtils
 import com.pvhung.ucar.utils.OnBackPressed
 import com.pvhung.ucar.utils.PermissionHelper
 import com.pvhung.ucar.utils.Utils
+import com.pvhung.ucar.utils.ViewUtils
 import com.pvhung.ucar.utils.beGone
 import com.pvhung.ucar.utils.beVisible
 
@@ -86,6 +90,7 @@ class CustomerMapFragment : BaseBindingFragment<FragmentCustomerMapBinding, Cust
     private var pickupMarker: Marker? = null
 
     lateinit var autoCompleteFragment: AutocompleteSupportFragment
+    lateinit var autoCompletePickupFragment: AutocompleteSupportFragment
 
     private val locationPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
@@ -153,10 +158,65 @@ class CustomerMapFragment : BaseBindingFragment<FragmentCustomerMapBinding, Cust
         if (!Places.isInitialized()) {
             Places.initialize(App.instance, Constant.MAPS_API)
         }
+
+
         autoCompleteFragment =
             ((childFragmentManager.findFragmentById(R.id.autocompleteFragment)) as AutocompleteSupportFragment).setPlaceFields(
                 listOf(Place.Field.NAME, Place.Field.LAT_LNG)
             )
+        autoCompletePickupFragment =
+            ((childFragmentManager.findFragmentById(R.id.autocompletePickupFragment)) as AutocompleteSupportFragment).setPlaceFields(
+                listOf(Place.Field.NAME, Place.Field.LAT_LNG)
+            )
+
+        try {
+            val autocompleteTextView = (autoCompleteFragment.view?.findViewById<View>(
+                com.google.android.libraries.places.R.id.places_autocomplete_search_input
+            ) as? EditText)
+            autocompleteTextView?.apply {
+                setHintTextColor(Color.GRAY)
+                setTextColor(Color.BLACK)
+                setHint("Destination address")
+                background = null
+                textSize = 16f
+                setPadding(
+                    ViewUtils.dpToPx(requireContext(), 8f),
+                    ViewUtils.dpToPx(requireContext(), 12f),
+                    ViewUtils.dpToPx(requireContext(), 8f),
+                    ViewUtils.dpToPx(requireContext(), 12f)
+                )
+            }
+
+            val searchIcon = autoCompleteFragment.view?.findViewById<View>(
+                com.google.android.libraries.places.R.id.places_autocomplete_search_button
+            )
+            searchIcon?.visibility = View.GONE
+            /////////////////////////////////////////
+            val tv = (autoCompletePickupFragment.view?.findViewById<View>(
+                com.google.android.libraries.places.R.id.places_autocomplete_search_input
+            ) as? EditText)
+            tv?.apply {
+                setHintTextColor(Color.GRAY)
+                setTextColor(Color.BLACK)
+                setHint("Pickup address")
+                background = null
+                textSize = 16f
+                setPadding(
+                    ViewUtils.dpToPx(requireContext(), 8f),
+                    ViewUtils.dpToPx(requireContext(), 12f),
+                    ViewUtils.dpToPx(requireContext(), 8f),
+                    ViewUtils.dpToPx(requireContext(), 12f)
+                )
+            }
+
+            val si = autoCompletePickupFragment.view?.findViewById<View>(
+                com.google.android.libraries.places.R.id.places_autocomplete_search_button
+            )
+            si?.visibility = View.GONE
+        }
+        catch (_:Exception) {}
+
+
         autoCompleteFragment.setOnPlaceSelectedListener(object : PlaceSelectionListener {
             override fun onError(e: Status) {
                 e.statusMessage?.let { showToast(it) }
@@ -480,7 +540,7 @@ class CustomerMapFragment : BaseBindingFragment<FragmentCustomerMapBinding, Cust
         bookState = UserBookingState.IDLE
         Utils.removeRequest()
         requestModel.reset()
-        if(::autoCompleteFragment.isInitialized) autoCompleteFragment.setText("")
+        if (::autoCompleteFragment.isInitialized) autoCompleteFragment.setText("")
     }
 
     private fun requestUcar() {
