@@ -9,7 +9,6 @@ import android.os.Looper
 import android.util.Log
 import android.view.View
 import android.widget.EditText
-import android.widget.ImageButton
 import androidx.activity.result.contract.ActivityResultContracts
 import com.firebase.geofire.GeoFire
 import com.firebase.geofire.GeoLocation
@@ -111,6 +110,18 @@ class CustomerMapFragment : BaseBindingFragment<FragmentCustomerMapBinding, Cust
             super.onLocationResult(locationResult)
             if (locationResult != null) {
                 locationResult.lastLocation?.let {
+                    if(mLastLocation == null ) {
+                        locationResult.lastLocation?.let {
+                            viewModel.getAddressFromLocation(
+                                requireContext(),
+                                it.latitude,
+                                it.longitude,
+                            ) { place ->
+                                Log.e("hungpv11", "setupAutoComplete: ${place}", )
+                                autoCompletePickupFragment.setText(place)
+                            }
+                        }
+                    }
                     mLastLocation = it
                     val newPos = LatLng(it.latitude, it.longitude)
                     mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(newPos, 18f))
@@ -213,8 +224,8 @@ class CustomerMapFragment : BaseBindingFragment<FragmentCustomerMapBinding, Cust
                 com.google.android.libraries.places.R.id.places_autocomplete_search_button
             )
             si?.visibility = View.GONE
+        } catch (_: Exception) {
         }
-        catch (_:Exception) {}
 
 
         autoCompleteFragment.setOnPlaceSelectedListener(object : PlaceSelectionListener {
@@ -224,6 +235,7 @@ class CustomerMapFragment : BaseBindingFragment<FragmentCustomerMapBinding, Cust
 
             override fun onPlaceSelected(place: Place) {
                 requestModel.destination = place.name?.toString() ?: ""
+
                 if (mLastLocation != null && place.latLng != null) {
                     val distance = mLastLocation!!.distanceTo(Location("").apply {
                         latitude = place.latLng!!.latitude
@@ -242,6 +254,18 @@ class CustomerMapFragment : BaseBindingFragment<FragmentCustomerMapBinding, Cust
             }
         })
 
+
+
+        autoCompletePickupFragment.setOnPlaceSelectedListener(object : PlaceSelectionListener {
+            override fun onError(e: Status) {
+                e.statusMessage?.let { showToast(it) }
+            }
+
+            override fun onPlaceSelected(place: Place) {
+
+
+            }
+        })
     }
 
     private fun initMaps() {
