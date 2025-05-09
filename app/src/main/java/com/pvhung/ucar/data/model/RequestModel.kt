@@ -10,6 +10,8 @@ data class RequestModel(
     var destinationLat: Double = 0.0,
     var destinationLng: Double = 0.0,
     var pickupLocation: String = "",
+    var pickupLat: Double = 0.0,
+    var pickupLng: Double = 0.0,
     var time: Long = 0,
     var distance: Double = 0.0,
     var cost: Float = 0f
@@ -23,5 +25,8 @@ data class RequestModel(
         time = 0
         distance = 0.0
         cost = 0f
+        pickupLng = 0.0
+        pickupLat = 0.0
+        pickupLocation = ""
     }
 }

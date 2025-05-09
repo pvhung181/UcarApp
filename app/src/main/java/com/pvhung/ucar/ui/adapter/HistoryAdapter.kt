@@ -57,6 +57,7 @@ class HistoryAdapter(
             }
 
             binding.tvDestination.text = historyItem.destination
+            binding.tvPickup.text = historyItem.pickupLocation
             binding.tvDistance.text = "${String.format("%.2f", historyItem.distance)}km"
             binding.tvMoney.text = "${String.format("$%.2f", historyItem.money)}"
 

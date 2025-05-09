@@ -61,4 +61,5 @@
     <string name="go_to_offline">Go to offline</string>
     <string name="booking_fee">Booking fee :</string>
     <string name="distance">Distance :</string>
+    <string name="customer_has_not_rated_yet">Customer has not rated yet</string>
 </resources>

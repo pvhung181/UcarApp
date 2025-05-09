@@ -167,8 +167,10 @@ class MapFragment : BaseBindingFragment<FragmentDriverMapBinding, MapViewModel>(
 
                     if (!binding.icUserRequest.root.isVisible && request?.state == RequestState.IDLE) binding.icUserRequest.root.beVisible()
                     if (request != null) {
-                        if (isAdded)
+                        if (isAdded) {
                             binding.icUserRequest.tvDestination.text = request.destination
+                            binding.icUserRequest.tvPickup.text = request.pickupLocation
+                        }
                     }
                     if (request != null && request.state == RequestState.ACCEPT) {
                         rideState = DriverRideState.MOVING
@@ -177,6 +179,7 @@ class MapFragment : BaseBindingFragment<FragmentDriverMapBinding, MapViewModel>(
                             root.beVisible()
                             tvName.text = requestModel.customerId
                             tvDestination.text = requestModel.destination
+                            tvPickup.text = requestModel.pickupLocation
                             tvMoney.text = String.format(
                                 "${getString(R.string.booking_fee)}$%.2f",
                                 requestModel.cost
@@ -356,7 +359,8 @@ class MapFragment : BaseBindingFragment<FragmentDriverMapBinding, MapViewModel>(
             driverId = uid,
             time = requestModel.time,
             money = requestModel.cost.toDouble(),
-            distance = requestModel.distance
+            distance = requestModel.distance,
+            pickupLocation = requestModel.pickupLocation
         )
 
         hr.child(requestId!!).setValue(history)

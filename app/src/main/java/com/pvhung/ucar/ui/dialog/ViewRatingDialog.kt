@@ -11,6 +11,9 @@ import android.widget.LinearLayout
 import androidx.databinding.DataBindingUtil
 import com.pvhung.ucar.R
 import com.pvhung.ucar.databinding.DialogViewRatingBinding
+import com.pvhung.ucar.utils.beGone
+import com.pvhung.ucar.utils.beInvisible
+import com.pvhung.ucar.utils.beVisible
 
 class ViewRatingDialog(
     context: Context
@@ -42,8 +45,19 @@ class ViewRatingDialog(
     }
 
     fun setReview(rating: Int, review: String) {
-        binding.ratingBar.rating = rating.toFloat()
-        binding.etFeedback.setText(review)
+        if(rating == 0) {
+            binding.tvNoRating.beVisible()
+            binding.ratingBar.beInvisible()
+            binding.etFeedback.beInvisible()
+        }
+        else {
+            binding.tvNoRating.beGone()
+            binding.ratingBar.beVisible()
+            binding.etFeedback.beVisible()
+            binding.ratingBar.rating = rating.toFloat()
+            binding.etFeedback.setText(review)
+        }
+
     }
 
     private fun initDialog() {

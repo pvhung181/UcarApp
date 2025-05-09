@@ -92,6 +92,7 @@
             android:layout_marginHorizontal="6dp"
             android:text="@string/call_ucar"
             android:textAllCaps="false"
+            android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent" />

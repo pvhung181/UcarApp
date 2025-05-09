@@ -110,14 +110,16 @@ class CustomerMapFragment : BaseBindingFragment<FragmentCustomerMapBinding, Cust
             super.onLocationResult(locationResult)
             if (locationResult != null) {
                 locationResult.lastLocation?.let {
-                    if(mLastLocation == null ) {
+                    if (mLastLocation == null) {
                         locationResult.lastLocation?.let {
                             viewModel.getAddressFromLocation(
                                 requireContext(),
                                 it.latitude,
                                 it.longitude,
                             ) { place ->
-                                Log.e("hungpv11", "setupAutoComplete: ${place}", )
+                                requestModel.pickupLat = it.latitude
+                                requestModel.pickupLng = it.longitude
+                                requestModel.pickupLocation = place ?: ""
                                 autoCompletePickupFragment.setText(place)
                             }
                         }
@@ -235,22 +237,31 @@ class CustomerMapFragment : BaseBindingFragment<FragmentCustomerMapBinding, Cust
 
             override fun onPlaceSelected(place: Place) {
                 requestModel.destination = place.name?.toString() ?: ""
+                place.latLng?.let {
+                    requestModel.destinationLat = it.latitude
+                    requestModel.destinationLng = it.longitude
+                }
+                if (requestModel.destination != "" && requestModel.pickupLocation != "") binding.callUberBtn.beVisible()
+                else binding.callUberBtn.beGone()
+                if (place.latLng != null) {
 
-                if (mLastLocation != null && place.latLng != null) {
-                    val distance = mLastLocation!!.distanceTo(Location("").apply {
-                        latitude = place.latLng!!.latitude
-                        longitude = place.latLng!!.longitude
-                    }).toDouble()
+                    val distance = getDistance(
+                        Location("").apply {
+                            longitude = requestModel.pickupLng
+                            latitude = requestModel.pickupLat
+                        },
+                        Location("").apply {
+                            longitude = requestModel.destinationLng
+                            latitude = requestModel.destinationLat
+                        }
+                    ).toDouble()
                     requestModel.distance = distance / 1000f
                     bookingBottomSheet?.setCost(
                         CostUtils.getCost(distance.toFloat()),
                         CostUtils.getCarCost(distance.toFloat())
                     )
                 }
-                place.latLng?.let {
-                    requestModel.destinationLat = it.latitude
-                    requestModel.destinationLng = it.longitude
-                }
+
             }
         })
 
@@ -262,10 +273,37 @@ class CustomerMapFragment : BaseBindingFragment<FragmentCustomerMapBinding, Cust
             }
 
             override fun onPlaceSelected(place: Place) {
+                requestModel.pickupLocation = place.name?.toString() ?: ""
+                place.latLng?.let {
+                    requestModel.pickupLat = it.latitude
+                    requestModel.pickupLng = it.longitude
+                }
+                if (requestModel.destination != "" && requestModel.pickupLocation != "") binding.callUberBtn.beVisible()
+                else binding.callUberBtn.beGone()
+                if (place.latLng != null) {
 
-
+                    val distance = getDistance(
+                        Location("").apply {
+                            longitude = requestModel.pickupLng
+                            latitude = requestModel.pickupLat
+                        },
+                        Location("").apply {
+                            longitude = requestModel.destinationLng
+                            latitude = requestModel.destinationLat
+                        }
+                    ).toDouble()
+                    requestModel.distance = distance / 1000f
+                    bookingBottomSheet?.setCost(
+                        CostUtils.getCost(distance.toFloat()),
+                        CostUtils.getCarCost(distance.toFloat())
+                    )
+                }
             }
         })
+    }
+
+    private fun getDistance(start: Location, end: Location): Float {
+        return start.distanceTo(end)
     }
 
     private fun initMaps() {
@@ -517,7 +555,7 @@ class CustomerMapFragment : BaseBindingFragment<FragmentCustomerMapBinding, Cust
     fun updateNotiDriverInfo(user: User, requestModel: RequestModel) {
         binding.icNotifyMinimal.let {
             it.tvName.text = user.fullName
-            it.tvRating.text = user.rating.toString()
+            it.tvRating.text = String.format("%.1f", user.rating)
             it.tvVehicle.text = user.getService()
         }
 
@@ -565,6 +603,7 @@ class CustomerMapFragment : BaseBindingFragment<FragmentCustomerMapBinding, Cust
         Utils.removeRequest()
         requestModel.reset()
         if (::autoCompleteFragment.isInitialized) autoCompleteFragment.setText("")
+        if (::autoCompletePickupFragment.isInitialized) autoCompletePickupFragment.setText("")
     }
 
     private fun requestUcar() {
@@ -636,6 +675,7 @@ class CustomerMapFragment : BaseBindingFragment<FragmentCustomerMapBinding, Cust
     //region update ui
     private fun updateUiWhenRideDone() {
         binding.callUberBtn.text = getString(R.string.call_ucar)
+        binding.callUberBtn.beGone()
         binding.callUberBtn.beVisible()
         binding.icNotifyMinimal.root.beGone()
         binding.icNotifyExpand.root.beGone()
