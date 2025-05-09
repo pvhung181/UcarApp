@@ -7,6 +7,9 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuth.AuthStateListener
+import com.google.firebase.auth.FirebaseAuthException
+import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
+import com.google.firebase.auth.FirebaseAuthInvalidUserException
 import com.pvhung.ucar.R
 import com.pvhung.ucar.databinding.FragmentSignInBinding
 import com.pvhung.ucar.ui.base.BaseBindingFragment
@@ -147,7 +150,13 @@ class SignInFragment : BaseBindingFragment<FragmentSignInBinding, SignInViewMode
             .addOnSuccessListener {
                 mainViewModel.getUserFromServer()
             }
-            .addOnFailureListener {
+            .addOnFailureListener { ex ->
+                val errorMessage = when (ex) {
+                    is FirebaseAuthInvalidUserException -> "This email is not registered."
+                    is FirebaseAuthInvalidCredentialsException -> "Incorrect password."
+                    else -> "Login failed: Unknown error"
+                }
+                Toast.makeText(context, errorMessage, Toast.LENGTH_LONG).show()
 
             }
             .addOnCompleteListener {

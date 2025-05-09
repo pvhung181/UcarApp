@@ -178,7 +178,7 @@
                 app:layout_constraintTop_toTopOf="@id/etGender" />
 
             <androidx.appcompat.widget.AppCompatButton
-                android:id="@+id/signUpButton"
+                android:id="@+id/saveBtn"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="@dimen/_24sdp"
@@ -209,10 +209,10 @@
                 android:layout_height="wrap_content"
                 android:indeterminateTint="@color/color_38b6ff"
                 android:visibility="invisible"
-                app:layout_constraintBottom_toBottomOf="@id/signUpButton"
-                app:layout_constraintEnd_toEndOf="@id/signUpButton"
-                app:layout_constraintStart_toStartOf="@id/signUpButton"
-                app:layout_constraintTop_toTopOf="@id/signUpButton" />
+                app:layout_constraintBottom_toBottomOf="@id/saveBtn"
+                app:layout_constraintEnd_toEndOf="@id/saveBtn"
+                app:layout_constraintStart_toStartOf="@id/saveBtn"
+                app:layout_constraintTop_toTopOf="@id/saveBtn" />
 
             <FrameLayout
                 android:id="@+id/progress"

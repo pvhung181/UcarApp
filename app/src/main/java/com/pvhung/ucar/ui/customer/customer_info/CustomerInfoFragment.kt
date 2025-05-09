@@ -14,6 +14,8 @@ import com.pvhung.ucar.utils.FirebaseDatabaseUtils
 import com.pvhung.ucar.utils.OnBackPressed
 import com.pvhung.ucar.utils.Utils
 import com.pvhung.ucar.utils.beGone
+import com.pvhung.ucar.utils.beInvisible
+import com.pvhung.ucar.utils.beVisible
 
 class CustomerInfoFragment :
     BaseBindingFragment<FragmentCustomerInfoBinding, CustomerInfoViewModel>() {
@@ -62,6 +64,28 @@ class CustomerInfoFragment :
 
     private fun onClick() {
         binding.icHeader.backButton.setOnClickListener { popBackStack() }
+
+        binding.saveBtn.setOnClickListener {
+
+            val map = mutableMapOf<String, Any>(
+                "fullName" to binding.etFullName.text.toString(),
+                "phoneNumber" to binding.etPhone.text.toString(),
+                "email" to binding.etEmail.text.toString(),
+                "gender" to binding.etGender.text.toString(),
+                "dateOfBirth" to binding.etDate.text.toString()
+
+            )
+            binding.savingProgress.beVisible()
+            binding.saveBtn.beInvisible()
+            FirebaseDatabaseUtils.getCurrentCustomerDatabase().updateChildren(map)
+                .addOnSuccessListener {
+                    showToast("Update successfully")
+                }
+                .addOnCompleteListener {
+                    binding.saveBtn.beVisible()
+                    binding.savingProgress.beGone()
+                }
+        }
     }
 
 
