@@ -2,7 +2,6 @@ package com.pvhung.ucar.ui.customer.customer_map
 
 import android.Manifest
 import android.annotation.SuppressLint
-import android.app.Activity
 import android.graphics.Color
 import android.location.Location
 import android.os.Bundle
@@ -270,7 +269,7 @@ class CustomerMapFragment : BaseBindingFragment<FragmentCustomerMapBinding, Cust
             PayPalWebCheckoutClient(requireActivity(), config, Constant.returnUrl)
         payPalWebCheckoutClient.listener = object : PayPalWebCheckoutListener {
             override fun onPayPalWebSuccess(result: PayPalWebCheckoutResult) {
-
+                showToast("Order success")
             }
 
             override fun onPayPalWebFailure(error: PayPalSDKError) {
@@ -279,7 +278,7 @@ class CustomerMapFragment : BaseBindingFragment<FragmentCustomerMapBinding, Cust
             }
 
             override fun onPayPalWebCanceled() {
-                showToast("Order cancel")
+                // showToast("Order cancel")
 
             }
         }
@@ -481,10 +480,13 @@ class CustomerMapFragment : BaseBindingFragment<FragmentCustomerMapBinding, Cust
                 override fun onResponse(response: JSONObject) {
                     Toast.makeText(requireActivity(), "Payment Successful", Toast.LENGTH_SHORT)
                         .show()
+                    requestUcar()
+
                 }
 
                 override fun onError(error: ANError) {
-                    // Handle the error
+                    Toast.makeText(requireActivity(), "Payment Fail", Toast.LENGTH_SHORT)
+                        .show()
                 }
             })
     }

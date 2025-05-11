@@ -33,6 +33,7 @@
             android:exported="true" />
         <activity
             android:name=".ui.customer.CustomerActivity"
+            android:launchMode="singleTop"
             android:exported="true" >
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
