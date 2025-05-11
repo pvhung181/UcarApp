@@ -63,4 +63,6 @@
     <string name="distance">Distance :</string>
     <string name="customer_has_not_rated_yet">Customer has not rated yet</string>
     <string name="ride_smart_ride_fast_ride_with_us">Ride Smart. Ride Fast. Ride with Us</string>
+    <string name="pay_with_paypal">Pay with Paypal</string>
+    <string name="pay_in_cash">Pay in cash</string>
 </resources>

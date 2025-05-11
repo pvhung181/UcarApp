@@ -16,6 +16,7 @@ import kotlinx.coroutines.launch
 class MainViewModel : BaseViewModel() {
     val user = MutableLiveData<User?>(null)
     val isError = MutableLiveData<Boolean>(false)
+    val captureOrder = MutableLiveData<Boolean?>(null)
 
     fun getUserFromServer() {
         viewModelScope.launch(Dispatchers.IO + CoroutineExceptionHandler { _, _ ->

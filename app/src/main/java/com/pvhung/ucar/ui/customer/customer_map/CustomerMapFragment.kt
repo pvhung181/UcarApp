@@ -2,14 +2,21 @@ package com.pvhung.ucar.ui.customer.customer_map
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.graphics.Color
 import android.location.Location
 import android.os.Bundle
 import android.os.Looper
+import android.util.Base64
 import android.util.Log
 import android.view.View
 import android.widget.EditText
+import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
+import com.androidnetworking.AndroidNetworking
+import com.androidnetworking.common.Priority
+import com.androidnetworking.error.ANError
+import com.androidnetworking.interfaces.JSONObjectRequestListener
 import com.firebase.geofire.GeoFire
 import com.firebase.geofire.GeoLocation
 import com.firebase.geofire.GeoQuery
@@ -37,9 +44,19 @@ import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.ValueEventListener
+import com.paypal.android.corepayments.CoreConfig
+import com.paypal.android.corepayments.Environment
+import com.paypal.android.corepayments.PayPalSDKError
+import com.paypal.android.paypalwebpayments.PayPalWebCheckoutClient
+import com.paypal.android.paypalwebpayments.PayPalWebCheckoutFundingSource
+import com.paypal.android.paypalwebpayments.PayPalWebCheckoutListener
+import com.paypal.android.paypalwebpayments.PayPalWebCheckoutRequest
+import com.paypal.android.paypalwebpayments.PayPalWebCheckoutResult
 import com.pvhung.ucar.App
 import com.pvhung.ucar.R
 import com.pvhung.ucar.common.Constant
+import com.pvhung.ucar.common.Constant.clientID
+import com.pvhung.ucar.common.Constant.secretID
 import com.pvhung.ucar.common.enums.RequestState
 import com.pvhung.ucar.common.enums.UserBookingState
 import com.pvhung.ucar.data.model.RequestModel
@@ -48,6 +65,7 @@ import com.pvhung.ucar.databinding.FragmentCustomerMapBinding
 import com.pvhung.ucar.ui.base.BaseBindingFragment
 import com.pvhung.ucar.ui.dialog.BottomSheetBookingVehicle
 import com.pvhung.ucar.ui.dialog.EnableGpsDialog
+import com.pvhung.ucar.ui.dialog.SelectPaymentMethodDialog
 import com.pvhung.ucar.utils.CostUtils
 import com.pvhung.ucar.utils.DeviceHelper
 import com.pvhung.ucar.utils.FirebaseDatabaseUtils
@@ -57,6 +75,9 @@ import com.pvhung.ucar.utils.Utils
 import com.pvhung.ucar.utils.ViewUtils
 import com.pvhung.ucar.utils.beGone
 import com.pvhung.ucar.utils.beVisible
+import org.json.JSONArray
+import org.json.JSONObject
+import java.util.UUID
 
 
 class CustomerMapFragment : BaseBindingFragment<FragmentCustomerMapBinding, CustomerMapViewModel>(),
@@ -84,12 +105,31 @@ class CustomerMapFragment : BaseBindingFragment<FragmentCustomerMapBinding, Cust
     private var driverLocationRef: DatabaseReference? = null
     private var driverLocationRefListener: ValueEventListener? = null
 
-
     private val requestModel = RequestModel()
     private var pickupMarker: Marker? = null
 
+
     lateinit var autoCompleteFragment: AutocompleteSupportFragment
     lateinit var autoCompletePickupFragment: AutocompleteSupportFragment
+
+    var accessToken = ""
+    private lateinit var uniqueId: String
+    private var orderid = ""
+
+    private val selectPaymentDialog by lazy {
+        SelectPaymentMethodDialog(
+            requireContext(),
+            object : SelectPaymentMethodDialog.SelectPaymentListener {
+                override fun onPayInCash() {
+                    requestUcar()
+                }
+
+                override fun onPayWithPaypal() {
+                    startOrder()
+                }
+            }
+        )
+    }
 
     private val locationPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
@@ -103,7 +143,6 @@ class CustomerMapFragment : BaseBindingFragment<FragmentCustomerMapBinding, Cust
 
         }
     }
-
 
     private val mLocationCallback: LocationCallback = object : LocationCallback() {
         override fun onLocationResult(locationResult: LocationResult) {
@@ -150,6 +189,105 @@ class CustomerMapFragment : BaseBindingFragment<FragmentCustomerMapBinding, Cust
         onClick()
         setupAutoComplete()
         initBottomsheet()
+        fetchAccessToken()
+    }
+
+    private fun fetchAccessToken() {
+        val authString = "$clientID:$secretID"
+        val encodedAuthString = Base64.encodeToString(authString.toByteArray(), Base64.NO_WRAP)
+
+        AndroidNetworking.post("https://api-m.sandbox.paypal.com/v1/oauth2/token")
+            .addHeaders("Authorization", "Basic $encodedAuthString")
+            .addHeaders("Content-Type", "application/x-www-form-urlencoded")
+            .addBodyParameter("grant_type", "client_credentials")
+            .setPriority(Priority.HIGH)
+            .build()
+            .getAsJSONObject(object : JSONObjectRequestListener {
+                override fun onResponse(response: JSONObject) {
+                    accessToken = response.getString("access_token")
+
+                    Toast.makeText(requireActivity(), "Access Token Fetched!", Toast.LENGTH_SHORT)
+                        .show()
+                }
+
+                override fun onError(error: ANError) {
+                    Toast.makeText(requireActivity(), "Error Occurred!", Toast.LENGTH_SHORT).show()
+                }
+            })
+    }
+
+    private fun startOrder() {
+        uniqueId = UUID.randomUUID().toString()
+
+        val orderRequestJson = JSONObject().apply {
+            put("intent", "CAPTURE")
+            put("purchase_units", JSONArray().apply {
+                put(JSONObject().apply {
+                    put("reference_id", uniqueId)
+                    put("amount", JSONObject().apply {
+                        put("currency_code", "USD")
+                        put("value", "${requestModel.cost}")
+                    })
+                })
+            })
+            put("payment_source", JSONObject().apply {
+                put("paypal", JSONObject().apply {
+                    put("experience_context", JSONObject().apply {
+                        put("payment_method_preference", "IMMEDIATE_PAYMENT_REQUIRED")
+                        put("brand_name", "Ucar Pvhung")
+                        put("locale", "en-US")
+                        put("landing_page", "LOGIN")
+                        put("shipping_preference", "NO_SHIPPING")
+                        put("user_action", "PAY_NOW")
+                        put("return_url", Constant.returnUrl)
+                        put("cancel_url", "https://example.com/cancelUrl")
+                    })
+                })
+            })
+        }
+
+        AndroidNetworking.post("https://api-m.sandbox.paypal.com/v2/checkout/orders")
+            .addHeaders("Authorization", "Bearer $accessToken")
+            .addHeaders("Content-Type", "application/json")
+            .addHeaders("PayPal-Request-Id", uniqueId)
+            .addJSONObjectBody(orderRequestJson)
+            .setPriority(Priority.HIGH)
+            .build()
+            .getAsJSONObject(object : JSONObjectRequestListener {
+                override fun onResponse(response: JSONObject) {
+                    handlerOrderID(response.getString("id"))
+                }
+
+                override fun onError(error: ANError) {
+                    showToast("Order Error")
+                }
+            })
+    }
+
+    private fun handlerOrderID(orderID: String) {
+        val config = CoreConfig(clientID, environment = Environment.SANDBOX)
+        val payPalWebCheckoutClient =
+            PayPalWebCheckoutClient(requireActivity(), config, Constant.returnUrl)
+        payPalWebCheckoutClient.listener = object : PayPalWebCheckoutListener {
+            override fun onPayPalWebSuccess(result: PayPalWebCheckoutResult) {
+
+            }
+
+            override fun onPayPalWebFailure(error: PayPalSDKError) {
+                showToast("Order Error")
+
+            }
+
+            override fun onPayPalWebCanceled() {
+                showToast("Order cancel")
+
+            }
+        }
+
+        orderid = orderID
+        val payPalWebCheckoutRequest =
+            PayPalWebCheckoutRequest(orderID, fundingSource = PayPalWebCheckoutFundingSource.PAYPAL)
+        payPalWebCheckoutClient.start(payPalWebCheckoutRequest)
     }
 
     private fun initBottomsheet() {
@@ -159,7 +297,7 @@ class CustomerMapFragment : BaseBindingFragment<FragmentCustomerMapBinding, Cust
                 override fun onBook(service: String) {
                     serviceBooking = service
                     requestModel.cost = bookingBottomSheet?.getCost() ?: 0f
-                    requestUcar()
+                    selectPaymentDialog.show()
                 }
 
                 override fun onDismiss() {}
@@ -316,6 +454,7 @@ class CustomerMapFragment : BaseBindingFragment<FragmentCustomerMapBinding, Cust
 
     private fun init() {
 
+
     }
 
     private fun initView() {
@@ -323,7 +462,31 @@ class CustomerMapFragment : BaseBindingFragment<FragmentCustomerMapBinding, Cust
     }
 
     override fun observerData() {
+        mainViewModel.captureOrder.observe(viewLifecycleOwner) {
+            if (it != null && it == true) {
+                captureOrder(orderid)
+                mainViewModel.captureOrder.value = null
+            }
+        }
+    }
 
+    private fun captureOrder(orderID: String) {
+        AndroidNetworking.post("https://api-m.sandbox.paypal.com/v2/checkout/orders/$orderID/capture")
+            .addHeaders("Authorization", "Bearer $accessToken")
+            .addHeaders("Content-Type", "application/json")
+            .addJSONObjectBody(JSONObject()) // Empty body
+            .setPriority(Priority.HIGH)
+            .build()
+            .getAsJSONObject(object : JSONObjectRequestListener {
+                override fun onResponse(response: JSONObject) {
+                    Toast.makeText(requireActivity(), "Payment Successful", Toast.LENGTH_SHORT)
+                        .show()
+                }
+
+                override fun onError(error: ANError) {
+                    // Handle the error
+                }
+            })
     }
 
     private fun onClick() {

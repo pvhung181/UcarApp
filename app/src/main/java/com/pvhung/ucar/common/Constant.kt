@@ -34,7 +34,11 @@ object Constant {
     const val USER_SERVICE = "service"
     const val MOTOBIKE_SERVICE = "Motobike"
     const val CAR_SERVICE = "Car"
-
+    const val clientID =
+        "ARk8C3u6gwVs6mia573_B0jYEOc0pCYovl4KpSx8E67D3mKeF8TKNeXUkabZBqOzn4RmKktFnwx-Tj-k"
+    const val secretID =
+        "EFlfdb5SpbA3JfJ0Z-MnVQU2qBTc7x4Tr_nnrU2WGwVHr2WphMmANTlRRQuyzqTmgrLiEJNgFOnRvH7g"
+    const val returnUrl = "nativexo://paypalpay"
     const val IS_DRIVER_ONLINE = "IS_DRIVER_ONLINE"
 
     const val DRIVER_STATE = "DriverState"
