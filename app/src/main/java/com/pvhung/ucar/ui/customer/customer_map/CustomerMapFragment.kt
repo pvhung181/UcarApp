@@ -64,10 +64,12 @@ import com.pvhung.ucar.databinding.FragmentCustomerMapBinding
 import com.pvhung.ucar.ui.base.BaseBindingFragment
 import com.pvhung.ucar.ui.dialog.BottomSheetBookingVehicle
 import com.pvhung.ucar.ui.dialog.EnableGpsDialog
+import com.pvhung.ucar.ui.dialog.SearchingDriverDialog
 import com.pvhung.ucar.ui.dialog.SelectPaymentMethodDialog
 import com.pvhung.ucar.utils.CostUtils
 import com.pvhung.ucar.utils.DeviceHelper
 import com.pvhung.ucar.utils.FirebaseDatabaseUtils
+import com.pvhung.ucar.utils.IntentManager
 import com.pvhung.ucar.utils.OnBackPressed
 import com.pvhung.ucar.utils.PermissionHelper
 import com.pvhung.ucar.utils.Utils
@@ -83,6 +85,7 @@ class CustomerMapFragment : BaseBindingFragment<FragmentCustomerMapBinding, Cust
     OnMapReadyCallback {
 
     private val enableGpsDialog by lazy { EnableGpsDialog(requireContext()) }
+    private val searchingDriverDialog by lazy { SearchingDriverDialog(requireContext()) }
     private var isChangeUiWhenDriverFound = false
     private var bookState = UserBookingState.IDLE
     private var isWaitingResponse = false
@@ -565,7 +568,7 @@ class CustomerMapFragment : BaseBindingFragment<FragmentCustomerMapBinding, Cust
     }
 
     private fun getClosestDriver() {
-        binding.callUberBtn.setText("Looking for driver location...")
+        searchingDriverDialog.show()
         bookState = UserBookingState.LOOKING
         val ref = FirebaseDatabaseUtils.getDriverAvailableDatabase()
         val geo = GeoFire(ref)
@@ -726,10 +729,18 @@ class CustomerMapFragment : BaseBindingFragment<FragmentCustomerMapBinding, Cust
 
         binding.icNotifyExpand.let {
             it.tvName.text = user.fullName
-            it.tvRating.text = user.rating.toString()
+            it.tvRating.text = String.format("%.1f", user.rating)
             it.tvVehicle.text = user.getService()
             it.tvDistance.text = String.format("%.2f km", requestModel.distance)
             it.tvMoney.text = String.format("$%.2f", requestModel.cost)
+        }
+
+        binding.icNotifyExpand.ivMessage.setOnClickListener {
+            IntentManager.goToMessage(requireActivity(), user.phoneNumber)
+        }
+
+        binding.icNotifyExpand.ivCall.setOnClickListener {
+            IntentManager.goToCall(requireActivity(), user.phoneNumber)
         }
     }
 
@@ -742,6 +753,7 @@ class CustomerMapFragment : BaseBindingFragment<FragmentCustomerMapBinding, Cust
     fun updateWhenFoundDriver() {
         if (!isChangeUiWhenDriverFound) {
             binding.callUberBtn.beGone()
+            searchingDriverDialog.dismiss()
             binding.icNotifyMinimal.root.beVisible()
             binding.icNotifyExpand.btnRide.text = getString(R.string.cancel)
             isChangeUiWhenDriverFound = true
@@ -794,7 +806,6 @@ class CustomerMapFragment : BaseBindingFragment<FragmentCustomerMapBinding, Cust
                             .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_map_pin))
                     )
                 getClosestDriver()
-                //todo show progressing
             }
         }
     }
@@ -841,7 +852,6 @@ class CustomerMapFragment : BaseBindingFragment<FragmentCustomerMapBinding, Cust
     private fun updateUiWhenRideDone() {
         binding.callUberBtn.text = getString(R.string.call_ucar)
         binding.callUberBtn.beGone()
-        binding.callUberBtn.beVisible()
         binding.icNotifyMinimal.root.beGone()
         binding.icNotifyExpand.root.beGone()
     }

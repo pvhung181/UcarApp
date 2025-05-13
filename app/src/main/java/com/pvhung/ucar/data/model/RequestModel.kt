@@ -14,7 +14,9 @@ data class RequestModel(
     var pickupLng: Double = 0.0,
     var time: Long = 0,
     var distance: Double = 0.0,
-    var cost: Float = 0f
+    var cost: Float = 0f,
+
+    var customerName: String = ""
 ) {
     fun reset() {
         customerId = ""

@@ -7,9 +7,9 @@
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:background="@color/white"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:background="@color/white">
 
         <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/ivMoney"
@@ -27,7 +27,7 @@
             android:layout_marginStart="24dp"
             android:fontFamily="@font/sf_pro_text_semibold"
             android:text="44.5$"
-            android:textSize="24dp"
+            android:textSize="18dp"
             app:layout_constraintBottom_toBottomOf="@id/ivMoney"
             app:layout_constraintStart_toEndOf="@id/ivMoney"
             app:layout_constraintTop_toTopOf="@id/ivMoney" />
@@ -50,16 +50,16 @@
             android:layout_marginStart="12dp"
             android:fontFamily="@font/sf_pro_text_semibold"
             android:text="27.21km"
-            android:textSize="24dp"
+            android:textSize="18dp"
             app:layout_constraintBottom_toBottomOf="@id/tvMoney"
             app:layout_constraintStart_toEndOf="@id/ivDot"
             app:layout_constraintTop_toTopOf="@id/tvMoney" />
 
         <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/ivCollapse"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:padding="12dp"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginEnd="8dp"
             android:src="@drawable/ic_arrow_down"
             app:layout_constraintBottom_toBottomOf="@id/tvMoney"
             app:layout_constraintEnd_toEndOf="parent"
@@ -119,6 +119,34 @@
             app:layout_constraintStart_toEndOf="@id/tvName"
             app:layout_constraintTop_toTopOf="@id/tvName" />
 
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/ivMessage"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginTop="8dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/ic_message"
+            android:background="?attr/selectableItemBackground"
+
+            app:layout_constraintDimensionRatio="68:27"
+            app:layout_constraintEnd_toStartOf="@id/ivCall"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/ivAvatar"
+            app:layout_constraintWidth_percent="0.4" />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/ivCall"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:background="?attr/selectableItemBackground"
+            android:scaleType="centerCrop"
+            android:src="@drawable/ic_call_driver"
+            app:layout_constraintDimensionRatio="68:27"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/ivMessage"
+            app:layout_constraintTop_toTopOf="@id/ivMessage"
+            app:layout_constraintWidth_percent="0.4" />
+
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/btnRide"
             android:layout_width="match_parent"
@@ -126,16 +154,18 @@
             android:layout_marginHorizontal="18dp"
             android:layout_marginTop="24dp"
             android:layout_marginBottom="16dp"
+
             android:background="@drawable/bg_view_round"
             android:backgroundTint="@color/color_38b6ff"
             android:fontFamily="@font/sf_pro_text_semibold"
-            android:paddingVertical="14dp"
+            android:paddingVertical="8dp"
             android:text="@string/arrived"
             android:textAllCaps="false"
+
             android:textColor="@color/white"
             android:textSize="22dp"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/ivAvatar" />
+            app:layout_constraintTop_toBottomOf="@id/ivMessage" />
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>

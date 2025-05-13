@@ -97,7 +97,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="12dp"
             android:fontFamily="@font/sf_pro_rounded_bold"
-            android:text="Driver's Name"
+            android:text="-------"
             android:textSize="18dp"
             app:layout_constraintStart_toEndOf="@id/ivAvatar"
             app:layout_constraintTop_toTopOf="@id/ivAvatar" />

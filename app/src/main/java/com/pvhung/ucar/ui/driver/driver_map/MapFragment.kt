@@ -46,6 +46,7 @@ import com.pvhung.ucar.common.enums.DriverRideState
 import com.pvhung.ucar.common.enums.RequestState
 import com.pvhung.ucar.data.model.HistoryItem
 import com.pvhung.ucar.data.model.RequestModel
+import com.pvhung.ucar.data.model.User
 import com.pvhung.ucar.databinding.FragmentDriverMapBinding
 import com.pvhung.ucar.ui.base.BaseBindingFragment
 import com.pvhung.ucar.utils.DeviceHelper
@@ -70,6 +71,7 @@ class MapFragment : BaseBindingFragment<FragmentDriverMapBinding, MapViewModel>(
     private var pickupLocation: Marker? = null
     private var destinationLocation: Marker? = null
     private var polylines = mutableListOf<Polyline>()
+    private var customer = User()
     private var isDriverOnline = false
     private val COLORS: IntArray = intArrayOf(
         R.color.primary_dark,
@@ -164,14 +166,27 @@ class MapFragment : BaseBindingFragment<FragmentDriverMapBinding, MapViewModel>(
             override fun onDataChange(snapshot: DataSnapshot) {
                 if (snapshot.exists()) {
                     val request = snapshot.getValue(RequestModel::class.java)
-
                     if (!binding.icUserRequest.root.isVisible && request?.state == RequestState.IDLE) binding.icUserRequest.root.beVisible()
-                    if (request != null) {
-                        if (isAdded) {
-                            binding.icUserRequest.tvDestination.text = request.destination
-                            binding.icUserRequest.tvPickup.text = request.pickupLocation
-                        }
+
+                    if(request!=null) {
+                        FirebaseDatabaseUtils.getSpecificCustomerDatabase(request.customerId).addListenerForSingleValueEvent(
+                            object : ValueEventListener {
+                                override fun onDataChange(snapshot: DataSnapshot) {
+                                    val user = FirebaseDatabaseUtils.getUserFromSnapshot(snapshot)
+                                    if(user!=null) binding.icUserInfo.tvName.text = user.fullName
+                                    if (request != null) {
+                                        if (isAdded) {
+                                            binding.icUserRequest.tvDestination.text = request.destination
+                                            binding.icUserRequest.tvPickup.text = request.pickupLocation
+                                        }
+                                    }
+                                }
+
+                                override fun onCancelled(error: DatabaseError) {}
+                            })
                     }
+
+
                     if (request != null && request.state == RequestState.ACCEPT) {
                         rideState = DriverRideState.MOVING
                         requestModel = request.copy()
@@ -378,7 +393,7 @@ class MapFragment : BaseBindingFragment<FragmentDriverMapBinding, MapViewModel>(
             assignedCustomerPickupRef?.removeEventListener(it)
         }
         rideState = DriverRideState.IDLE
-
+        destinationLocation?.remove()
         binding.icUserInfo.root.beInvisible()
     }
 

@@ -1,32 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:context=".ui.driver.driver_home.DriverHomeFragment">
+
         <androidx.viewpager2.widget.ViewPager2
             android:id="@+id/viewPager2"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:background="@color/white"
             app:layout_constraintBottom_toTopOf="@+id/bottomNav"
-            app:layout_constraintTop_toTopOf="parent"/>
+            app:layout_constraintTop_toTopOf="parent" />
 
         <com.google.android.material.bottomnavigation.BottomNavigationView
             android:id="@+id/bottomNav"
+            style="?android:attr/buttonBarStyle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:background="@color/white"
             app:itemBackground="@color/transparent"
-            app:itemRippleColor="@android:color/transparent"
             app:itemIconTint="@color/custom_color_bottom_nav"
+            app:itemRippleColor="@android:color/transparent"
             app:itemTextColor="@color/custom_color_bottom_nav"
             app:labelVisibilityMode="labeled"
-            android:background="@color/white"
-            style="?android:attr/buttonBarStyle"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:menu="@menu/main_menu" />
+            app:menu="@menu/driver_menu" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

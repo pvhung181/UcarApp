@@ -65,4 +65,7 @@
     <string name="ride_smart_ride_fast_ride_with_us">Ride Smart. Ride Fast. Ride with Us</string>
     <string name="pay_with_paypal">Pay with Paypal</string>
     <string name="pay_in_cash">Pay in cash</string>
+    <string name="earnings">Earnings</string>
+    <string name="history">History</string>
+    <string name="we_are_looking_for_a_driver_for_you">We are looking for a driver for you....</string>
 </resources>
