@@ -14,6 +14,7 @@ import com.pvhung.ucar.databinding.FragmentDriverAccountBinding
 import com.pvhung.ucar.ui.base.BaseBindingFragment
 import com.pvhung.ucar.ui.main.MainActivity
 import com.pvhung.ucar.utils.FirebaseDatabaseUtils
+import com.pvhung.ucar.utils.MethodUtils
 import com.pvhung.ucar.utils.OnBackPressed
 import com.pvhung.ucar.utils.Utils
 
@@ -54,11 +55,6 @@ class DriverAccountFragment :
         binding.tvLanguage.setOnClickListener {
 
         }
-
-        binding.tvFb.setOnClickListener {
-
-        }
-
         binding.tvPolicy.setOnClickListener {
 
         }
@@ -66,9 +62,12 @@ class DriverAccountFragment :
         binding.tvRate.setOnClickListener {
 
         }
+        binding.tvFb.setOnClickListener {
+            feedBack()
+        }
 
         binding.tvShareApp.setOnClickListener {
-
+            shareApp()
         }
 
         binding.tvLogout.setOnClickListener { signOut() }
@@ -77,6 +76,18 @@ class DriverAccountFragment :
     override fun observerData() {
 
     }
+
+    private fun shareApp() {
+        val text =
+            (getString(R.string.app_name) + requireContext().resources.getString(R.string.link_share_app)
+                    + requireContext().packageName)
+        MethodUtils.shareText(requireContext(), text, getString(R.string.app_name))
+    }
+
+    private fun feedBack() {
+        MethodUtils.sendEmail(requireContext(), getString(R.string.emailFeedBack))
+    }
+
 
 
     private fun signOut() {

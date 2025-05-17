@@ -172,7 +172,8 @@ class SignUpFragment : BaseBindingFragment<FragmentSignUpBinding, SignUpViewMode
                             gender = binding.etGender.text.toString(),
                             dateOfBirth = binding.etDate.text.toString(),
                             password = binding.etPassword.text.toString(),
-                            isDriver = !binding.rbUser.isChecked
+                            isDriver = !binding.rbUser.isChecked,
+                            numberPlate = binding.etBsx.text.toString()
                         )
                         user = userInfo.copy(password = "")
                         userInfo.setService(currentService)
@@ -337,6 +338,12 @@ class SignUpFragment : BaseBindingFragment<FragmentSignUpBinding, SignUpViewMode
         if (confirmPassword.isEmpty()) {
             binding.etConfirmPassword.requestFocus()
             binding.etConfirmPassword.showKeyboard()
+            return false
+        }
+
+        if(binding.etBsx.visibility == View.VISIBLE && binding.etBsx.text.toString().isEmpty()) {
+            binding.etBsx.requestFocus()
+            binding.etBsx.showKeyboard()
             return false
         }
 

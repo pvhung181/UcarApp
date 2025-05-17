@@ -1,5 +1,6 @@
 package com.pvhung.ucar.utils
 
+import java.text.DecimalFormat
 import kotlin.math.ceil
 import kotlin.math.roundToInt
 
@@ -8,7 +9,6 @@ object CostUtils {
         val baseFareVND = 10000f
         val baseDistance = 2000f
         val costPerKmVND = 4000f
-        val exchangeRate = 24000f
 
         val totalVND = if (distanceInMeters <= baseDistance) {
             baseFareVND
@@ -17,9 +17,12 @@ object CostUtils {
             val extraKm = ceil(extraDistance / 1000).toInt()
             baseFareVND + extraKm * costPerKmVND
         }
+        return totalVND
+    }
 
-        val totalUSD = totalVND / exchangeRate
-        return ((totalUSD * 100).roundToInt()) / 100f
+    fun formatCurrency(amount: Float): String {
+        val formatter = DecimalFormat("#,###")
+        return formatter.format(amount.toLong()) + " VND"
     }
 
     fun getCarCost(distanceInMeters: Float): Float {

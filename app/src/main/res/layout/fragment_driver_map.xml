@@ -12,24 +12,35 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
 
-        <androidx.appcompat.widget.SwitchCompat
-            android:id="@+id/swGoToOnline"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:layout_constraintStart_toStartOf="parent"
+        <!--        <androidx.appcompat.widget.SwitchCompat-->
+        <!--            android:id="@+id/swGoToOnline"-->
+        <!--            android:layout_width="wrap_content"-->
+        <!--            android:layout_height="wrap_content"-->
+        <!--            app:layout_constraintStart_toStartOf="parent"-->
+        <!--            app:layout_constraintTop_toTopOf="parent" />-->
+
+        <View
+            android:id="@+id/viewBg"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:background="#4D000000"
+            app:layout_constraintHeight_percent="0.15"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/tvGoToOnline"
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btnGoToOnline"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:fontFamily="@font/sf_pro_display_semi_bold"
+            android:background="@drawable/bg_view_round_100"
+            android:backgroundTint="@color/color_3BCC27"
+            android:paddingHorizontal="24dp"
             android:text="@string/go_to_online"
-            android:textColor="@color/black"
-            app:layout_constraintBottom_toBottomOf="@id/swGoToOnline"
-            app:layout_constraintStart_toEndOf="@id/swGoToOnline"
-            app:layout_constraintTop_toTopOf="@id/swGoToOnline" />
+            android:textColor="@color/white"
+            app:layout_constraintBottom_toBottomOf="@id/viewBg"
+            app:layout_constraintEnd_toEndOf="@id/viewBg"
+            app:layout_constraintStart_toStartOf="@id/viewBg"
+            app:layout_constraintTop_toTopOf="@id/viewBg" />
+
 
         <include
             android:id="@+id/icUserRequest"

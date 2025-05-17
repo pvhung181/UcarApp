@@ -334,12 +334,40 @@
                 app:layout_constraintTop_toTopOf="@id/motobikeBtn"
                 app:layout_constraintWidth_percent="0.4" />
 
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvBsx"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/_8sdp"
+                android:fontFamily="@font/sf_pro_text_semibold"
+                android:text="@string/number_plate"
+                app:layout_constraintStart_toStartOf="@id/etEmail"
+                app:layout_constraintTop_toBottomOf="@id/carBtn" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/etBsx"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/_4sdp"
+                android:background="@drawable/bg_ripple_f2f2f2_round_6"
+                android:ellipsize="start"
+                android:paddingVertical="@dimen/_12sdp"
+                android:paddingStart="@dimen/_12sdp"
+                android:paddingEnd="42dp"
+                android:singleLine="true"
+                android:textSize="16dp"
+                app:layout_constraintStart_toStartOf="@id/etEmail"
+                app:layout_constraintTop_toBottomOf="@id/tvBsx"
+                app:layout_constraintEnd_toEndOf="@id/etEmail"
+                />
+
+
             <androidx.constraintlayout.widget.Group
                 android:id="@+id/serviceGroup"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:visibility="gone"
-                app:constraint_referenced_ids="carBtn, motobikeBtn" />
+                app:constraint_referenced_ids="carBtn, motobikeBtn, etBsx,tvBsx" />
 
             <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/signUpButton"
@@ -355,7 +383,7 @@
                 android:textAllCaps="false"
                 android:textColor="@color/white"
                 android:textSize="@dimen/_16sdp"
-                app:layout_constraintTop_toBottomOf="@id/motobikeBtn" />
+                app:layout_constraintTop_toBottomOf="@id/etBsx" />
 
 
             <androidx.appcompat.widget.AppCompatTextView

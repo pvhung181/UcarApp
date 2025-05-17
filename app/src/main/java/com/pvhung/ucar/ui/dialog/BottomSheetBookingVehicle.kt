@@ -14,7 +14,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.pvhung.ucar.R
 import com.pvhung.ucar.common.Constant
 import com.pvhung.ucar.databinding.BottomSheetBookingVehicleBinding
-import java.util.Locale
+import com.pvhung.ucar.utils.CostUtils
 
 class BottomSheetBookingVehicle(context: Context, val listener: OnRequestListener) :
     BottomSheetDialog(context) {
@@ -72,8 +72,8 @@ class BottomSheetBookingVehicle(context: Context, val listener: OnRequestListene
     fun setCost(cost: Float, carCost: Float) {
         motobikeCost = cost
         this.carCost = carCost
-        binding.tvPrice.text = String.format(Locale.US, "$%.2f", cost)
-        binding.tvPriceCar.text = String.format(Locale.US, "$%.2f", carCost)
+        binding.tvPrice.text = CostUtils.formatCurrency(cost.toFloat())
+        binding.tvPriceCar.text = CostUtils.formatCurrency(carCost.toFloat())
     }
 
     fun getCost(): Float {

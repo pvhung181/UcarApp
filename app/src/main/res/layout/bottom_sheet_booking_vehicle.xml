@@ -17,7 +17,7 @@
             android:layout_marginVertical="8dp"
             android:fontFamily="@font/sf_pro_display_semi_bold"
             android:gravity="center"
-            android:text="Vui long chon loai phuong tien di chuyen"
+            android:text="@string/please_select_a_vehicle"
             android:textSize="20dp"
             app:layout_constraintTop_toTopOf="parent" />
 

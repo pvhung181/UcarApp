@@ -14,6 +14,7 @@ import com.pvhung.ucar.databinding.FragmentCustomerAccountBinding
 import com.pvhung.ucar.ui.base.BaseBindingFragment
 import com.pvhung.ucar.ui.main.MainActivity
 import com.pvhung.ucar.utils.FirebaseDatabaseUtils
+import com.pvhung.ucar.utils.MethodUtils
 import com.pvhung.ucar.utils.OnBackPressed
 import com.pvhung.ucar.utils.Utils
 
@@ -79,24 +80,24 @@ class CustomerAccountFragment :
             navigateScreen(null, R.id.customerInfoFragment)
         }
 
-        binding.tvLanguage.setOnClickListener {
+//        binding.tvLanguage.setOnClickListener {
+//            gotoLanguage()
+//        }
 
-        }
+//        binding.tvPolicy.setOnClickListener {
+//            gotoPolicy()
+//        }
+
+//        binding.tvRate.setOnClickListener {
+//            showRateApp()
+//        }
 
         binding.tvFb.setOnClickListener {
-
-        }
-
-        binding.tvPolicy.setOnClickListener {
-
-        }
-
-        binding.tvRate.setOnClickListener {
-
+            feedBack()
         }
 
         binding.tvShareApp.setOnClickListener {
-
+            shareApp()
         }
 
         binding.tvLogout.setOnClickListener {
@@ -104,10 +105,31 @@ class CustomerAccountFragment :
         }
     }
 
+
     override fun observerData() {
 
     }
 
+    private fun shareApp() {
+        val text =
+            (getString(R.string.app_name) + requireContext().resources.getString(R.string.link_share_app)
+                    + requireContext().packageName)
+        MethodUtils.shareText(requireContext(), text, getString(R.string.app_name))
+    }
+
+    private fun feedBack() {
+        MethodUtils.sendEmail(requireContext(), getString(R.string.emailFeedBack))
+    }
+
+
+//    private fun gotoPolicy() {
+//        navigateSlideScreen(null, R.id.policyFragment)
+//    }
+//
+//    private fun gotoLanguage() {
+//        currentId = R.id.languageFragment
+//        navigateScreen()
+//    }
 
     private fun signOut() {
         FirebaseAuth.getInstance().signOut()

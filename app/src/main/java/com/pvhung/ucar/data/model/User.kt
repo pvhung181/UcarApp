@@ -9,7 +9,8 @@ data class User(
     var password: String = "",
     var rating: Float = 5f,
     var isDriver: Boolean = false,
-    var isActive: Boolean = true
+    var isActive: Boolean = true,
+    var numberPlate: String = ""
 ) {
     private var service = ""
     fun setService(s: String) {

@@ -17,14 +17,15 @@ import javax.inject.Inject
 class App : Application() {
     @Inject
     lateinit var mPrefHelper: SharedPreferenceHelper
-
     companion object {
         @JvmStatic
         lateinit var instance: App
             private set
+        var isDriverOnline = false
     }
 
     override fun onCreate() {
+        isDriverOnline = false
         FirebaseApp.initializeApp(this)
         super.onCreate()
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)

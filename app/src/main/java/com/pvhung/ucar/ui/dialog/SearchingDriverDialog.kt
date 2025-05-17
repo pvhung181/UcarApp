@@ -12,7 +12,7 @@ import androidx.databinding.DataBindingUtil
 import com.pvhung.ucar.R
 import com.pvhung.ucar.databinding.DialogSearchingDriverBinding
 
-class SearchingDriverDialog(context: Context) : Dialog(context) {
+class SearchingDriverDialog(context: Context, val listener: ItemClickListener) : Dialog(context) {
 
     private val binding: DialogSearchingDriverBinding
 
@@ -44,6 +44,13 @@ class SearchingDriverDialog(context: Context) : Dialog(context) {
     }
 
     private fun onCLick() {
+        binding.btnCancel.setOnClickListener {
+            dismiss()
+            listener.onCancelClick()
+        }
+    }
 
+    interface ItemClickListener {
+        fun onCancelClick()
     }
 }

@@ -33,6 +33,7 @@
                 app:lottie_speed="1" />
 
             <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tv"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:layout_constraintTop_toBottomOf="@id/loading"
@@ -44,6 +45,22 @@
                 android:textColor="@color/black"
                 android:fontFamily="@font/sf_pro_display_semi_bold"/>
 
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tv"
+                app:layout_constraintBottom_toBottomOf="parent"
+                android:layout_marginVertical="12dp"
+                android:text="@string/cancel"
+                android:textAllCaps="false"
+                android:background="@drawable/bg_view_round"
+                android:backgroundTint="@color/color_999999"
+                android:textColor="@color/white"
+                android:id="@+id/btnCancel"
+                />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

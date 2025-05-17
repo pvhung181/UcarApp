@@ -16,7 +16,7 @@ data class RequestModel(
     var distance: Double = 0.0,
     var cost: Float = 0f,
 
-    var customerName: String = ""
+    var isAlreadyPaid: Boolean = false
 ) {
     fun reset() {
         customerId = ""
@@ -30,5 +30,6 @@ data class RequestModel(
         pickupLng = 0.0
         pickupLat = 0.0
         pickupLocation = ""
+        isAlreadyPaid = false
     }
 }

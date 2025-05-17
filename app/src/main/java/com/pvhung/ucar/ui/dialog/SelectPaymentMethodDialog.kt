@@ -61,6 +61,10 @@ class SelectPaymentMethodDialog(
         }
     }
 
+    fun setFee(fee: String) {
+        binding.tvCost.text = fee
+    }
+
     interface SelectPaymentListener {
         fun onPayInCash()
         fun onPayWithPaypal()

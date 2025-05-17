@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvPickup"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:drawableStart="@drawable/ic_pickup"
+            android:drawablePadding="12dp"
+            android:ellipsize="end"
+            android:gravity="center_vertical"
+            android:maxLines="1"
+            android:text="Pick up locations"
+
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvDestination"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="12dp"
+            android:drawableStart="@drawable/ic_destination"
+            android:drawablePadding="12dp"
+            android:gravity="center_vertical"
+            android:text="Destination location"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tvPickup" />
+
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/ivTime"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginStart="4dp"
+            android:layout_marginTop="8dp"
+            android:src="@drawable/ic_time"
+            app:layout_constraintStart_toStartOf="@id/tvDestination"
+            app:layout_constraintTop_toBottomOf="@id/tvDestination" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvTime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:fontFamily="@font/sf_pro_text_semibold"
+            android:text="Thứ 3 30/4/2025"
+            android:textColor="@color/black"
+            app:layout_constraintBottom_toBottomOf="@id/ivTime"
+            app:layout_constraintStart_toEndOf="@id/ivTime"
+            app:layout_constraintTop_toTopOf="@id/ivTime" />
+
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvMoney"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="6dp"
+            android:ellipsize="end"
+            android:gravity="center_vertical"
+            android:maxLines="1"
+            android:textSize="16dp"
+            android:textColor="@color/color_36FF3D"
+
+            android:text="+ 24,000 VND"
+            app:layout_constraintStart_toStartOf="@id/ivTime"
+            app:layout_constraintTop_toBottomOf="@id/ivTime" />
+
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="0.5dp"
+            android:layout_marginHorizontal="12dp"
+            android:background="@color/color_9C9C9C"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

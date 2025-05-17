@@ -5,6 +5,11 @@
     <string name="author" translatable="false">Phạm Việt Hùng</string>
     <string name="author_phone" translatable="false">0589089549</string>
 
+    <string name="link_policy" translatable="false">https://policies.google.com/privacy</string>
+    <string name="link_share_app" translatable="false">\"\https://play.google.com/store/apps/details?id=\"</string>
+    <string name="link_share_market" translatable="false">\"\market://details?id=\"</string>
+    <string name="emailFeedBack" translatable="false">"testshare@gmail.com"</string>
+
     <string name="english" translatable="false">English</string>
     <string name="vietnam" translatable="false">Tiếng Việt</string>
 
@@ -68,4 +73,9 @@
     <string name="earnings">Earnings</string>
     <string name="history">History</string>
     <string name="we_are_looking_for_a_driver_for_you">We are looking for a driver for you....</string>
+    <string name="please_select_a_vehicle">Please select a vehicle</string>
+    <string name="your_driver_has_arrived">Your driver has arrived.</string>
+    <string name="paid">( Paid )</string>
+    <string name="_3_recent_transactions">3 recent transactions</string>
+    <string name="number_plate">Number plate</string>
 </resources>

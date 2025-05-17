@@ -42,13 +42,14 @@ import com.google.firebase.database.ValueEventListener
 import com.pvhung.ucar.App
 import com.pvhung.ucar.R
 import com.pvhung.ucar.common.Constant
-import com.pvhung.ucar.common.enums.DriverRideState
 import com.pvhung.ucar.common.enums.RequestState
+import com.pvhung.ucar.common.enums.RideState
 import com.pvhung.ucar.data.model.HistoryItem
 import com.pvhung.ucar.data.model.RequestModel
 import com.pvhung.ucar.data.model.User
 import com.pvhung.ucar.databinding.FragmentDriverMapBinding
 import com.pvhung.ucar.ui.base.BaseBindingFragment
+import com.pvhung.ucar.utils.CostUtils
 import com.pvhung.ucar.utils.DeviceHelper
 import com.pvhung.ucar.utils.FirebaseDatabaseUtils
 import com.pvhung.ucar.utils.OnBackPressed
@@ -56,6 +57,9 @@ import com.pvhung.ucar.utils.PermissionHelper
 import com.pvhung.ucar.utils.beGone
 import com.pvhung.ucar.utils.beInvisible
 import com.pvhung.ucar.utils.beVisible
+import com.pvhung.ucar.utils.getNumberValue
+import com.pvhung.ucar.utils.setOffline
+import com.pvhung.ucar.utils.setOnline
 
 
 class MapFragment : BaseBindingFragment<FragmentDriverMapBinding, MapViewModel>(),
@@ -67,12 +71,11 @@ class MapFragment : BaseBindingFragment<FragmentDriverMapBinding, MapViewModel>(
     private lateinit var mLocationRequest: LocationRequest
     private lateinit var mFusedLocationClient: FusedLocationProviderClient
     private var requestModel = RequestModel()
-    private var rideState = DriverRideState.IDLE
+    private var rideState = RideState.IDLE
     private var pickupLocation: Marker? = null
     private var destinationLocation: Marker? = null
     private var polylines = mutableListOf<Polyline>()
     private var customer = User()
-    private var isDriverOnline = false
     private val COLORS: IntArray = intArrayOf(
         R.color.primary_dark,
         R.color.primary,
@@ -101,10 +104,9 @@ class MapFragment : BaseBindingFragment<FragmentDriverMapBinding, MapViewModel>(
                     mLastLocation = it
                     val newPos = LatLng(it.latitude, it.longitude)
                     mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(newPos, 18f))
-                    mMap.animateCamera(CameraUpdateFactory.zoomTo(11f))
+                    mMap.animateCamera(CameraUpdateFactory.zoomTo(18f))
 
-                    if (isDriverOnline) {
-                        Log.e("pvhung11", "onLocationResult: is driver online true")
+                    if (App.isDriverOnline) {
                         FirebaseAuth.getInstance().currentUser?.uid?.let { id ->
                             val refAvailable = FirebaseDatabase.getInstance()
                                 .getReference(Constant.DRIVERS_AVAILABLE_REFERENCES)
@@ -163,42 +165,60 @@ class MapFragment : BaseBindingFragment<FragmentDriverMapBinding, MapViewModel>(
             .child(Constant.REQUEST_STATE_REFERENCES)
 
         assignedCustomerRef.addValueEventListener(object : ValueEventListener {
+            @SuppressLint("SetTextI18n")
             override fun onDataChange(snapshot: DataSnapshot) {
                 if (snapshot.exists()) {
                     val request = snapshot.getValue(RequestModel::class.java)
-                    if (!binding.icUserRequest.root.isVisible && request?.state == RequestState.IDLE) binding.icUserRequest.root.beVisible()
+                    if (!binding.icUserRequest.root.isVisible && request?.state == RequestState.IDLE) {
+                        binding.icUserRequest.tvFeeAndDistance.text =
+                            "${String.format("%.2f km", request.distance)} - ${
+                                CostUtils.formatCurrency(request.cost)
+                            }"
+                        if (request.isAlreadyPaid) binding.icUserRequest.tvPaid.beVisible()
+                        else binding.icUserRequest.tvPaid.beGone()
+                        binding.icUserRequest.root.beVisible()
 
-                    if(request!=null) {
-                        FirebaseDatabaseUtils.getSpecificCustomerDatabase(request.customerId).addListenerForSingleValueEvent(
-                            object : ValueEventListener {
-                                override fun onDataChange(snapshot: DataSnapshot) {
-                                    val user = FirebaseDatabaseUtils.getUserFromSnapshot(snapshot)
-                                    if(user!=null) binding.icUserInfo.tvName.text = user.fullName
-                                    if (request != null) {
-                                        if (isAdded) {
-                                            binding.icUserRequest.tvDestination.text = request.destination
-                                            binding.icUserRequest.tvPickup.text = request.pickupLocation
+                    }
+
+                    if (request != null) {
+                        FirebaseDatabaseUtils.getSpecificCustomerDatabase(request.customerId)
+                            .addListenerForSingleValueEvent(
+                                object : ValueEventListener {
+                                    override fun onDataChange(snapshot: DataSnapshot) {
+                                        val user =
+                                            FirebaseDatabaseUtils.getUserFromSnapshot(snapshot)
+                                        if (user != null) binding.icUserInfo.tvName.text =
+                                            user.fullName
+                                        if (request != null) {
+                                            if (isAdded) {
+                                                binding.icUserRequest.tvDestination.text =
+                                                    request.destination
+                                                binding.icUserRequest.tvPickup.text =
+                                                    request.pickupLocation
+                                            }
                                         }
                                     }
-                                }
 
-                                override fun onCancelled(error: DatabaseError) {}
-                            })
+                                    override fun onCancelled(error: DatabaseError) {}
+                                })
                     }
 
 
                     if (request != null && request.state == RequestState.ACCEPT) {
-                        rideState = DriverRideState.MOVING
+                        rideState = RideState.MOVING
                         requestModel = request.copy()
                         binding.icUserInfo.apply {
                             root.beVisible()
                             tvName.text = requestModel.customerId
                             tvDestination.text = requestModel.destination
                             tvPickup.text = requestModel.pickupLocation
-                            tvMoney.text = String.format(
-                                "${getString(R.string.booking_fee)}$%.2f",
-                                requestModel.cost
-                            )
+                            tvMoney.text =
+                                "${getString(R.string.booking_fee)} ${
+                                    CostUtils.formatCurrency(
+                                        requestModel.cost.toFloat()
+                                    )
+                                }"
+
                             tvDistance.text = String.format(
                                 "${getString(R.string.distance)}%.2f km",
                                 requestModel.distance
@@ -206,7 +226,7 @@ class MapFragment : BaseBindingFragment<FragmentDriverMapBinding, MapViewModel>(
                         }
                         getAssignedCustomerPickupLocation()
                     } else if (request != null && request.state == RequestState.CANCEL) {
-                        rideState = DriverRideState.IDLE
+                        rideState = RideState.IDLE
                         assignedCustomerRef.removeValue()
                     }
                 } else {
@@ -277,14 +297,12 @@ class MapFragment : BaseBindingFragment<FragmentDriverMapBinding, MapViewModel>(
     }
 
     private fun init() {
-        if (mPrefHelper.getBoolean(Constant.IS_DRIVER_ONLINE, false)) {
-            binding.swGoToOnline.isChecked = true
-            isDriverOnline = true
-            binding.tvGoToOnline.text = getString(R.string.go_to_offline)
+        if (App.isDriverOnline) {
+            binding.btnGoToOnline.setOnline()
         } else {
-            binding.swGoToOnline.isChecked = false
-            isDriverOnline = false
-            binding.tvGoToOnline.text = getString(R.string.go_to_online)
+            binding.btnGoToOnline.setOffline()
+            FirebaseDatabaseUtils.getDriverAvailableDatabase().removeValue()
+            FirebaseDatabaseUtils.getDriverWorkingDatabase().removeValue()
         }
     }
 
@@ -297,17 +315,15 @@ class MapFragment : BaseBindingFragment<FragmentDriverMapBinding, MapViewModel>(
     }
 
     private fun onClick() {
-        binding.swGoToOnline.setOnCheckedChangeListener { v, isChecked ->
-            if (isChecked) {
-                mPrefHelper.storeBoolean(Constant.IS_DRIVER_ONLINE, true)
-                binding.tvGoToOnline.text = getString(R.string.go_to_offline)
-                isDriverOnline = true
+        binding.btnGoToOnline.setOnClickListener {
+            if (App.isDriverOnline) {
+                App.isDriverOnline = false
+                binding.btnGoToOnline.setOffline()
+                FirebaseDatabaseUtils.getDriverAvailableDatabase().removeValue()
+                FirebaseDatabaseUtils.getDriverWorkingDatabase().removeValue()
             } else {
-                mPrefHelper.storeBoolean(Constant.IS_DRIVER_ONLINE, false)
-                binding.tvGoToOnline.text = getString(R.string.go_to_online)
-                isDriverOnline = false
-                FirebaseDatabaseUtils.removeDriverAvailable()
-
+                App.isDriverOnline = true
+                binding.btnGoToOnline.setOnline()
             }
         }
 
@@ -326,10 +342,10 @@ class MapFragment : BaseBindingFragment<FragmentDriverMapBinding, MapViewModel>(
 
         binding.icUserInfo.rideStatus.setOnClickListener {
             when (rideState) {
-                DriverRideState.IDLE -> {}
+                RideState.IDLE -> {}
 
-                DriverRideState.MOVING -> {
-                    rideState = DriverRideState.RIDING
+                RideState.MOVING -> {
+                    rideState = RideState.RIDING
                     pickupLocation?.remove()
                     binding.icUserInfo.rideStatus.text = getString(R.string.confirm_done)
                     erasePolyLines()
@@ -345,17 +361,40 @@ class MapFragment : BaseBindingFragment<FragmentDriverMapBinding, MapViewModel>(
                             )
                         )
                         getRouteToMarker(des)
+                        FirebaseDatabaseUtils.getSpecificCustomerDatabase(requestModel.customerId)
+                            .child("State").setValue(RideState.PICKED)
                     }
                 }
 
-                DriverRideState.RIDING -> {
+                RideState.RIDING -> {
+                    FirebaseDatabaseUtils.getSpecificCustomerDatabase(requestModel.customerId)
+                        .child("State").setValue(RideState.DONE)
+
+                    updateTotalEarning(requestModel.cost)
                     saveRide()
                     endRide()
                 }
 
-                DriverRideState.DONE -> {}
+                RideState.DONE -> {}
+
+                RideState.PICKED -> {}
             }
         }
+    }
+
+    fun updateTotalEarning(v: Float) {
+        val db = FirebaseDatabaseUtils.getCurrentDriverDatabase().child("Earnings")
+        db.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                var value = snapshot.getNumberValue()
+                value += v
+                db.setValue(value)
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+
+            }
+        })
     }
 
     private fun saveRide() {
@@ -384,6 +423,7 @@ class MapFragment : BaseBindingFragment<FragmentDriverMapBinding, MapViewModel>(
     }
 
     private fun endRide() {
+        binding.icUserInfo.rideStatus.text = getString(R.string.confirm_pickup)
         FirebaseDatabaseUtils.getSpecificRiderDatabase(FirebaseAuth.getInstance().currentUser!!.uid)
             .child(Constant.REQUEST_STATE_REFERENCES).removeValue()
         erasePolyLines()
@@ -392,7 +432,7 @@ class MapFragment : BaseBindingFragment<FragmentDriverMapBinding, MapViewModel>(
         assignedCustomerPickupRefListener?.let {
             assignedCustomerPickupRef?.removeEventListener(it)
         }
-        rideState = DriverRideState.IDLE
+        rideState = RideState.IDLE
         destinationLocation?.remove()
         binding.icUserInfo.root.beInvisible()
     }
@@ -420,6 +460,7 @@ class MapFragment : BaseBindingFragment<FragmentDriverMapBinding, MapViewModel>(
                 mFusedLocationClient.requestLocationUpdates(
                     mLocationRequest, mLocationCallback, Looper.myLooper()
                 )
+                mMap.uiSettings.isMyLocationButtonEnabled = false
                 mMap.isMyLocationEnabled = true
             } else {
                 PermissionHelper.requestLocationPermission(locationPermissionLauncher)
