@@ -2,16 +2,21 @@ package com.pvhung.ucar.utils
 
 import android.app.Activity
 import android.content.Context
+import android.content.Intent
 import android.content.res.Configuration
 import android.content.res.Resources
 import android.os.Build
 import android.preference.PreferenceManager
 import android.text.TextUtils
+import androidx.core.app.ActivityCompat
 import com.pvhung.ucar.App
 import com.pvhung.ucar.R
 import com.pvhung.ucar.common.Constant
 import com.pvhung.ucar.common.model.Language
 import com.pvhung.ucar.common.model.ListLanguage
+import com.pvhung.ucar.ui.customer.CustomerActivity
+import com.pvhung.ucar.ui.driver.DriverActivity
+import com.pvhung.ucar.ui.main.MainActivity
 import java.util.Locale
 
 
@@ -73,18 +78,30 @@ object LocaleUtils {
         return Build.VERSION.SDK_INT >= versionCode
     }
 
-//    fun applyLocaleAndRestart(activity: Activity, localeString: String) {
-//        val preferences = PreferenceManager
-//            .getDefaultSharedPreferences(activity)
-//        preferences.edit().putString(Constant.PREF_SETTING_LANGUAGE, localeString).apply()
-//        applyLocale(activity)
-//
-//        val intent = Intent(activity, SettingActivity::class.java)
-//        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
-//        activity.startActivity(intent)
-//        ActivityCompat.finishAffinity(activity)
-//    }
-//
+    fun applyLocaleAndRestartCustomer(activity: Activity, localeString: String) {
+        val preferences = PreferenceManager
+            .getDefaultSharedPreferences(activity)
+        preferences.edit().putString(Constant.PREF_SETTING_LANGUAGE, localeString).apply()
+        applyLocale(activity)
+
+        val intent = Intent(activity, CustomerActivity::class.java)
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+        activity.startActivity(intent)
+        ActivityCompat.finishAffinity(activity)
+    }
+
+    fun applyLocaleAndRestartDriver(activity: Activity, localeString: String) {
+        val preferences = PreferenceManager
+            .getDefaultSharedPreferences(activity)
+        preferences.edit().putString(Constant.PREF_SETTING_LANGUAGE, localeString).apply()
+        applyLocale(activity)
+
+        val intent = Intent(activity, DriverActivity::class.java)
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+        activity.startActivity(intent)
+        ActivityCompat.finishAffinity(activity)
+    }
+
 //    fun applyLocaleAndRestartFirst(activity: Activity, localeString: String) {
 //        val preferences = PreferenceManager
 //            .getDefaultSharedPreferences(activity)

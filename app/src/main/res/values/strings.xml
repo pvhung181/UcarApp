@@ -78,4 +78,8 @@
     <string name="paid">( Paid )</string>
     <string name="_3_recent_transactions">3 recent transactions</string>
     <string name="number_plate">Number plate</string>
+    <string name="collect_money">Collect money</string>
+    <string name="payment_received">Payment received</string>
+    <string name="you_will_receive_for_this_trip">You will receive %1$s for this trip</string>
+    <string name="total_earnings">Total earnings</string>
 </resources>

@@ -28,6 +28,10 @@
         android:id="@+id/driverInfoFragment"
         android:name="com.pvhung.ucar.ui.driver.driver_info.DriverInfoFragment"
         android:label="DriverInfoFragment" />
+    <dialog
+        android:id="@+id/policyFragment"
+        android:name="com.pvhung.ucar.ui.main.policy.PolicyFragment"
+        android:label="PolicyFragment" />
 
 
 </navigation>

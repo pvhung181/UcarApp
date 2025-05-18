@@ -7,9 +7,9 @@
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:background="@color/white"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:background="@color/white">
 
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/tvPickup"
@@ -25,14 +25,14 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
 
-            app:layout_constraintTop_toTopOf="parent"/>
+            app:layout_constraintTop_toTopOf="parent" />
 
 
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/tvDestination"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
+            android:layout_marginTop="16dp"
             android:layout_marginBottom="12dp"
             android:drawableStart="@drawable/ic_destination"
             android:drawablePadding="12dp"
@@ -42,25 +42,24 @@
             app:layout_constraintTop_toBottomOf="@id/tvPickup" />
 
         <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guiline"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            app:layout_constraintGuide_percent="0.5"
-            android:id="@+id/guiline"/>
+            app:layout_constraintGuide_percent="0.5" />
 
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/tvMoney"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:fontFamily="@font/sf_pro_text_semibold"
-            android:text="@string/booking_fee"
             android:layout_marginStart="6dp"
             android:layout_marginTop="6dp"
-            app:layout_constraintEnd_toEndOf="@id/guiline"
+            android:fontFamily="@font/sf_pro_text_semibold"
+            android:text="@string/booking_fee"
             android:textSize="16dp"
+            app:layout_constraintEnd_toEndOf="@id/guiline"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tvDestination"
-            />
+            app:layout_constraintTop_toBottomOf="@id/tvDestination" />
 
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/tvDistance"
@@ -94,20 +93,44 @@
 
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/tvName"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="12dp"
             android:fontFamily="@font/sf_pro_rounded_bold"
             android:text="-------"
             android:textSize="18dp"
+            app:layout_constraintEnd_toStartOf="@id/ivCall"
             app:layout_constraintStart_toEndOf="@id/ivAvatar"
             app:layout_constraintTop_toTopOf="@id/ivAvatar" />
 
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvPhone"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:fontFamily="@font/sf_pro_rounded_bold"
+            android:text="-------"
+            android:textSize="18dp"
+            app:layout_constraintBottom_toBottomOf="@id/ivAvatar"
+            app:layout_constraintEnd_toStartOf="@id/ivCall"
+            app:layout_constraintStart_toEndOf="@id/ivAvatar"
+            app:layout_constraintTop_toBottomOf="@id/tvName" />
 
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/ivCall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="6dp"
+            android:padding="12dp"
+            android:src="@drawable/ic_blue_call"
+            app:layout_constraintBottom_toBottomOf="@id/ivAvatar"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/ivAvatar" />
 
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/rideStatus"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="18dp"
             android:layout_marginTop="24dp"
@@ -115,13 +138,16 @@
             android:background="@drawable/bg_view_round"
             android:backgroundTint="@color/color_38b6ff"
             android:fontFamily="@font/sf_pro_text_semibold"
-            android:paddingVertical="8dp"
+            android:paddingVertical="6dp"
             android:text="@string/confirm_pickup"
             android:textAllCaps="false"
             android:textColor="@color/white"
-            android:textSize="20dp"
+            android:textSize="18dp"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/ivAvatar" />
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/ivAvatar"
+            app:layout_constraintWidth_percent="0.5" />
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>

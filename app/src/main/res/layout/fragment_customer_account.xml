@@ -175,33 +175,7 @@
                 app:layout_constraintBottom_toTopOf="@id/tvPolicy"
                 app:layout_constraintEnd_toEndOf="@id/tvPolicy" />
 
-            <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/tvRate"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:background="@drawable/bg_view_rect_settings"
-                android:drawableEnd="@drawable/ic_arrow_right"
-                android:drawablePadding="@dimen/_10sdp"
-                android:ellipsize="end"
-                android:fontFamily="@font/sf_pro_text_regular"
-                android:gravity="center_vertical"
-                android:maxLines="1"
-                android:paddingHorizontal="@dimen/_14sdp"
-                android:paddingVertical="@dimen/_16sdp"
-                android:text="@string/rate_us"
-                android:textColor="@color/black"
-                android:textSize="16sp"
-                app:layout_constraintEnd_toEndOf="@id/tvInfo"
-                app:layout_constraintStart_toStartOf="@id/tvInfo"
-                app:layout_constraintTop_toBottomOf="@id/tvPolicy" />
 
-            <View
-                android:id="@+id/viewRate"
-                android:layout_width="0dp"
-                android:layout_height="0.5dp"
-                android:background="@drawable/bg_view"
-                app:layout_constraintBottom_toTopOf="@id/tvRate"
-                app:layout_constraintEnd_toEndOf="@id/tvRate" />
 
             <!--        <androidx.appcompat.widget.AppCompatTextView-->
             <!--            android:id="@+id/tvLanguage"-->
@@ -249,7 +223,7 @@
                 android:textSize="16sp"
                 app:layout_constraintEnd_toEndOf="@id/tvInfo"
                 app:layout_constraintStart_toStartOf="@id/tvInfo"
-                app:layout_constraintTop_toBottomOf="@id/tvRate" />
+                app:layout_constraintTop_toBottomOf="@id/tvPolicy" />
 
             <View
                 android:layout_width="0dp"

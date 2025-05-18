@@ -754,9 +754,7 @@ class CustomerMapFragment : BaseBindingFragment<FragmentCustomerMapBinding, Cust
 
 
     fun updateWhenDriverArrived() {
-        binding.icNotifyExpand.btnRide.text = getString(R.string.arrived)
         bookState = UserBookingState.RIDING
-
     }
 
     fun updateWhenFoundDriver() {
@@ -764,7 +762,6 @@ class CustomerMapFragment : BaseBindingFragment<FragmentCustomerMapBinding, Cust
             binding.callUberBtn.beGone()
             searchingDriverDialog.dismiss()
             binding.icNotifyMinimal.root.beVisible()
-            binding.icNotifyExpand.btnRide.text = getString(R.string.cancel)
             isChangeUiWhenDriverFound = true
         }
 

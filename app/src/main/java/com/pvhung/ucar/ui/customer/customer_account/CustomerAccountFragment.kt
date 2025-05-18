@@ -9,11 +9,13 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.ValueEventListener
 import com.pvhung.ucar.R
+import com.pvhung.ucar.common.Constant
 import com.pvhung.ucar.data.model.User
 import com.pvhung.ucar.databinding.FragmentCustomerAccountBinding
 import com.pvhung.ucar.ui.base.BaseBindingFragment
 import com.pvhung.ucar.ui.main.MainActivity
 import com.pvhung.ucar.utils.FirebaseDatabaseUtils
+import com.pvhung.ucar.utils.LocaleUtils
 import com.pvhung.ucar.utils.MethodUtils
 import com.pvhung.ucar.utils.OnBackPressed
 import com.pvhung.ucar.utils.Utils
@@ -71,7 +73,12 @@ class CustomerAccountFragment :
     }
 
     private fun initView() {
-
+        if(mPrefHelper.getString(Constant.PREF_SETTING_LANGUAGE) == Constant.LANGUAGE_EN) {
+            binding.tvCurrentSetLanguage.text = getString(R.string.english)
+        }
+        else {
+            binding.tvCurrentSetLanguage.text = getString(R.string.vietnam)
+        }
     }
 
     private fun onClick() {
@@ -80,13 +87,13 @@ class CustomerAccountFragment :
             navigateScreen(null, R.id.customerInfoFragment)
         }
 
-//        binding.tvLanguage.setOnClickListener {
-//            gotoLanguage()
-//        }
+        binding.tvLanguage.setOnClickListener {
+            setLanguage()
+        }
 
-//        binding.tvPolicy.setOnClickListener {
-//            gotoPolicy()
-//        }
+        binding.tvPolicy.setOnClickListener {
+            navigateScreen(null, R.id.policyFragment2)
+        }
 
 //        binding.tvRate.setOnClickListener {
 //            showRateApp()
@@ -103,6 +110,30 @@ class CustomerAccountFragment :
         binding.tvLogout.setOnClickListener {
             signOut()
         }
+    }
+
+    private fun setLanguage() {
+        if(LocaleUtils.codeLanguageCurrent == Constant.LANGUAGE_EN) {
+            mPrefHelper.storeString(
+                Constant.PREF_SETTING_LANGUAGE,
+                Constant.LANGUAGE_VN
+            )
+            LocaleUtils.applyLocaleAndRestartCustomer(
+                requireActivity(),
+                Constant.LANGUAGE_VN
+            )
+        }
+        else {
+            mPrefHelper.storeString(
+                Constant.PREF_SETTING_LANGUAGE,
+                Constant.LANGUAGE_EN
+            )
+            LocaleUtils.applyLocaleAndRestartCustomer(
+                requireActivity(),
+                Constant.LANGUAGE_EN
+            )
+        }
+
     }
 
 

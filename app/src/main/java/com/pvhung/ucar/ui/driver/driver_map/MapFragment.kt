@@ -49,9 +49,11 @@ import com.pvhung.ucar.data.model.RequestModel
 import com.pvhung.ucar.data.model.User
 import com.pvhung.ucar.databinding.FragmentDriverMapBinding
 import com.pvhung.ucar.ui.base.BaseBindingFragment
+import com.pvhung.ucar.ui.dialog.PayDialog
 import com.pvhung.ucar.utils.CostUtils
 import com.pvhung.ucar.utils.DeviceHelper
 import com.pvhung.ucar.utils.FirebaseDatabaseUtils
+import com.pvhung.ucar.utils.IntentManager
 import com.pvhung.ucar.utils.OnBackPressed
 import com.pvhung.ucar.utils.PermissionHelper
 import com.pvhung.ucar.utils.beGone
@@ -82,6 +84,9 @@ class MapFragment : BaseBindingFragment<FragmentDriverMapBinding, MapViewModel>(
         R.color.primary_light,
         R.color.accent
     )
+    private val payDialog: PayDialog by lazy {
+        PayDialog(requireContext())
+    }
 
     private val locationPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
@@ -116,6 +121,10 @@ class MapFragment : BaseBindingFragment<FragmentDriverMapBinding, MapViewModel>(
                             val geoAvailable = GeoFire(refAvailable)
                             val geoWorking = GeoFire(refWorking)
 
+                            if(requestModel.customerId.isNotEmpty() && requestModel.destinationLat!=0.0&&requestModel.destinationLng!= 0.0 ) {
+
+                            }
+
                             when (requestModel.customerId) {
                                 "" -> {
                                     geoWorking.removeLocation(id)
@@ -131,6 +140,7 @@ class MapFragment : BaseBindingFragment<FragmentDriverMapBinding, MapViewModel>(
                                         id,
                                         GeoLocation(it.latitude, it.longitude)
                                     )
+
                                 }
                             }
                         }
@@ -174,8 +184,7 @@ class MapFragment : BaseBindingFragment<FragmentDriverMapBinding, MapViewModel>(
                             "${String.format("%.2f km", request.distance)} - ${
                                 CostUtils.formatCurrency(request.cost)
                             }"
-                        if (request.isAlreadyPaid) binding.icUserRequest.tvPaid.beVisible()
-                        else binding.icUserRequest.tvPaid.beGone()
+
                         binding.icUserRequest.root.beVisible()
 
                     }
@@ -187,8 +196,20 @@ class MapFragment : BaseBindingFragment<FragmentDriverMapBinding, MapViewModel>(
                                     override fun onDataChange(snapshot: DataSnapshot) {
                                         val user =
                                             FirebaseDatabaseUtils.getUserFromSnapshot(snapshot)
-                                        if (user != null) binding.icUserInfo.tvName.text =
-                                            user.fullName
+                                        if (user != null) {
+                                            customer = user
+                                            binding.icUserInfo.apply {
+                                                tvName.text = customer.fullName
+                                                tvPhone.text = customer.phoneNumber
+                                                ivCall.setOnClickListener(null)
+                                                ivCall.setOnClickListener {
+                                                    IntentManager.goToCall(
+                                                        requireActivity(),
+                                                        user.phoneNumber
+                                                    )
+                                                }
+                                            }
+                                        }
                                         if (request != null) {
                                             if (isAdded) {
                                                 binding.icUserRequest.tvDestination.text =
@@ -371,6 +392,8 @@ class MapFragment : BaseBindingFragment<FragmentDriverMapBinding, MapViewModel>(
                         .child("State").setValue(RideState.DONE)
 
                     updateTotalEarning(requestModel.cost)
+                    payDialog.setMoney(CostUtils.formatCurrency(requestModel.cost.toFloat()))
+                    payDialog.show()
                     saveRide()
                     endRide()
                 }

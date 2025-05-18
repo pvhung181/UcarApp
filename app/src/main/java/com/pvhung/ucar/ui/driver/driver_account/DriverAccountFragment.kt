@@ -9,11 +9,13 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.ValueEventListener
 import com.pvhung.ucar.R
+import com.pvhung.ucar.common.Constant
 import com.pvhung.ucar.data.model.User
 import com.pvhung.ucar.databinding.FragmentDriverAccountBinding
 import com.pvhung.ucar.ui.base.BaseBindingFragment
 import com.pvhung.ucar.ui.main.MainActivity
 import com.pvhung.ucar.utils.FirebaseDatabaseUtils
+import com.pvhung.ucar.utils.LocaleUtils
 import com.pvhung.ucar.utils.MethodUtils
 import com.pvhung.ucar.utils.OnBackPressed
 import com.pvhung.ucar.utils.Utils
@@ -44,7 +46,12 @@ class DriverAccountFragment :
     }
 
     private fun initView() {
-
+        if(mPrefHelper.getString(Constant.PREF_SETTING_LANGUAGE) == Constant.LANGUAGE_EN) {
+            binding.tvCurrentSetLanguage.text = getString(R.string.english)
+        }
+        else {
+            binding.tvCurrentSetLanguage.text = getString(R.string.vietnam)
+        }
     }
 
     private fun onClick() {
@@ -53,15 +60,12 @@ class DriverAccountFragment :
         }
 
         binding.tvLanguage.setOnClickListener {
-
+            setLanguage()
         }
         binding.tvPolicy.setOnClickListener {
-
+            navigateScreen(null, R.id.policyFragment)
         }
 
-        binding.tvRate.setOnClickListener {
-
-        }
         binding.tvFb.setOnClickListener {
             feedBack()
         }
@@ -71,6 +75,30 @@ class DriverAccountFragment :
         }
 
         binding.tvLogout.setOnClickListener { signOut() }
+    }
+
+    private fun setLanguage() {
+        if(LocaleUtils.codeLanguageCurrent == Constant.LANGUAGE_EN) {
+            mPrefHelper.storeString(
+                Constant.PREF_SETTING_LANGUAGE,
+                Constant.LANGUAGE_VN
+            )
+            LocaleUtils.applyLocaleAndRestartDriver(
+                requireActivity(),
+                Constant.LANGUAGE_VN
+            )
+        }
+        else {
+            mPrefHelper.storeString(
+                Constant.PREF_SETTING_LANGUAGE,
+                Constant.LANGUAGE_EN
+            )
+            LocaleUtils.applyLocaleAndRestartDriver(
+                requireActivity(),
+                Constant.LANGUAGE_EN
+            )
+        }
+
     }
 
     override fun observerData() {

@@ -28,4 +28,8 @@
         android:id="@+id/customerInfoFragment"
         android:name="com.pvhung.ucar.ui.customer.customer_info.CustomerInfoFragment"
         android:label="CustomerInfoFragment" />
+    <dialog
+        android:id="@+id/policyFragment2"
+        android:name="com.pvhung.ucar.ui.main.policy.PolicyFragment"
+        android:label="PolicyFragment" />
 </navigation>

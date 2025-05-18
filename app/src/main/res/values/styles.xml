@@ -3,4 +3,9 @@
     <style name="MyBottomSheetStyle" parent="Theme.Material3.Light.BottomSheetDialog">
         <item name="android:background">@android:color/transparent</item>
     </style>
+    <style name="MaterialDialogSheetPolicy" parent="android:Theme.Translucent.NoTitleBar">
+        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
+        <item name="android:windowTranslucentStatus">false</item>
+        <item name="android:statusBarColor">@color/white</item>
+    </style>
 </resources>
