@@ -2,6 +2,7 @@ package com.pvhung.ucar.ui.customer.customer_info
 
 import android.os.Bundle
 import android.view.View
+import androidx.core.content.ContextCompat
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
@@ -11,6 +12,7 @@ import com.pvhung.ucar.data.model.User
 import com.pvhung.ucar.databinding.FragmentCustomerInfoBinding
 import com.pvhung.ucar.ui.base.BaseBindingFragment
 import com.pvhung.ucar.utils.FirebaseDatabaseUtils
+import com.pvhung.ucar.utils.MethodUtils
 import com.pvhung.ucar.utils.OnBackPressed
 import com.pvhung.ucar.utils.Utils
 import com.pvhung.ucar.utils.beGone
@@ -100,6 +102,23 @@ class CustomerInfoFragment :
             binding.etEmail.setText(user.email)
             binding.etGender.setText(user.gender)
             binding.etDate.setText(user.dateOfBirth)
+
+            if (user.avatar != "") {
+                try {
+                    val bm = MethodUtils.base64ToBitmap(user.avatar)
+                    binding.ivAvatar.setImageBitmap(bm)
+                    binding.ivAvatar.setImageBitmap(bm)
+                } catch (_: Exception) {
+                }
+            } else {
+                binding.ivAvatar.setImageDrawable(
+                    ContextCompat.getDrawable(
+                        requireContext(),
+                        R.drawable.iv_male_avatar
+                    )
+                )
+
+            }
         }
     }
 

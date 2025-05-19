@@ -1,16 +1,23 @@
 package com.pvhung.ucar.ui.driver.driver_info
 
+import android.net.Uri
 import android.os.Bundle
+import android.provider.MediaStore
 import android.view.View
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.ContextCompat
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.ValueEventListener
+import com.pvhung.ucar.App
 import com.pvhung.ucar.R
 import com.pvhung.ucar.data.model.User
 import com.pvhung.ucar.databinding.FragmentDriverInfoBinding
 import com.pvhung.ucar.ui.base.BaseBindingFragment
 import com.pvhung.ucar.utils.FirebaseDatabaseUtils
+import com.pvhung.ucar.utils.MethodUtils
 import com.pvhung.ucar.utils.OnBackPressed
 import com.pvhung.ucar.utils.Utils
 import com.pvhung.ucar.utils.beGone
@@ -20,6 +27,15 @@ import com.pvhung.ucar.utils.beVisible
 class DriverInfoFragment : BaseBindingFragment<FragmentDriverInfoBinding, DriverInfoViewModel>() {
     private var db: DatabaseReference? = null
     private var dbListener: ValueEventListener? = null
+    private var resultUri: Uri? = null
+
+    private val pickMedia =
+        registerForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
+            if (uri != null) {
+                resultUri = uri
+                binding.ivAvatar.setImageURI(resultUri)
+            }
+        }
 
     override fun getViewModel(): Class<DriverInfoViewModel> {
         return DriverInfoViewModel::class.java
@@ -53,6 +69,10 @@ class DriverInfoFragment : BaseBindingFragment<FragmentDriverInfoBinding, Driver
                 "dateOfBirth" to binding.etDate.text.toString()
 
             )
+            if(resultUri != null) {
+                val bm = MediaStore.Images.Media.getBitmap(requireContext().contentResolver, resultUri)
+                map.put("avatar", MethodUtils.bitmapToBase64(bm))
+            }
             binding.savingProgress.beVisible()
             binding.saveBtn.beInvisible()
             FirebaseDatabaseUtils.getCurrentDriverDatabase().updateChildren(map)
@@ -63,6 +83,13 @@ class DriverInfoFragment : BaseBindingFragment<FragmentDriverInfoBinding, Driver
                     binding.saveBtn.beVisible()
                     binding.savingProgress.beGone()
                 }
+
+        }
+
+        binding.ivChooseAvatar.setOnClickListener {
+            if (checkClick()) {
+                pickMedia.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
+            }
         }
     }
 
@@ -99,6 +126,23 @@ class DriverInfoFragment : BaseBindingFragment<FragmentDriverInfoBinding, Driver
             binding.etEmail.setText(user.email)
             binding.etGender.setText(user.gender)
             binding.etDate.setText(user.dateOfBirth)
+
+            if (user.avatar != "") {
+                try {
+                    val bm = MethodUtils.base64ToBitmap(user.avatar)
+                    binding.ivAvatar.setImageBitmap(bm)
+                    binding.ivAvatar.setImageBitmap(bm)
+                } catch (_: Exception) {
+                }
+            } else {
+                binding.ivAvatar.setImageDrawable(
+                    ContextCompat.getDrawable(
+                        requireContext(),
+                        R.drawable.iv_male_avatar
+                    )
+                )
+
+            }
         }
     }
 

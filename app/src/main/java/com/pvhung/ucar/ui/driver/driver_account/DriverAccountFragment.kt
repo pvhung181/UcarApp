@@ -3,6 +3,7 @@ package com.pvhung.ucar.ui.driver.driver_account
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
+import androidx.core.content.ContextCompat
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -151,6 +152,22 @@ class DriverAccountFragment :
             binding.tvPhone.text = user.phoneNumber
             binding.tvUserName.text = user.fullName
             binding.tvRating.text = String.format("%.1f", user.rating)
+            if (user.avatar != "") {
+                try {
+                    val bm = MethodUtils.base64ToBitmap(user.avatar)
+                    binding.ivAvatar.setImageBitmap(bm)
+                    binding.ivAvatar.setImageBitmap(bm)
+                } catch (_: Exception) {
+                }
+            } else {
+                binding.ivAvatar.setImageDrawable(
+                    ContextCompat.getDrawable(
+                        requireContext(),
+                        R.drawable.iv_male_avatar
+                    )
+                )
+
+            }
         }
     }
 

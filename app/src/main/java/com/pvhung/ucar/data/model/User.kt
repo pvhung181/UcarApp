@@ -10,7 +10,8 @@ data class User(
     var rating: Float = 5f,
     var isDriver: Boolean = false,
     var isActive: Boolean = true,
-    var numberPlate: String = ""
+    var numberPlate: String = "",
+    var avatar: String = ""
 ) {
     private var service = ""
     fun setService(s: String) {

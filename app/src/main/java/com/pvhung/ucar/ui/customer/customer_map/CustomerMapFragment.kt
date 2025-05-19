@@ -77,6 +77,7 @@ import com.pvhung.ucar.utils.CostUtils
 import com.pvhung.ucar.utils.DeviceHelper
 import com.pvhung.ucar.utils.FirebaseDatabaseUtils
 import com.pvhung.ucar.utils.IntentManager
+import com.pvhung.ucar.utils.MethodUtils
 import com.pvhung.ucar.utils.OnBackPressed
 import com.pvhung.ucar.utils.PermissionHelper
 import com.pvhung.ucar.utils.Utils
@@ -738,9 +739,25 @@ class CustomerMapFragment : BaseBindingFragment<FragmentCustomerMapBinding, Cust
         binding.icNotifyExpand.let {
             it.tvName.text = user.fullName
             it.tvRating.text = String.format("%.1f", user.rating)
-            it.tvVehicle.text = user.getService()
+            it.tvVehicle.text = "${user.getService()} | ${user.numberPlate}"
             it.tvDistance.text = String.format("%.2f km", requestModel.distance)
             it.tvMoney.text = CostUtils.formatCurrency(requestModel.cost.toFloat())
+            if (user.avatar != "") {
+                try {
+                    val bm = MethodUtils.base64ToBitmap(user.avatar)
+                    binding.icNotifyExpand.ivAvatar.setImageBitmap(bm)
+                    binding.icNotifyMinimal.ivAvatar.setImageBitmap(bm)
+                } catch (_: Exception) {
+                }
+            } else {
+                binding.icNotifyExpand.ivAvatar.setImageDrawable(
+                    ContextCompat.getDrawable(
+                        requireContext(),
+                        R.drawable.iv_male_avatar
+                    )
+                )
+
+            }
         }
 
         binding.icNotifyExpand.ivMessage.setOnClickListener {
@@ -843,11 +860,11 @@ class CustomerMapFragment : BaseBindingFragment<FragmentCustomerMapBinding, Cust
             mLastLocation?.let { ll ->
                 geo.setLocation(uid, GeoLocation(ll.latitude, ll.longitude))
                 pickupLocation = LatLng(ll.latitude, ll.longitude)
-                pickupMarker =
-                    mMap.addMarker(
-                        MarkerOptions().position(pickupLocation!!).title("Pick up here")
-                            .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_map_pin))
-                    )
+//                pickupMarker =
+//                    mMap.addMarker(
+//                        MarkerOptions().position(pickupLocation!!).title("Pick up here")
+//                            .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_map_pin))
+//                    )
                 getClosestDriver()
             }
         }

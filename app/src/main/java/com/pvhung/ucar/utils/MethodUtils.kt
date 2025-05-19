@@ -7,12 +7,14 @@ import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.graphics.Typeface
 import android.net.Uri
 import android.os.Build
 import android.provider.Settings
 import android.text.TextUtils
+import android.util.Base64
 import android.widget.GridLayout
 import androidx.appcompat.app.AlertDialog
 import androidx.core.app.ActivityCompat
@@ -21,6 +23,7 @@ import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
 import androidx.core.graphics.toColorInt
+import java.io.ByteArrayOutputStream
 
 object MethodUtils {
     fun saveBitmapToLocal(bm: Bitmap, file: File): String {
@@ -170,6 +173,20 @@ object MethodUtils {
         return !(color.isNullOrBlank() || !color.startsWith("#"))
     }
 
+    fun base64ToBitmap(base64Str: String): Bitmap? {
+        return try {
+            val decodedBytes = Base64.decode(base64Str, Base64.DEFAULT)
+            BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.size)
+        } catch (e: IllegalArgumentException) {
+            null
+        }
+    }
 
+    fun bitmapToBase64(bitmap: Bitmap): String {
+        val outputStream = ByteArrayOutputStream()
+        bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
+        val byteArray = outputStream.toByteArray()
+        return Base64.encodeToString(byteArray, Base64.DEFAULT)
+    }
 
 }

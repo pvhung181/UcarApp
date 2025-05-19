@@ -48,7 +48,7 @@
     <string name="submit">Gửi</string>
     <string name="exit">Thoát</string>
     <string name="go_to_online">Bật nhận chuyến</string>
-    <string name="go_to_offline">Tắt nhận chuyết</string>
+    <string name="go_to_offline">Tắt nhận chuyến</string>
     <string name="booking_fee">Phí đặt xe:</string>
     <string name="distance">Khoảng cách :</string>
     <string name="customer_has_not_rated_yet">Khách hàng chưa đánh giá</string>

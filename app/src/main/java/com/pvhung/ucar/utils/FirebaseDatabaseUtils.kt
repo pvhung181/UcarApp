@@ -97,6 +97,8 @@ object FirebaseDatabaseUtils {
                 rating = snapshot.child(Constant.USER_RATING).getNumberValue()
                 isDriver = snapshot.child(Constant.USER_IS_DRIVER).getBooleanValue()
                 isActive = snapshot.child(Constant.USER_IS_ACTIVE).getBooleanValue()
+                numberPlate = snapshot.child(Constant.USER_NUMBER_PLATE).getStringValue()
+                avatar = snapshot.child(Constant.USER_AVATAR).getStringValue()
                 setService(snapshot.child(Constant.USER_SERVICE).getStringValue())
             }
             return user
