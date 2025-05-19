@@ -82,4 +82,9 @@
     <string name="payment_received">Payment received</string>
     <string name="you_will_receive_for_this_trip">You will receive %1$s for this trip</string>
     <string name="total_earnings">Total earnings</string>
+    <string name="forget_password"><u>Forget password</u></string>
+    <string name="reset_password">Reset password</string>
+    <string name="check_your_email_to_confirm">Check your email to confirm</string>
+    <string name="done">Done</string>
+    <string name="email_sent_successfully">Email sent successfully</string>
 </resources>

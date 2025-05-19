@@ -6,8 +6,6 @@ import android.view.View
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.FirebaseAuth.AuthStateListener
-import com.google.firebase.auth.FirebaseAuthException
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
 import com.google.firebase.auth.FirebaseAuthInvalidUserException
 import com.pvhung.ucar.R
@@ -106,6 +104,10 @@ class SignInFragment : BaseBindingFragment<FragmentSignInBinding, SignInViewMode
 
         binding.tvNewAccount.setOnClickListener {
             navigateScreen(null, R.id.signUpFragment)
+        }
+
+        binding.tvForget.setOnClickListener {
+            navigateScreen(null,R.id.forgetPasswordFragment)
         }
     }
 
