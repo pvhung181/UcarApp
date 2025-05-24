@@ -16,5 +16,9 @@
         android:id="@+id/forgetPasswordFragment"
         android:name="com.pvhung.ucar.ui.main.forget.ForgetPasswordFragment"
         android:label="ForgetPasswordFragment" />
+    <fragment
+        android:id="@+id/verifyPhoneFragment"
+        android:name="com.pvhung.ucar.ui.main.verify_phone.VerifyPhoneFragment"
+        android:label="VerifyPhoneFragment" />
 
 </navigation>

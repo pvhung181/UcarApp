@@ -54,6 +54,10 @@ class DriverActivityFragment :
                     viewRatingDialog.setReview(rating, review)
                     viewRatingDialog.show()
                 }
+
+                override fun onPaypalClick(historyItem: HistoryItem) {
+
+                }
             })
         binding.rcvHistory.adapter = historyAdapter
 

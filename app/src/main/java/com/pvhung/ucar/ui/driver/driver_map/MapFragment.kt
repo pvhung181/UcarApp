@@ -121,7 +121,7 @@ class MapFragment : BaseBindingFragment<FragmentDriverMapBinding, MapViewModel>(
                             val geoAvailable = GeoFire(refAvailable)
                             val geoWorking = GeoFire(refWorking)
 
-                            if(requestModel.customerId.isNotEmpty() && requestModel.destinationLat!=0.0&&requestModel.destinationLng!= 0.0 ) {
+                            if (requestModel.customerId.isNotEmpty() && requestModel.destinationLat != 0.0 && requestModel.destinationLng != 0.0) {
 
                             }
 
@@ -437,12 +437,14 @@ class MapFragment : BaseBindingFragment<FragmentDriverMapBinding, MapViewModel>(
             time = requestModel.time,
             money = requestModel.cost.toDouble(),
             distance = requestModel.distance,
-            pickupLocation = requestModel.pickupLocation
+            pickupLocation = requestModel.pickupLocation,
+            paymentMethod = requestModel.paymentMethod,
+            isPaid = requestModel.isAlreadyPaid
         )
 
         hr.child(requestId!!).setValue(history)
-        dr.child(requestId!!).setValue(history)
-        cr.child(requestId!!).setValue(history)
+        dr.child(requestId).setValue(history)
+        cr.child(requestId).setValue(history)
     }
 
     private fun endRide() {

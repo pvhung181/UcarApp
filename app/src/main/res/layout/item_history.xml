@@ -97,7 +97,6 @@
             android:maxLines="1"
             android:text="Write review"
             android:textColor="@color/color_38b6ff"
-            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="@id/tvDestination"
             app:layout_constraintTop_toBottomOf="@id/tvDestination" />
 
@@ -111,12 +110,30 @@
             android:ellipsize="end"
             android:gravity="center_vertical"
             android:maxLines="1"
-            android:text="View review"
+            android:text="@string/view_review"
             android:textColor="@color/color_38b6ff"
             android:visibility="invisible"
-            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="@id/tvDestination"
             app:layout_constraintTop_toBottomOf="@id/tvDestination" />
+
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/paypalBtn"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/_32sdp"
+            android:layout_marginTop="12dp"
+            android:layout_marginBottom="12dp"
+            android:background="@drawable/bg_view_round_100"
+            android:backgroundTint="@color/color_3BCC27"
+            android:text="@string/pay_with_paypal"
+            android:textColor="@color/white"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tvReview" />
+
 
         <View
             android:layout_width="0dp"

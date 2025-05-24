@@ -34,5 +34,6 @@
     <color name="color_36FF3D">#36FF3D</color>
     <color name="color_8036FF3D">#4836FF3D</color>
     <color name="color_3BCC27">#3BCC27</color>
-
+    <color name="btn_color">#FF735C</color>
+    <color name="edit_text_color">#FFD6CF</color>
 </resources>

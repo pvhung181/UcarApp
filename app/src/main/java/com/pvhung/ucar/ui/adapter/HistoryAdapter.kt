@@ -10,6 +10,7 @@ import com.pvhung.ucar.data.model.HistoryItem
 import com.pvhung.ucar.databinding.ItemHistoryBinding
 import com.pvhung.ucar.utils.CostUtils
 import com.pvhung.ucar.utils.DateUtils
+import com.pvhung.ucar.utils.beGone
 import com.pvhung.ucar.utils.beInvisible
 import com.pvhung.ucar.utils.beVisible
 
@@ -57,6 +58,9 @@ class HistoryAdapter(
                 }
             }
 
+            if (!isDriver && !historyItem.isPaid) binding.paypalBtn.beVisible()
+            else binding.paypalBtn.beGone()
+
             binding.tvDestination.text = historyItem.destination
             binding.tvPickup.text = historyItem.pickupLocation
             binding.tvDistance.text = "${String.format("%.2f", historyItem.distance)}km"
@@ -76,6 +80,10 @@ class HistoryAdapter(
                     historyItem.rating.toInt(),
                     historyItem.review
                 )
+            }
+
+            binding.paypalBtn.setOnClickListener {
+                listener?.onPaypalClick(historyItem)
             }
         }
     }
@@ -98,6 +106,7 @@ class HistoryAdapter(
     interface HistoryClickListener {
         fun onReviewClick(historyItem: HistoryItem)
         fun onViewReviewClick(rating: Int, review: String)
+        fun onPaypalClick(historyItem: HistoryItem)
     }
 
 }

@@ -10,5 +10,7 @@ data class HistoryItem(
     var review: String = "",
     var money: Double = 0.0,
     var distance: Double = 0.0,
-    var time: Long = 0
+    var time: Long = 0,
+    var paymentMethod: String = "Cash",
+    var isPaid: Boolean = false
 )

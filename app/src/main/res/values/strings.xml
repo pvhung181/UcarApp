@@ -87,4 +87,7 @@
     <string name="check_your_email_to_confirm">Check your email to confirm</string>
     <string name="done">Done</string>
     <string name="email_sent_successfully">Email sent successfully</string>
+    <string name="view_review">View review</string>
+    <string name="please_check_your_internet_connection">Please check your internet connection</string>
+    <string name="payment_successful">Payment Successful</string>
 </resources>

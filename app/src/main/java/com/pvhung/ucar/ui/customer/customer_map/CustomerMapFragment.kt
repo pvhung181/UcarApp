@@ -73,6 +73,7 @@ import com.pvhung.ucar.ui.base.BaseBindingFragment
 import com.pvhung.ucar.ui.dialog.BottomSheetBookingVehicle
 import com.pvhung.ucar.ui.dialog.EnableGpsDialog
 import com.pvhung.ucar.ui.dialog.SearchingDriverDialog
+import com.pvhung.ucar.ui.dialog.SelectPaymentMethodDialog
 import com.pvhung.ucar.utils.CostUtils
 import com.pvhung.ucar.utils.DeviceHelper
 import com.pvhung.ucar.utils.FirebaseDatabaseUtils
@@ -100,6 +101,25 @@ class CustomerMapFragment : BaseBindingFragment<FragmentCustomerMapBinding, Cust
                 cancelRequest()
             }
         })
+    }
+    private val selectPaymentMethod by lazy {
+        SelectPaymentMethodDialog(
+            requireContext(),
+            object : SelectPaymentMethodDialog.SelectPaymentListener {
+                override fun onPayInCash() {
+                    requestModel.isAlreadyPaid = true
+                    requestModel.paymentMethod = "Cash"
+                    requestUcar()
+                }
+
+                override fun onPayWithPaypal() {
+                    requestModel.isAlreadyPaid = false
+                    requestModel.paymentMethod = "Paypal"
+                    requestUcar()
+                }
+            }
+
+        )
     }
 
     private var isChangeUiWhenDriverFound = false
@@ -132,9 +152,7 @@ class CustomerMapFragment : BaseBindingFragment<FragmentCustomerMapBinding, Cust
     lateinit var autoCompleteFragment: AutocompleteSupportFragment
     lateinit var autoCompletePickupFragment: AutocompleteSupportFragment
 
-    var accessToken = ""
-    private lateinit var uniqueId: String
-    private var orderid = ""
+
 
     private var customerStateRef: DatabaseReference? = null
     private var customerStateListener: ValueEventListener? = null
@@ -147,6 +165,7 @@ class CustomerMapFragment : BaseBindingFragment<FragmentCustomerMapBinding, Cust
         R.color.accent
     )
 
+    @SuppressLint("MissingPermission")
     private val locationPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
     ) { permissions ->
@@ -154,6 +173,17 @@ class CustomerMapFragment : BaseBindingFragment<FragmentCustomerMapBinding, Cust
         val coarseLocationGranted = permissions[Manifest.permission.ACCESS_COARSE_LOCATION] ?: false
 
         if (fineLocationGranted && coarseLocationGranted) {
+            mFusedLocationClient.removeLocationUpdates(mLocationCallback)
+            mFusedLocationClient.requestLocationUpdates(
+                mLocationRequest,
+                mLocationCallback,
+                Looper.myLooper()
+            )
+            if(::mMap.isInitialized) {
+                mMap.uiSettings.isZoomControlsEnabled = false
+                mMap.uiSettings.isMyLocationButtonEnabled = false
+                mMap.isMyLocationEnabled = true
+            }
 
         } else {
 
@@ -208,7 +238,6 @@ class CustomerMapFragment : BaseBindingFragment<FragmentCustomerMapBinding, Cust
         onClick()
         setupAutoComplete()
         initBottomsheet()
-        fetchAccessToken()
     }
 
     private fun observerCustomerState() {
@@ -276,7 +305,7 @@ class CustomerMapFragment : BaseBindingFragment<FragmentCustomerMapBinding, Cust
                 override fun onBook(service: String) {
                     serviceBooking = service
                     requestModel.cost = bookingBottomSheet?.getCost() ?: 0f
-                    requestUcar()
+                    selectPaymentMethod.show()
                 }
 
                 override fun onDismiss() {}
@@ -496,12 +525,7 @@ class CustomerMapFragment : BaseBindingFragment<FragmentCustomerMapBinding, Cust
     }
 
     override fun observerData() {
-        mainViewModel.captureOrder.observe(viewLifecycleOwner) {
-            if (it != null && it == true) {
-                captureOrder(orderid)
-                mainViewModel.captureOrder.value = null
-            }
-        }
+
     }
 
 
@@ -939,129 +963,6 @@ class CustomerMapFragment : BaseBindingFragment<FragmentCustomerMapBinding, Cust
 
     override fun onRoutingCancelled() {
 
-    }
-    //endregion
-
-    //region paypal
-    private fun captureOrder(orderID: String) {
-        AndroidNetworking.post("https://api-m.sandbox.paypal.com/v2/checkout/orders/$orderID/capture")
-            .addHeaders("Authorization", "Bearer $accessToken")
-            .addHeaders("Content-Type", "application/json")
-            .addJSONObjectBody(JSONObject()) // Empty body
-            .setPriority(Priority.HIGH)
-            .build()
-            .getAsJSONObject(object : JSONObjectRequestListener {
-                override fun onResponse(response: JSONObject) {
-                    Toast.makeText(requireActivity(), "Payment Successful", Toast.LENGTH_SHORT)
-                        .show()
-                    requestModel.isAlreadyPaid = true
-                    requestUcar()
-
-                }
-
-                override fun onError(error: ANError) {
-                    Toast.makeText(requireActivity(), "Payment Fail", Toast.LENGTH_SHORT)
-                        .show()
-                }
-            })
-    }
-
-    private fun fetchAccessToken() {
-        val authString = "$clientID:$secretID"
-        val encodedAuthString = Base64.encodeToString(authString.toByteArray(), Base64.NO_WRAP)
-
-        AndroidNetworking.post("https://api-m.sandbox.paypal.com/v1/oauth2/token")
-            .addHeaders("Authorization", "Basic $encodedAuthString")
-            .addHeaders("Content-Type", "application/x-www-form-urlencoded")
-            .addBodyParameter("grant_type", "client_credentials")
-            .setPriority(Priority.HIGH)
-            .build()
-            .getAsJSONObject(object : JSONObjectRequestListener {
-                override fun onResponse(response: JSONObject) {
-                    accessToken = response.getString("access_token")
-
-//                    Toast.makeText(requireActivity(), "Access Token Fetched!", Toast.LENGTH_SHORT)
-//                        .show()
-                }
-
-                override fun onError(error: ANError) {
-                    Toast.makeText(requireActivity(), "Error Occurred!", Toast.LENGTH_SHORT).show()
-                }
-            })
-    }
-
-    private fun startOrder() {
-        uniqueId = UUID.randomUUID().toString()
-
-        val orderRequestJson = JSONObject().apply {
-            put("intent", "CAPTURE")
-            put("purchase_units", JSONArray().apply {
-                put(JSONObject().apply {
-                    put("reference_id", uniqueId)
-                    put("amount", JSONObject().apply {
-                        put("currency_code", "USD")
-                        put("value", "${requestModel.cost}")
-                    })
-                })
-            })
-            put("payment_source", JSONObject().apply {
-                put("paypal", JSONObject().apply {
-                    put("experience_context", JSONObject().apply {
-                        put("payment_method_preference", "IMMEDIATE_PAYMENT_REQUIRED")
-                        put("brand_name", "Ucar Pvhung")
-                        put("locale", "en-US")
-                        put("landing_page", "LOGIN")
-                        put("shipping_preference", "NO_SHIPPING")
-                        put("user_action", "PAY_NOW")
-                        put("return_url", Constant.returnUrl)
-                        put("cancel_url", "https://example.com/cancelUrl")
-                    })
-                })
-            })
-        }
-
-        AndroidNetworking.post("https://api-m.sandbox.paypal.com/v2/checkout/orders")
-            .addHeaders("Authorization", "Bearer $accessToken")
-            .addHeaders("Content-Type", "application/json")
-            .addHeaders("PayPal-Request-Id", uniqueId)
-            .addJSONObjectBody(orderRequestJson)
-            .setPriority(Priority.HIGH)
-            .build()
-            .getAsJSONObject(object : JSONObjectRequestListener {
-                override fun onResponse(response: JSONObject) {
-                    handlerOrderID(response.getString("id"))
-                }
-
-                override fun onError(error: ANError) {
-                    showToast("Order Error")
-                }
-            })
-    }
-
-    private fun handlerOrderID(orderID: String) {
-        val config = CoreConfig(clientID, environment = Environment.SANDBOX)
-        val payPalWebCheckoutClient =
-            PayPalWebCheckoutClient(requireActivity(), config, Constant.returnUrl)
-        payPalWebCheckoutClient.listener = object : PayPalWebCheckoutListener {
-            override fun onPayPalWebSuccess(result: PayPalWebCheckoutResult) {
-                showToast("Order success")
-            }
-
-            override fun onPayPalWebFailure(error: PayPalSDKError) {
-                showToast("Order Error")
-
-            }
-
-            override fun onPayPalWebCanceled() {
-                // showToast("Order cancel")
-
-            }
-        }
-
-        orderid = orderID
-        val payPalWebCheckoutRequest =
-            PayPalWebCheckoutRequest(orderID, fundingSource = PayPalWebCheckoutFundingSource.PAYPAL)
-        payPalWebCheckoutClient.start(payPalWebCheckoutRequest)
     }
     //endregion
 
